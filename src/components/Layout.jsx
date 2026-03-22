@@ -15,7 +15,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-background">
       {/* Top header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl border-b" style={{ background: 'hsl(340 20% 7% / 0.85)', borderColor: 'hsl(340 20% 14%)' }}>
+      <header className="sticky top-0 z-50 backdrop-blur-xl border-b" style={{ background: 'hsl(340 30% 97% / 0.9)', borderColor: 'hsl(340 20% 88%)' }}>
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
