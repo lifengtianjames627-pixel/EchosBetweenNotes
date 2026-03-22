@@ -16,32 +16,32 @@ function AlbumCard({ album, index, inView }) {
     >
       <Link to={`/album/${album.id}`} className="group block">
         <div className="relative rounded-xl overflow-hidden border transition-colors duration-200"
-          style={{ background: 'hsl(340 25% 14%)', borderColor: 'hsl(340 20% 22%)' }}
-          onMouseEnter={e => e.currentTarget.style.borderColor = 'hsl(330 75% 55% / 0.45)'}
-          onMouseLeave={e => e.currentTarget.style.borderColor = 'hsl(340 20% 22%)'}
+          style={{ background: 'hsl(0 0% 100%)', borderColor: 'hsl(340 20% 90%)' }}
+          onMouseEnter={e => e.currentTarget.style.borderColor = 'hsl(330 75% 75%)'}
+          onMouseLeave={e => e.currentTarget.style.borderColor = 'hsl(340 20% 90%)'}
         >
           {/* cover */}
-          <div className="aspect-square overflow-hidden" style={{ background: 'hsl(340 20% 10%)' }}>
+          <div className="aspect-square overflow-hidden" style={{ background: 'hsl(340 30% 96%)' }}>
             {album.cover_url
               ? <img src={album.cover_url} alt={album.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              : <div className="w-full h-full flex items-center justify-center text-4xl" style={{ color: 'hsl(330 75% 55% / 0.3)' }}>🎵</div>
+              : <div className="w-full h-full flex items-center justify-center text-4xl" style={{ color: 'hsl(330 75% 80%)' }}>🎵</div>
             }
           </div>
 
           {/* info */}
           <div className="p-3">
-            <p className="text-sm font-medium truncate" style={{ color: 'hsl(340 10% 92%)' }}>{album.title}</p>
-            <p className="text-xs truncate mt-0.5" style={{ color: 'hsl(340 10% 55%)' }}>{album.artist}</p>
+            <p className="text-sm font-medium truncate" style={{ color: 'hsl(340 25% 12%)' }}>{album.title}</p>
+            <p className="text-xs truncate mt-0.5" style={{ color: 'hsl(340 10% 50%)' }}>{album.artist}</p>
 
             <div className="flex items-center gap-2 mt-2">
               <div className="flex items-center gap-0.5">
-                <Star className="w-3 h-3" style={{ fill: 'hsl(330 75% 60%)', color: 'hsl(330 75% 60%)' }} />
-                <span className="text-xs" style={{ color: 'hsl(330 60% 65%)' }}>
+                <Star className="w-3 h-3" style={{ fill: 'hsl(330 75% 55%)', color: 'hsl(330 75% 55%)' }} />
+                <span className="text-xs" style={{ color: 'hsl(330 60% 55%)' }}>
                   {album.avg_rating?.toFixed(1) || '—'}
                 </span>
               </div>
-              <span className="flex items-center gap-0.5 text-xs" style={{ color: 'hsl(340 10% 45%)' }}>
+              <span className="flex items-center gap-0.5 text-xs" style={{ color: 'hsl(340 10% 55%)' }}>
                 <MessageSquare className="w-3 h-3" />
                 {album.review_count || 0}
               </span>
