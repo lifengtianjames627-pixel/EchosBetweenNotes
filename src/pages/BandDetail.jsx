@@ -4,19 +4,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Card } from '@/components/ui/card';
-import GenreBadge from '@/components/GenreBadge';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Users, Guitar, User, UserPlus } from 'lucide-react';
+import GenreBadge from '@/components/GenreBadge';
+import { ArrowLeft, Users, Guitar, Crown, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function BandDetail() {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const [showJoin, setShowJoin] = useState(false);
-  const [joinRole, setJoinRole] = useState('');
+  const [myRole, setMyRole] = useState('');
 
   const { data: band, isLoading } = useQuery({
     queryKey: ['band', id],
@@ -36,7 +35,7 @@ export default function BandDetail() {
     queryFn: () => base44.auth.me(),
   });
 
-  const isMember = members.some(m => m.user_email === currentUser?.email);
+  const isMember = members.some((m) => m.user_email === currentUser?.email);
 
   const joinBand = useMutation({
     mutationFn: async () => {
@@ -45,28 +44,20 @@ export default function BandDetail() {
         band_name: band.name,
         user_email: currentUser.email,
         user_name: currentUser.full_name,
-        role: joinRole,
+        role: myRole || 'Member',
         is_founder: false,
       });
-      await base44.entities.Band.update(id, {
-        member_count: (band.member_count || 1) + 1,
-      });
+      await base44.entities.Band.update(id, { member_count: (band.member_count || 1) + 1 });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['band-members', id] });
       queryClient.invalidateQueries({ queryKey: ['band', id] });
       setShowJoin(false);
-      setJoinRole('');
     },
   });
 
-  if (isLoading) {
-    return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>;
-  }
-
-  if (!band) {
-    return <div className="text-center py-20 text-muted-foreground">Band not found.</div>;
-  }
+  if (isLoading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>;
+  if (!band) return <div className="text-center py-20 text-muted-foreground">Band not found.</div>;
 
   return (
     <div className="space-y-8">
@@ -75,90 +66,97 @@ export default function BandDetail() {
       </Link>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="bg-gradient-to-br from-primary/10 via-accent/5 to-transparent rounded-3xl p-8">
-          <div className="flex items-start gap-5">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center shrink-0">
-              <Guitar className="w-10 h-10 text-primary" />
+        {/* Band Header */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 p-8 border">
+          <div className="flex flex-col md:flex-row gap-6 items-start">
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center shrink-0 shadow-lg">
+              {band.cover_image_url ? (
+                <img src={band.cover_image_url} alt="" className="w-full h-full object-cover rounded-2xl" />
+              ) : (
+                <Guitar className="w-12 h-12 text-primary" />
+              )}
             </div>
-            <div>
-              <h1 className="text-3xl font-extrabold">{band.name}</h1>
-              <div className="flex items-center gap-2 mt-2 flex-wrap">
-                {band.genre && <GenreBadge genre={band.genre} />}
+            <div className="flex-1">
+              <div className="flex flex-wrap gap-2 items-center">
+                <h1 className="text-3xl font-extrabold">{band.name}</h1>
                 <Badge variant={band.status === 'recruiting' ? 'default' : 'secondary'}>
                   {band.status || 'recruiting'}
                 </Badge>
-                <span className="text-sm text-muted-foreground flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5" /> {band.member_count || 1} members
+              </div>
+              <div className="flex items-center gap-3 mt-2">
+                {band.genre && <GenreBadge genre={band.genre} />}
+                <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Users className="w-4 h-4" /> {band.member_count || members.length} members
                 </span>
               </div>
               {band.description && (
-                <p className="mt-4 text-sm text-muted-foreground leading-relaxed max-w-lg">{band.description}</p>
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-lg">{band.description}</p>
               )}
-              {!isMember && band.status === 'recruiting' && (
+              {band.looking_for?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <span className="text-xs font-medium text-muted-foreground">Looking for:</span>
+                  {band.looking_for.map((role) => (
+                    <span key={role} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                      {role}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {!isMember && currentUser && (
                 <Dialog open={showJoin} onOpenChange={setShowJoin}>
                   <DialogTrigger asChild>
                     <Button className="mt-5 rounded-xl gap-2">
-                      <UserPlus className="w-4 h-4" /> Join this Band
+                      <UserPlus className="w-4 h-4" /> Join This Band
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-sm">
+                  <DialogContent>
                     <DialogHeader><DialogTitle>Join {band.name}</DialogTitle></DialogHeader>
-                    <form onSubmit={(e) => { e.preventDefault(); joinBand.mutate(); }} className="space-y-4 mt-2">
+                    <div className="space-y-4 mt-2">
                       <div className="space-y-2">
-                        <Label>Your Role / Instrument</Label>
-                        <Input value={joinRole} onChange={(e) => setJoinRole(e.target.value)} placeholder="e.g. Guitarist, Vocalist" required />
+                        <Label>Your role / instrument</Label>
+                        <Input value={myRole} onChange={(e) => setMyRole(e.target.value)} placeholder="e.g. Guitarist, Drummer, Vocalist..." />
                       </div>
-                      <Button type="submit" className="w-full rounded-xl" disabled={joinBand.isPending}>
+                      <Button className="w-full rounded-xl" onClick={() => joinBand.mutate()} disabled={joinBand.isPending}>
                         {joinBand.isPending ? 'Joining...' : 'Join Band'}
                       </Button>
-                    </form>
+                    </div>
                   </DialogContent>
                 </Dialog>
               )}
               {isMember && (
-                <Badge variant="outline" className="mt-5 border-primary text-primary">
-                  ✓ You're a member
+                <Badge variant="outline" className="mt-5 gap-1.5">
+                  <Users className="w-3 h-3" /> You're a member
                 </Badge>
               )}
             </div>
           </div>
         </div>
-      </motion.div>
 
-      {/* Looking For */}
-      {band.looking_for?.length > 0 && (
-        <section>
-          <h2 className="text-lg font-bold mb-3">Looking For</h2>
-          <div className="flex flex-wrap gap-2">
-            {band.looking_for.map((role) => (
-              <Badge key={role} variant="outline" className="px-4 py-2 text-sm border-primary/30 text-primary bg-primary/5">
-                🎵 {role}
-              </Badge>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Members */}
-      <section>
-        <h2 className="text-lg font-bold mb-3">Members ({members.length})</h2>
-        <div className="grid sm:grid-cols-2 gap-3">
-          {members.map((member) => (
-            <Card key={member.id} className="p-4 border-0 shadow-sm flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <User className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium text-sm">{member.user_name || member.user_email}</p>
-                <p className="text-xs text-muted-foreground">
-                  {member.role || 'Member'}
-                  {member.is_founder && ' · Founder'}
-                </p>
-              </div>
-            </Card>
-          ))}
+        {/* Members */}
+        <div className="mt-8">
+          <h2 className="text-xl font-bold mb-4">Members ({members.length})</h2>
+          {members.length > 0 ? (
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {members.map((member) => (
+                <div key={member.id} className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-sm border">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                    <span className="text-sm font-bold text-primary">
+                      {(member.user_name || member.user_email)?.[0]?.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">{member.user_name || member.user_email}</p>
+                    <p className="text-xs text-muted-foreground">{member.role || 'Member'}</p>
+                  </div>
+                  {member.is_founder && <Crown className="w-4 h-4 text-yellow-500 shrink-0" />}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm">No members yet.</p>
+          )}
         </div>
-      </section>
+      </motion.div>
     </div>
   );
 }
