@@ -42,26 +42,74 @@ export default function Home() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary/90 to-accent p-8 md:p-12 text-primary-foreground"
+        className="relative overflow-hidden text-primary-foreground"
+        style={{
+          background: 'linear-gradient(135deg, hsl(262,83%,40%) 0%, hsl(262,83%,58%) 40%, hsl(330,80%,55%) 80%, hsl(330,80%,45%) 100%)',
+          borderRadius: '2.5rem 1rem 3rem 1.5rem / 1.5rem 3rem 1rem 2.5rem',
+          padding: '3rem 2.5rem',
+          minHeight: '220px',
+        }}
       >
+        <HeroStars />
+
+        {/* decorative blobs */}
+        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute right-16 top-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl" />
+        <div className="absolute left-1/2 -bottom-6 w-40 h-40 bg-primary/20 rounded-full blur-2xl" />
+
+        {/* vinyl disc decoration */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+          className="absolute right-8 top-1/2 -translate-y-1/2 w-32 h-32 md:w-44 md:h-44 opacity-20"
+        >
+          <div className="w-full h-full rounded-full border-8 border-white/40 flex items-center justify-center">
+            <div className="w-1/2 h-1/2 rounded-full border-4 border-white/40 flex items-center justify-center">
+              <div className="w-4 h-4 rounded-full bg-white/60" />
+            </div>
+          </div>
+        </motion.div>
+
         <div className="relative z-10">
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
-            Your School's<br />Music Community
-          </h1>
-          <p className="mt-3 text-sm md:text-base opacity-90 max-w-md leading-relaxed">
-            Discover albums, share your reviews, find bandmates, and connect with fellow music lovers at your school.
-          </p>
-          <div className="flex gap-3 mt-6">
-            <Link to="/discover" className="px-5 py-2.5 bg-white text-primary font-semibold rounded-xl text-sm hover:bg-white/90 transition-colors">
+          <motion.p
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-xs font-semibold uppercase tracking-widest opacity-75 mb-2"
+          >
+            🎵 Your School's Music Hub
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight"
+          >
+            Discover. Review.<br />
+            <span className="opacity-80">Connect.</span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-3 text-sm md:text-base opacity-85 max-w-sm leading-relaxed"
+          >
+            Share reviews, find bandmates, and connect with fellow music lovers at your school.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="flex gap-3 mt-6"
+          >
+            <Link to="/discover" className="px-5 py-2.5 bg-white text-primary font-semibold rounded-xl text-sm hover:bg-white/90 transition-colors shadow-lg">
               Explore Albums
             </Link>
-            <Link to="/bands" className="px-5 py-2.5 bg-white/15 font-semibold rounded-xl text-sm hover:bg-white/25 transition-colors backdrop-blur-sm">
+            <Link to="/bands" className="px-5 py-2.5 bg-white/15 font-semibold rounded-xl text-sm hover:bg-white/25 transition-colors backdrop-blur-sm border border-white/20">
               Find Bands
             </Link>
-          </div>
+          </motion.div>
         </div>
-        <div className="absolute -right-8 -bottom-8 w-48 h-48 bg-white/10 rounded-full blur-2xl" />
-        <div className="absolute right-12 top-8 w-24 h-24 bg-white/5 rounded-full blur-xl" />
       </motion.div>
 
       {/* Stats */}
