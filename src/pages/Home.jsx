@@ -6,6 +6,7 @@ import AlbumCard from '@/components/AlbumCard';
 import ReviewCard from '@/components/ReviewCard';
 import { ArrowRight, Disc3, Users, Star, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
+import HeroStars from '@/components/HeroStars';
 
 const StatCard = ({ icon: Icon, label, value, color }) => (
   <div className="flex items-center gap-3 p-4 rounded-2xl bg-card shadow-sm">
