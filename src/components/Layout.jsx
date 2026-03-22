@@ -49,7 +49,7 @@ export default function Layout() {
       </header>
 
       {/* Main content */}
-      <main className="max-w-6xl mx-auto px-4 py-6 pb-24 md:pb-6">
+      <main className="max-w-6xl mx-auto px-4 pt-0 pb-24 md:pb-6">
         <Outlet />
       </main>
 

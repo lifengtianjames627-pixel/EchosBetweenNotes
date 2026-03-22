@@ -37,7 +37,7 @@ export default function Home() {
   });
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 -mt-6">
       {/* Hero */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
