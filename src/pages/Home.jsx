@@ -121,7 +121,7 @@ export default function Home() {
   }, [allAlbums]);
 
   return (
-    <div className="-mt-6 min-h-screen px-0 pt-6" style={{ background: 'hsl(340 20% 7%)' }}>
+    <div className="-mt-6 min-h-screen px-0 pt-6" style={{ background: 'hsl(340 30% 97%)' }}>
       {genreSections.length > 0 ? (
         genreSections.map(({ genre, albums }) => (
           <GenreSection key={genre.id} genre={genre} albums={albums} />
