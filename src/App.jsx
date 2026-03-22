@@ -6,7 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from '@/components/Layout';
-import Home from '@/pages/Home';
+import Home from '@/pages/Home.jsx';
 import Discover from '@/pages/Discover';
 import AlbumDetail from '@/pages/AlbumDetail';
 import Bands from '@/pages/Bands';
