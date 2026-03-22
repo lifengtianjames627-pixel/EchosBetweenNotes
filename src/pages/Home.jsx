@@ -15,38 +15,33 @@ function AlbumCard({ album, index, inView }) {
       transition={{ duration: 0.38, delay: index * 0.06 }}
     >
       <Link to={`/album/${album.id}`} className="group block">
-        <div className="relative rounded-xl overflow-hidden bg-[#1e1e1e] border border-white/[0.06] hover:border-white/20 transition-colors">
-
-          {/* subtle hover glow */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle at center, rgba(255,255,255,0.06), transparent)'
-            }}
-          />
-
+        <div className="relative rounded-xl overflow-hidden border transition-colors duration-200"
+          style={{ background: 'hsl(340 25% 14%)', borderColor: 'hsl(340 20% 22%)' }}
+          onMouseEnter={e => e.currentTarget.style.borderColor = 'hsl(330 75% 55% / 0.45)'}
+          onMouseLeave={e => e.currentTarget.style.borderColor = 'hsl(340 20% 22%)'}
+        >
           {/* cover */}
-          <div className="aspect-square overflow-hidden bg-[#2a2a2a]">
+          <div className="aspect-square overflow-hidden" style={{ background: 'hsl(340 20% 10%)' }}>
             {album.cover_url
               ? <img src={album.cover_url} alt={album.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              : <div className="w-full h-full flex items-center justify-center text-4xl text-white/20">🎵</div>
+              : <div className="w-full h-full flex items-center justify-center text-4xl" style={{ color: 'hsl(330 75% 55% / 0.3)' }}>🎵</div>
             }
           </div>
 
           {/* info */}
           <div className="p-3">
-            <p className="text-sm font-medium text-white/90 truncate">{album.title}</p>
-            <p className="text-xs text-white/40 truncate mt-0.5">{album.artist}</p>
+            <p className="text-sm font-medium truncate" style={{ color: 'hsl(340 10% 92%)' }}>{album.title}</p>
+            <p className="text-xs truncate mt-0.5" style={{ color: 'hsl(340 10% 55%)' }}>{album.artist}</p>
 
             <div className="flex items-center gap-2 mt-2">
               <div className="flex items-center gap-0.5">
-                <Star className="w-3 h-3 fill-white/50 text-white/50" />
-                <span className="text-xs text-white/50">
+                <Star className="w-3 h-3" style={{ fill: 'hsl(330 75% 60%)', color: 'hsl(330 75% 60%)' }} />
+                <span className="text-xs" style={{ color: 'hsl(330 60% 65%)' }}>
                   {album.avg_rating?.toFixed(1) || '—'}
                 </span>
               </div>
-
-              <span className="flex items-center gap-0.5 text-xs text-white/30">
+              <span className="flex items-center gap-0.5 text-xs" style={{ color: 'hsl(340 10% 45%)' }}>
                 <MessageSquare className="w-3 h-3" />
                 {album.review_count || 0}
               </span>
