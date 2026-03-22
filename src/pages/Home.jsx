@@ -2,201 +2,216 @@ import React from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import AlbumCard from '@/components/AlbumCard';
-import ReviewCard from '@/components/ReviewCard';
-import { ArrowRight, Disc3, Users, Star, TrendingUp } from 'lucide-react';
-import { motion } from 'framer-motion';
-import HeroStars from '@/components/HeroStars';
+import { Star, Users, ArrowRight, Disc3, MessageSquare } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import GenreBadge from '@/components/GenreBadge';
+import StarRating from '@/components/StarRating';
 
-const StatCard = ({ icon: Icon, label, value, color }) => (
-  <div className="flex items-center gap-3 p-4 rounded-2xl bg-card shadow-sm">
-    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
-      <Icon className="w-5 h-5" />
-    </div>
-    <div>
-      <p className="text-2xl font-bold">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
-    </div>
-  </div>
-);
+function ReviewFeedItem({ review }) {
+  return (
+    <Link to={`/album/${review.album_id}`} className="flex gap-4 p-4 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-sm transition-all group">
+      <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-muted">
+        {review.album_cover_url ? (
+          <img src={review.album_cover_url} alt={review.album_title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20 text-2xl">🎵</div>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground truncate">{review.album_title} · {review.album_artist}</p>
+            <StarRating rating={review.rating} size="sm" />
+          </div>
+          <span className="text-[11px] text-muted-foreground whitespace-nowrap shrink-0">
+            {review.created_date ? formatDistanceToNow(new Date(review.created_date), { addSuffix: true }) : ''}
+          </span>
+        </div>
+        {review.title && <p className="text-sm font-semibold mt-1 truncate">"{review.title}"</p>}
+        <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">{review.content}</p>
+        <p className="text-xs text-muted-foreground mt-1.5 font-medium">{review.reviewer_name || 'Anonymous'}</p>
+      </div>
+    </Link>
+  );
+}
+
+function AlbumDiscussionItem({ album }) {
+  return (
+    <Link to={`/album/${album.id}`} className="flex gap-4 p-4 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-sm transition-all group">
+      <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-muted">
+        {album.cover_url ? (
+          <img src={album.cover_url} alt={album.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20 text-2xl">🎵</div>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="font-semibold text-sm truncate">{album.title}</p>
+            <p className="text-xs text-muted-foreground truncate">{album.artist}</p>
+          </div>
+          {album.genre && <GenreBadge genre={album.genre} className="shrink-0" />}
+        </div>
+        <div className="flex items-center gap-3 mt-2">
+          <StarRating rating={album.avg_rating || 0} size="sm" />
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <MessageSquare className="w-3 h-3" />
+            {album.review_count || 0} reviews
+          </span>
+        </div>
+        {album.description && (
+          <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{album.description}</p>
+        )}
+      </div>
+    </Link>
+  );
+}
+
+function BandSidebarItem({ band }) {
+  return (
+    <Link to={`/band/${band.id}`} className="flex items-center gap-3 py-2.5 group">
+      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center shrink-0">
+        <Users className="w-4 h-4 text-primary" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">{band.name}</p>
+        <p className="text-xs text-muted-foreground truncate">{band.genre?.replace(/_/g, ' ')} · {band.member_count || 1} members</p>
+      </div>
+      {band.status === 'recruiting' && (
+        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium shrink-0">hiring</span>
+      )}
+    </Link>
+  );
+}
 
 export default function Home() {
   const { data: albums = [] } = useQuery({
-    queryKey: ['albums-trending'],
-    queryFn: () => base44.entities.Album.list('-avg_rating', 8),
+    queryKey: ['albums-home'],
+    queryFn: () => base44.entities.Album.list('-avg_rating', 12),
   });
 
   const { data: reviews = [] } = useQuery({
-    queryKey: ['reviews-recent'],
-    queryFn: () => base44.entities.Review.list('-created_date', 6),
+    queryKey: ['reviews-home'],
+    queryFn: () => base44.entities.Review.list('-created_date', 20),
   });
 
   const { data: bands = [] } = useQuery({
-    queryKey: ['bands-recruiting'],
-    queryFn: () => base44.entities.Band.filter({ status: 'recruiting' }, '-created_date', 4),
+    queryKey: ['bands-home'],
+    queryFn: () => base44.entities.Band.list('-created_date', 8),
   });
 
+  // Merge reviews and albums into a unified feed, alternating
+  const feedItems = [];
+  const maxLen = Math.max(reviews.length, albums.length);
+  for (let i = 0; i < maxLen; i++) {
+    if (reviews[i]) feedItems.push({ type: 'review', data: reviews[i] });
+    if (albums[i]) feedItems.push({ type: 'album', data: albums[i] });
+  }
+
+  const recruitingBands = bands.filter(b => b.status === 'recruiting');
+  const otherBands = bands.filter(b => b.status !== 'recruiting');
+  const sidebarBands = [...recruitingBands, ...otherBands].slice(0, 6);
+
   return (
-    <div className="space-y-10 -mt-6">
-      {/* Hero */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden text-primary-foreground -mx-4 md:-mx-8 px-8 md:px-16 pt-10 pb-14"
-        style={{
-          background: 'linear-gradient(160deg, hsl(330,80%,52%) 0%, hsl(300,65%,52%) 60%, hsl(280,65%,50%) 100%)',
-          minHeight: '240px',
-        }}
+    <div className="-mt-6 space-y-0">
+      {/* Slim top banner */}
+      <div
+        className="relative -mx-4 md:-mx-8 px-6 md:px-12 py-4 mb-6 flex items-center justify-between gap-4"
+        style={{ background: 'linear-gradient(90deg, hsl(330,75%,52%) 0%, hsl(280,65%,52%) 100%)' }}
       >
-        <HeroStars />
-
-        {/* decorative blobs */}
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute right-16 top-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl" />
-        <div className="absolute left-1/2 -bottom-6 w-40 h-40 bg-primary/20 rounded-full blur-2xl" />
-
-        {/* vinyl disc decoration */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-          className="absolute right-8 top-1/2 -translate-y-1/2 w-32 h-32 md:w-44 md:h-44 opacity-20"
-        >
-          <div className="w-full h-full rounded-full border-8 border-white/40 flex items-center justify-center">
-            <div className="w-1/2 h-1/2 rounded-full border-4 border-white/40 flex items-center justify-center">
-              <div className="w-4 h-4 rounded-full bg-white/60" />
-            </div>
-          </div>
-        </motion.div>
-
-        <div className="relative z-10">
-          <motion.p
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xs font-semibold uppercase tracking-widest opacity-75 mb-2"
-          >
-            🎵 Your School's Music Hub
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight"
-          >
-            Discover. Review.<br />
-            <span className="opacity-80">Connect.</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="mt-3 text-sm md:text-base opacity-85 max-w-sm leading-relaxed"
-          >
-            Share reviews, find bandmates, and connect with fellow music lovers at your school.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="flex gap-3 mt-6"
-          >
-            <Link to="/discover" className="px-5 py-2.5 bg-white text-primary font-semibold rounded-xl text-sm hover:bg-white/90 transition-colors shadow-lg">
-              Explore Albums
-            </Link>
-            <Link to="/bands" className="px-5 py-2.5 bg-white/15 font-semibold rounded-xl text-sm hover:bg-white/25 transition-colors backdrop-blur-sm border border-white/20">
-              Find Bands
-            </Link>
-          </motion.div>
+        <div className="flex items-center gap-3">
+          <Disc3 className="w-5 h-5 text-white opacity-80" />
+          <span className="text-white font-semibold text-sm">SoundWave · Your school's music community</span>
         </div>
-      </motion.div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard icon={Disc3} label="Albums" value={albums.length || '—'} color="bg-primary/10 text-primary" />
-        <StatCard icon={Star} label="Reviews" value={reviews.length || '—'} color="bg-yellow-100 text-yellow-600" />
-        <StatCard icon={Users} label="Bands" value={bands.length || '—'} color="bg-accent/10 text-accent" />
-        <StatCard icon={TrendingUp} label="Active" value="🔥" color="bg-emerald-100 text-emerald-600" />
-      </div>
-
-      {/* Trending Albums */}
-      <section>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl font-bold">Trending Albums</h2>
-          <Link to="/discover" className="text-sm text-primary font-medium flex items-center gap-1 hover:gap-2 transition-all">
-            See all <ArrowRight className="w-4 h-4" />
+        <div className="flex gap-2 shrink-0">
+          <Link to="/discover" className="text-xs px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg font-medium transition-colors">
+            Albums
+          </Link>
+          <Link to="/bands" className="text-xs px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg font-medium transition-colors">
+            Bands
           </Link>
         </div>
-        {albums.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {albums.map((album) => (
-              <AlbumCard key={album.id} album={album} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 bg-card rounded-2xl shadow-sm">
-            <Disc3 className="w-12 h-12 mx-auto text-muted-foreground/30" />
-            <p className="mt-3 text-muted-foreground text-sm">No albums yet. Be the first to add one!</p>
-            <Link to="/discover" className="mt-3 inline-block text-sm text-primary font-medium">
-              Add an Album →
+      </div>
+
+      {/* Main layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Feed — center/main */}
+        <div className="lg:col-span-2 space-y-3">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Activity Feed</h2>
+            <Link to="/discover" className="text-xs text-primary font-medium flex items-center gap-1 hover:underline">
+              All albums <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
-        )}
-      </section>
 
-      {/* Latest Reviews */}
-      <section>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl font-bold">Latest Reviews</h2>
+          {feedItems.length === 0 ? (
+            <div className="text-center py-16 bg-card rounded-xl border border-border">
+              <Disc3 className="w-10 h-10 mx-auto text-muted-foreground/30 mb-3" />
+              <p className="text-sm text-muted-foreground">No activity yet. Explore albums and leave a review!</p>
+            </div>
+          ) : (
+            feedItems.map((item, idx) =>
+              item.type === 'review'
+                ? <ReviewFeedItem key={`r-${item.data.id}`} review={item.data} />
+                : <AlbumDiscussionItem key={`a-${item.data.id}`} album={item.data} />
+            )
+          )}
         </div>
-        {reviews.length > 0 ? (
-          <div className="grid gap-3">
-            {reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 bg-card rounded-2xl shadow-sm">
-            <Star className="w-12 h-12 mx-auto text-muted-foreground/30" />
-            <p className="mt-3 text-muted-foreground text-sm">No reviews yet. Start sharing your thoughts!</p>
-          </div>
-        )}
-      </section>
 
-      {/* Bands Recruiting */}
-      {bands.length > 0 && (
-        <section>
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-xl font-bold">Bands Looking for Members</h2>
-            <Link to="/bands" className="text-sm text-primary font-medium flex items-center gap-1 hover:gap-2 transition-all">
-              All bands <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {bands.map((band) => (
-              <Link key={band.id} to={`/band/${band.id}`} className="p-5 bg-card rounded-2xl shadow-sm hover:shadow-md transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                    <Users className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">{band.name}</h3>
-                    <p className="text-xs text-muted-foreground">{band.genre?.replace(/_/g, ' ')} · {band.member_count || 1} members</p>
-                  </div>
-                </div>
-                {band.looking_for?.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {band.looking_for.map((role) => (
-                      <span key={role} className="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-                        Looking for {role}
-                      </span>
-                    ))}
-                  </div>
-                )}
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Bands */}
+          <div className="bg-card rounded-xl border border-border p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold">Bands</h3>
+              <Link to="/bands" className="text-xs text-primary hover:underline flex items-center gap-0.5">
+                All <ArrowRight className="w-3 h-3" />
               </Link>
-            ))}
+            </div>
+            {sidebarBands.length > 0 ? (
+              <div className="divide-y divide-border">
+                {sidebarBands.map(band => <BandSidebarItem key={band.id} band={band} />)}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground text-center py-4">No bands yet</p>
+            )}
           </div>
-        </section>
-      )}
+
+          {/* Top Rated Albums */}
+          {albums.slice(0, 5).length > 0 && (
+            <div className="bg-card rounded-xl border border-border p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold">Top Rated</h3>
+                <Link to="/discover" className="text-xs text-primary hover:underline flex items-center gap-0.5">
+                  All <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="space-y-3">
+                {albums.slice(0, 5).map((album, idx) => (
+                  <Link key={album.id} to={`/album/${album.id}`} className="flex items-center gap-3 group">
+                    <span className="text-xs font-bold text-muted-foreground w-4">{idx + 1}</span>
+                    <div className="w-9 h-9 rounded-md overflow-hidden shrink-0 bg-muted">
+                      {album.cover_url
+                        ? <img src={album.cover_url} alt="" className="w-full h-full object-cover" />
+                        : <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-sm">🎵</div>
+                      }
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">{album.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{album.artist}</p>
+                    </div>
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                      <span className="text-xs font-medium">{album.avg_rating?.toFixed(1) || '—'}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
