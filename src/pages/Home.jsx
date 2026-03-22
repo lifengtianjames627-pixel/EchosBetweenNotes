@@ -65,9 +65,7 @@ function GenreSection({ genre, albums }) {
       animate={inView ? { opacity: 1 } : {}}
       transition={{ duration: 0.4 }}
       className="mb-10 rounded-2xl px-4 py-4"
-      style={{
-        background: genre.theme?.bg || 'transparent'
-      }}
+      style={{ background: 'transparent' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
