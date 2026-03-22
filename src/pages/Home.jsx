@@ -84,7 +84,8 @@ function GenreSection({ genre, albums }) {
 
         <Link
           to={`/discover`}
-          className="flex items-center gap-1 text-xs text-white/40 hover:text-white/70 transition-colors"
+          className="flex items-center gap-1 text-xs transition-colors"
+          style={{ color: 'hsl(330 75% 60%)' }}
         >
           More <ArrowRight className="w-3 h-3" />
         </Link>
