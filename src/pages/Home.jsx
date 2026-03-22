@@ -73,16 +73,10 @@ function GenreSection({ genre, albums }) {
           <span className="text-xl">{genre.icon}</span>
 
           <div>
-            <h2
-              className="text-base font-bold leading-none"
-              style={{
-                color: genre.theme?.accent || 'rgba(255,255,255,0.9)'
-              }}
-            >
+            <h2 className="text-base font-bold leading-none" style={{ color: 'hsl(340 10% 92%)' }}>
               {genre.label}
             </h2>
-
-            <p className="text-xs text-white/35 mt-0.5">
+            <p className="text-xs mt-0.5" style={{ color: 'hsl(340 10% 50%)' }}>
               {genre.tagline}
             </p>
           </div>
