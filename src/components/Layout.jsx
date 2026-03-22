@@ -54,7 +54,7 @@ export default function Layout() {
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-t border-border">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t" style={{ background: 'hsl(340 20% 7% / 0.92)', borderColor: 'hsl(340 20% 14%)' }}>
         <div className="flex justify-around items-center h-16 px-2">
           {navItems.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path ||
