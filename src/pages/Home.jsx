@@ -40,14 +40,12 @@ export default function Home() {
     <div className="space-y-10">
       {/* Hero */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden text-primary-foreground"
+        className="relative overflow-hidden text-primary-foreground -mx-4 md:-mx-8 px-8 md:px-16 pt-10 pb-14"
         style={{
-          background: 'linear-gradient(135deg, hsl(262,83%,40%) 0%, hsl(262,83%,58%) 40%, hsl(330,80%,55%) 80%, hsl(330,80%,45%) 100%)',
-          borderRadius: '2.5rem 1rem 3rem 1.5rem / 1.5rem 3rem 1rem 2.5rem',
-          padding: '3rem 2.5rem',
-          minHeight: '220px',
+          background: 'linear-gradient(160deg, hsl(330,80%,52%) 0%, hsl(300,65%,52%) 60%, hsl(280,65%,50%) 100%)',
+          minHeight: '240px',
         }}
       >
         <HeroStars />
