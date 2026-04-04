@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GENRES } from '@/lib/genreConfig';
@@ -135,44 +135,64 @@ function rand(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-function FloatingBubble({ genre, colorIdx, size, floatX, floatY, duration, delay }) {
+function FloatingBubble({ genre, colorIdx, size, floatX, floatY, duration, delay, hovered, onHover, onLeave }) {
   const c = BUBBLE_COLORS[colorIdx % BUBBLE_COLORS.length];
-  const iconSize = size * 0.38;
+  const iconSize = (hovered ? size * 1.22 : size) * 0.38;
   const IconSvg = GENRE_ICONS[genre.id] || GENRE_ICONS['electronic'];
   return (
     <motion.div
-      className="absolute rounded-full flex flex-col items-center justify-center cursor-pointer"
+      className="rounded-full flex flex-col items-center justify-center cursor-pointer select-none"
       style={{
         width: size,
         height: size,
-        background: c.bg,
-        border: `1.5px solid ${c.border}`,
-        boxShadow: c.glow,
+        background: hovered
+          ? c.bg.replace('0.6', '0.85')
+          : c.bg,
+        border: `${hovered ? 2 : 1.5}px solid ${c.border}`,
+        boxShadow: hovered
+          ? `0 0 48px 14px ${c.border}55, 0 0 110px 20px ${c.border}22, 0 0 0 2px ${c.border}44`
+          : c.glow,
         backdropFilter: 'blur(18px)',
         WebkitBackdropFilter: 'blur(18px)',
+        position: 'relative',
       }}
       animate={{
         x: [0, floatX, -floatX * 0.5, floatX * 0.3, 0],
         y: [0, floatY, -floatY * 0.6, floatY * 0.4, 0],
+        scale: hovered ? 1.22 : 1,
       }}
-      transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
-      whileHover={{ scale: 1.12, zIndex: 50 }}
+      transition={{
+        x: { duration, delay, repeat: Infinity, ease: 'easeInOut' },
+        y: { duration, delay, repeat: Infinity, ease: 'easeInOut' },
+        scale: { duration: 0.28, ease: [0.34, 1.56, 0.64, 1] },
+        boxShadow: { duration: 0.25 },
+      }}
+      onHoverStart={onHover}
+      onHoverEnd={onLeave}
     >
       {/* Inner radial shimmer */}
       <div
         className="absolute inset-0 rounded-full pointer-events-none"
         style={{ background: 'radial-gradient(ellipse at 35% 28%, rgba(255,255,255,0.13) 0%, transparent 62%)' }}
       />
-      <div style={{ width: iconSize, height: iconSize, filter: `drop-shadow(0 0 8px ${c.border})` }}>
+      <motion.div
+        animate={{ width: iconSize, height: iconSize }}
+        transition={{ duration: 0.25, ease: 'easeOut' }}
+        style={{ filter: `drop-shadow(0 0 ${hovered ? 14 : 8}px ${c.border})` }}
+      >
         {IconSvg(c.border)}
-      </div>
-      <span
+      </motion.div>
+      <motion.span
         className="font-bold text-center uppercase"
+        animate={{ opacity: hovered ? 1 : 0.55, y: hovered ? 0 : 4 }}
+        transition={{ duration: 0.22 }}
         style={{
           color: c.text,
           fontSize: size * 0.088,
           letterSpacing: '0.14em',
-          textShadow: `0 0 10px ${c.border}, 0 0 22px ${c.border}`,
+          textShadow: hovered
+            ? `0 0 14px ${c.border}, 0 0 32px ${c.border}`
+            : `0 0 8px ${c.border}`,
           marginTop: size * 0.04,
           lineHeight: 1.1,
           paddingLeft: size * 0.08,
@@ -180,13 +200,14 @@ function FloatingBubble({ genre, colorIdx, size, floatX, floatY, duration, delay
         }}
       >
         {genre.label}
-      </span>
+      </motion.span>
     </motion.div>
   );
 }
 
 export default function Home() {
   const navigate = useNavigate();
+  const [hoveredIdx, setHoveredIdx] = useState(null);
 
   const bubbleParams = useMemo(() =>
     GENRES.map(() => ({
@@ -290,7 +311,6 @@ export default function Home() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.6, duration: 0.8 }}
         className="pb-12 px-4 flex flex-col items-center -mt-32"
-        onClick={() => navigate('/discover')}
       >
         <div
           className="relative mx-auto"
@@ -300,6 +320,7 @@ export default function Home() {
             const pos = CLUSTER_POSITIONS[i % CLUSTER_POSITIONS.length];
             const p = bubbleParams[i];
             const size = Math.round(BASE_SIZE * pos.r);
+            const isHovered = hoveredIdx === i;
             return (
               <div
                 key={genre.id}
@@ -308,7 +329,7 @@ export default function Home() {
                   left: `${pos.cx}%`,
                   top: `${pos.cy}%`,
                   transform: 'translate(-50%, -50%)',
-                  zIndex: Math.round(pos.r * 10),
+                  zIndex: isHovered ? 50 : Math.round(pos.r * 10),
                 }}
               >
                 <FloatingBubble
@@ -319,6 +340,9 @@ export default function Home() {
                   floatY={p.floatY}
                   duration={p.duration}
                   delay={p.delay}
+                  hovered={isHovered}
+                  onHover={() => setHoveredIdx(i)}
+                  onLeave={() => setHoveredIdx(null)}
                 />
               </div>
             );
