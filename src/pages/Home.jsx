@@ -75,7 +75,6 @@ function FloatingBubble({ genre, colorIdx, size, floatX, floatY, duration, delay
         height: size,
         background: c.bg,
         border: `2.5px solid ${c.border}`,
-        transform: 'translate(-50%, -50%)',
       }}
       animate={{
         x: [0, floatX, -floatX * 0.5, floatX * 0.3, 0],
@@ -132,11 +131,16 @@ export default function Home() {
 
           {/* Letters animate in one by one */}
           <motion.h1
-            className="font-black tracking-tight leading-none"
+            className="font-black leading-none"
             style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontStyle: 'italic',
               fontSize: 'clamp(3rem, 9vw, 7.5rem)',
-              color: 'hsl(220 30% 10%)',
-              letterSpacing: '-0.03em',
+              background: 'linear-gradient(135deg, hsl(230 70% 45%) 0%, hsl(270 60% 55%) 50%, hsl(200 75% 45%) 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              letterSpacing: '-0.01em',
             }}
           >
             {'Music Critics'.split('').map((char, i) => (
@@ -235,6 +239,7 @@ export default function Home() {
                   position: 'absolute',
                   left: `${pos.cx}%`,
                   top: `${pos.cy}%`,
+                  transform: 'translate(-50%, -50%)',
                   zIndex: Math.round(pos.r * 10),
                 }}
               >
