@@ -136,10 +136,7 @@ export default function Home() {
               fontFamily: "'Playfair Display', Georgia, serif",
               fontStyle: 'italic',
               fontSize: 'clamp(3rem, 9vw, 7.5rem)',
-              background: 'linear-gradient(135deg, hsl(230 70% 45%) 0%, hsl(270 60% 55%) 50%, hsl(200 75% 45%) 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              color: 'hsl(230 60% 45%)',
               letterSpacing: '-0.01em',
             }}
           >
@@ -211,7 +208,7 @@ export default function Home() {
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.6, duration: 0.7 }}
-        className="pb-12 px-4 flex flex-col items-center -mt-8"
+        className="pb-12 px-4 flex flex-col items-center mt-4"
         onClick={() => navigate('/discover')}
       >
         <p className="text-center text-xs font-semibold uppercase tracking-widest mb-4"
