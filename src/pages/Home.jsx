@@ -22,19 +22,19 @@ const BUBBLE_COLORS = [
 // Positions arranged in a tight organic cluster (percentage of container)
 // Hand-placed so they form one cohesive blob shape
 const CLUSTER_POSITIONS = [
-  { cx: 50,  cy: 50,  r: 1.05 }, // center large
-  { cx: 33,  cy: 44,  r: 0.95 }, // left-center
-  { cx: 67,  cy: 44,  r: 0.90 }, // right-center
-  { cx: 50,  cy: 28,  r: 0.88 }, // top-center
-  { cx: 50,  cy: 72,  r: 0.88 }, // bottom-center
-  { cx: 22,  cy: 60,  r: 0.82 }, // far left
-  { cx: 78,  cy: 60,  r: 0.82 }, // far right
-  { cx: 36,  cy: 22,  r: 0.78 }, // top-left
-  { cx: 64,  cy: 22,  r: 0.78 }, // top-right
-  { cx: 22,  cy: 38,  r: 0.75 }, // mid-left
-  { cx: 78,  cy: 38,  r: 0.75 }, // mid-right
-  { cx: 38,  cy: 76,  r: 0.72 }, // bottom-left
-  { cx: 62,  cy: 76,  r: 0.72 }, // bottom-right
+  { cx: 42,  cy: 50,  r: 1.05 }, // center large
+  { cx: 25,  cy: 44,  r: 0.95 }, // left-center
+  { cx: 59,  cy: 44,  r: 0.90 }, // right-center
+  { cx: 42,  cy: 28,  r: 0.88 }, // top-center
+  { cx: 42,  cy: 72,  r: 0.88 }, // bottom-center
+  { cx: 14,  cy: 60,  r: 0.82 }, // far left
+  { cx: 70,  cy: 60,  r: 0.82 }, // far right
+  { cx: 28,  cy: 22,  r: 0.78 }, // top-left
+  { cx: 56,  cy: 22,  r: 0.78 }, // top-right
+  { cx: 14,  cy: 38,  r: 0.75 }, // mid-left
+  { cx: 70,  cy: 38,  r: 0.75 }, // mid-right
+  { cx: 30,  cy: 76,  r: 0.72 }, // bottom-left
+  { cx: 54,  cy: 76,  r: 0.72 }, // bottom-right
 ];
 
 const BASE_SIZE = 190; // px, base bubble diameter
@@ -225,7 +225,7 @@ export default function Home() {
           style={{
             width: '100%',
             maxWidth: containerSize,
-            height: Math.round(containerSize * 0.78),
+            height: Math.round(containerSize * 0.92),
           }}
         >
           {GENRES.map((genre, i) => {
