@@ -7,10 +7,8 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from '@/components/Layout';
 import Home from '@/pages/Home';
-import Discover from '@/pages/Discover';
 import AlbumDetail from '@/pages/AlbumDetail';
-import Bands from '@/pages/Bands';
-import BandDetail from '@/pages/BandDetail';
+import GenreSpace from '@/pages/GenreSpace';
 import Profile from '@/pages/Profile';
 
 const AuthenticatedApp = () => {
@@ -37,10 +35,8 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/discover" element={<Discover />} />
+        <Route path="/genre/:genreId" element={<GenreSpace />} />
         <Route path="/album/:id" element={<AlbumDetail />} />
-        <Route path="/bands" element={<Bands />} />
-        <Route path="/band/:id" element={<BandDetail />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />

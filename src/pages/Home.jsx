@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GENRES } from '@/lib/genreConfig';
 
@@ -268,30 +268,11 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.6 }}
-          className="mt-7 flex gap-3"
+          className="mt-7"
         >
-          <Link
-            to="/discover"
-            className="px-7 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-85"
-            style={{
-              background: 'linear-gradient(135deg, #7c6fff, #c084fc)',
-              color: '#fff',
-              boxShadow: '0 0 20px rgba(124,111,255,0.45)',
-            }}
-          >
-            Browse Albums
-          </Link>
-          <Link
-            to="/bands"
-            className="px-7 py-2.5 rounded-full text-sm font-semibold transition-all"
-            style={{
-              border: '1px solid rgba(124,111,255,0.4)',
-              color: 'rgba(180,195,235,0.85)',
-              background: 'rgba(124,111,255,0.07)',
-            }}
-          >
-            Find Bands
-          </Link>
+          <p className="text-sm" style={{ color: 'rgba(160,175,215,0.5)' }}>
+            Pick a genre below to enter its space
+          </p>
         </motion.div>
 
         <motion.p
@@ -332,18 +313,20 @@ export default function Home() {
                   zIndex: isHovered ? 50 : Math.round(pos.r * 10),
                 }}
               >
-                <FloatingBubble
-                  genre={genre}
-                  colorIdx={i}
-                  size={size}
-                  floatX={p.floatX}
-                  floatY={p.floatY}
-                  duration={p.duration}
-                  delay={p.delay}
-                  hovered={isHovered}
-                  onHover={() => setHoveredIdx(i)}
-                  onLeave={() => setHoveredIdx(null)}
-                />
+                <div onClick={() => navigate(`/genre/${genre.id}`)}>
+                  <FloatingBubble
+                    genre={genre}
+                    colorIdx={i}
+                    size={size}
+                    floatX={p.floatX}
+                    floatY={p.floatY}
+                    duration={p.duration}
+                    delay={p.delay}
+                    hovered={isHovered}
+                    onHover={() => setHoveredIdx(i)}
+                    onLeave={() => setHoveredIdx(null)}
+                  />
+                </div>
               </div>
             );
           })}
