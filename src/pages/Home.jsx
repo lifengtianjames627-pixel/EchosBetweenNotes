@@ -122,7 +122,7 @@ export default function Home() {
   return (
     <div className="min-h-screen" style={{ background: 'hsl(220 20% 97%)' }}>
       {/* ── Animated Hero Title ── */}
-      <div className="flex flex-col items-center justify-center pt-16 pb-6 px-4 text-center">
+      <div className="flex flex-col items-center justify-center pt-8 pb-4 px-4 text-center">
         <div className="relative inline-block">
           {/* Floating notes */}
           {titleNotes.map((n, i) => (
@@ -211,7 +211,7 @@ export default function Home() {
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.6, duration: 0.7 }}
-        className="pb-24 px-4 flex flex-col items-center"
+        className="pb-12 px-4 flex flex-col items-center -mt-8"
         onClick={() => navigate('/discover')}
       >
         <p className="text-center text-xs font-semibold uppercase tracking-widest mb-4"
