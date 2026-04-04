@@ -201,6 +201,11 @@ export default function Home() {
             Find Bands
           </Link>
         </motion.div>
+
+        <p className="mt-8 text-center text-xs font-semibold uppercase tracking-widest"
+           style={{ color: 'hsl(220 15% 55%)' }}>
+          Explore by Genre
+        </p>
       </div>
 
       {/* ── Bubble Cluster ── */}
@@ -211,10 +216,6 @@ export default function Home() {
         className="pb-12 px-4 flex flex-col items-center -mt-16"
         onClick={() => navigate('/discover')}
       >
-        <p className="text-center text-xs font-semibold uppercase tracking-widest mb-4"
-           style={{ color: 'hsl(220 15% 55%)' }}>
-          Explore by Genre
-        </p>
 
         {/* Absolute-positioned cluster */}
         <div
