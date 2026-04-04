@@ -3,20 +3,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GENRES } from '@/lib/genreConfig';
 
+// Neon glow colors: bg = dark glass, border = neon edge, text = bright neon, glow = shadow color
 const BUBBLE_COLORS = [
-  { bg: 'hsl(230 55% 92%)', border: 'hsl(230 50% 75%)', text: 'hsl(230 55% 28%)' },
-  { bg: 'hsl(250 50% 92%)', border: 'hsl(250 45% 73%)', text: 'hsl(250 50% 28%)' },
-  { bg: 'hsl(200 55% 90%)', border: 'hsl(200 50% 70%)', text: 'hsl(200 55% 22%)' },
-  { bg: 'hsl(160 45% 88%)', border: 'hsl(160 40% 62%)', text: 'hsl(160 50% 20%)' },
-  { bg: 'hsl(30 55% 90%)',  border: 'hsl(30 50% 68%)',  text: 'hsl(30 55% 22%)'  },
-  { bg: 'hsl(345 30% 91%)', border: 'hsl(345 28% 70%)', text: 'hsl(345 35% 25%)' },
-  { bg: 'hsl(270 40% 92%)', border: 'hsl(270 38% 72%)', text: 'hsl(270 45% 26%)' },
-  { bg: 'hsl(185 50% 89%)', border: 'hsl(185 45% 66%)', text: 'hsl(185 55% 20%)' },
-  { bg: 'hsl(45 55% 90%)',  border: 'hsl(45 50% 66%)',  text: 'hsl(45 55% 20%)'  },
-  { bg: 'hsl(215 45% 91%)', border: 'hsl(215 40% 70%)', text: 'hsl(215 50% 24%)' },
-  { bg: 'hsl(130 35% 90%)', border: 'hsl(130 32% 66%)', text: 'hsl(130 40% 22%)' },
-  { bg: 'hsl(12 45% 90%)',  border: 'hsl(12 40% 66%)',  text: 'hsl(12 50% 22%)'  },
-  { bg: 'hsl(260 40% 92%)', border: 'hsl(260 36% 72%)', text: 'hsl(260 44% 26%)' },
+  { bg: 'rgba(30,20,80,0.55)',  border: '#7c6fff', text: '#c4baff', glow: '0 0 22px 4px rgba(124,111,255,0.55), 0 0 60px 8px rgba(124,111,255,0.18)' },
+  { bg: 'rgba(10,40,80,0.55)',  border: '#38bdf8', text: '#93e4ff', glow: '0 0 22px 4px rgba(56,189,248,0.55), 0 0 60px 8px rgba(56,189,248,0.18)' },
+  { bg: 'rgba(60,10,60,0.55)',  border: '#f472b6', text: '#ffb3d9', glow: '0 0 22px 4px rgba(244,114,182,0.55), 0 0 60px 8px rgba(244,114,182,0.18)' },
+  { bg: 'rgba(10,55,35,0.55)',  border: '#34d399', text: '#a7f3d0', glow: '0 0 22px 4px rgba(52,211,153,0.55), 0 0 60px 8px rgba(52,211,153,0.18)' },
+  { bg: 'rgba(70,35,10,0.55)',  border: '#fb923c', text: '#fed7aa', glow: '0 0 22px 4px rgba(251,146,60,0.55), 0 0 60px 8px rgba(251,146,60,0.18)' },
+  { bg: 'rgba(65,10,30,0.55)',  border: '#f87171', text: '#fecaca', glow: '0 0 22px 4px rgba(248,113,113,0.55), 0 0 60px 8px rgba(248,113,113,0.18)' },
+  { bg: 'rgba(55,10,70,0.55)',  border: '#c084fc', text: '#e9d5ff', glow: '0 0 22px 4px rgba(192,132,252,0.55), 0 0 60px 8px rgba(192,132,252,0.18)' },
+  { bg: 'rgba(10,55,55,0.55)',  border: '#2dd4bf', text: '#99f6e4', glow: '0 0 22px 4px rgba(45,212,191,0.55), 0 0 60px 8px rgba(45,212,191,0.18)' },
+  { bg: 'rgba(60,55,10,0.55)',  border: '#fbbf24', text: '#fde68a', glow: '0 0 22px 4px rgba(251,191,36,0.55), 0 0 60px 8px rgba(251,191,36,0.18)' },
+  { bg: 'rgba(15,30,65,0.55)',  border: '#60a5fa', text: '#bfdbfe', glow: '0 0 22px 4px rgba(96,165,250,0.55), 0 0 60px 8px rgba(96,165,250,0.18)' },
+  { bg: 'rgba(10,50,20,0.55)',  border: '#86efac', text: '#bbf7d0', glow: '0 0 22px 4px rgba(134,239,172,0.55), 0 0 60px 8px rgba(134,239,172,0.18)' },
+  { bg: 'rgba(65,20,10,0.55)',  border: '#fdba74', text: '#fed7aa', glow: '0 0 22px 4px rgba(253,186,116,0.55), 0 0 60px 8px rgba(253,186,116,0.18)' },
+  { bg: 'rgba(40,10,65,0.55)',  border: '#a78bfa', text: '#ddd6fe', glow: '0 0 22px 4px rgba(167,139,250,0.55), 0 0 60px 8px rgba(167,139,250,0.18)' },
 ];
 
 // Positions arranged in a tight organic cluster (percentage of container)
@@ -37,7 +38,7 @@ const CLUSTER_POSITIONS = [
   { cx: 54,  cy: 76,  r: 0.72 }, // bottom-right
 ];
 
-const BASE_SIZE = 190; // px, base bubble diameter
+const BASE_SIZE = 240; // px, base bubble diameter
 
 const MUSIC_NOTES = ['♩', '♪', '♫', '♬', '𝄞'];
 
@@ -64,31 +65,46 @@ function TitleNote({ note, x, y, delay }) {
   );
 }
 
-// Individual floating bubble
+// Individual floating bubble — dark glass + neon glow style
 function FloatingBubble({ genre, colorIdx, size, floatX, floatY, duration, delay }) {
   const c = BUBBLE_COLORS[colorIdx % BUBBLE_COLORS.length];
   return (
     <motion.div
-      className="absolute rounded-full flex flex-col items-center justify-center cursor-pointer shadow-lg"
+      className="absolute rounded-full flex flex-col items-center justify-center cursor-pointer"
       style={{
         width: size,
         height: size,
         background: c.bg,
-        border: `2.5px solid ${c.border}`,
+        border: `1.5px solid ${c.border}`,
+        boxShadow: c.glow,
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
       }}
       animate={{
         x: [0, floatX, -floatX * 0.5, floatX * 0.3, 0],
         y: [0, floatY, -floatY * 0.6, floatY * 0.4, 0],
       }}
       transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
-      whileHover={{ scale: 1.14, zIndex: 50 }}
+      whileHover={{ scale: 1.12, zIndex: 50 }}
     >
-      <span style={{ fontSize: size * 0.27 }}>{genre.icon}</span>
+      {/* Inner glass shimmer */}
+      <div
+        className="absolute inset-0 rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at 35% 30%, rgba(255,255,255,0.18) 0%, transparent 65%)',
+        }}
+      />
+      <span style={{ fontSize: size * 0.26, filter: 'drop-shadow(0 0 6px currentColor)' }}>{genre.icon}</span>
       <span
-        className="font-semibold tracking-wide text-center leading-tight px-3"
-        style={{ color: c.text, fontSize: size * 0.105 }}
+        className="font-bold tracking-widest text-center leading-tight px-3 uppercase"
+        style={{
+          color: c.text,
+          fontSize: size * 0.095,
+          textShadow: `0 0 10px ${c.border}, 0 0 20px ${c.border}`,
+          letterSpacing: '0.12em',
+        }}
       >
-        {genre.label.toUpperCase()}
+        {genre.label}
       </span>
     </motion.div>
   );
@@ -120,7 +136,7 @@ export default function Home() {
   const minSize = 500;
 
   return (
-    <div className="min-h-screen" style={{ background: 'hsl(220 20% 97%)' }}>
+    <div className="min-h-screen" style={{ background: 'radial-gradient(ellipse at 50% 0%, #0e1530 0%, #07090f 60%, #000 100%)' }}>
       {/* ── Animated Hero Title ── */}
       <div className="flex flex-col items-center justify-center pt-8 pb-4 px-4 text-center">
         <div className="relative inline-block px-16 pt-10 pb-4">
@@ -136,7 +152,7 @@ export default function Home() {
               fontFamily: "'Playfair Display', Georgia, serif",
               fontStyle: 'italic',
               fontSize: 'clamp(3rem, 9vw, 7.5rem)',
-              color: 'hsl(230 60% 45%)',
+              color: '#a5b4fc',
               letterSpacing: '-0.01em',
             }}
           >
@@ -175,7 +191,7 @@ export default function Home() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.55, delay: 0.5 }}
           className="mt-5 text-base md:text-lg max-w-xl"
-          style={{ color: 'hsl(220 15% 48%)' }}
+          style={{ color: 'rgba(180,190,220,0.75)' }}
         >
           Honest reviews. Every genre. By people who actually care.
         </motion.p>
@@ -196,14 +212,14 @@ export default function Home() {
           <Link
             to="/bands"
             className="px-6 py-2.5 rounded-full text-sm font-semibold border transition-all hover:bg-white"
-            style={{ borderColor: 'hsl(220 15% 80%)', color: 'hsl(220 25% 30%)' }}
+            style={{ borderColor: 'rgba(120,140,200,0.4)', color: 'rgba(180,195,230,0.9)', background: 'rgba(255,255,255,0.04)' }}
           >
             Find Bands
           </Link>
         </motion.div>
 
         <p className="mt-8 text-center text-xs font-semibold uppercase tracking-widest"
-           style={{ color: 'hsl(220 15% 55%)' }}>
+           style={{ color: 'rgba(150,165,210,0.6)' }}>
           Explore by Genre
         </p>
       </div>
