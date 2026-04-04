@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Disc3, Users, Music, User } from 'lucide-react';
+import { Home, Disc3, Users, User } from 'lucide-react';
 
 const navItems = [
   { path: '/', icon: Home, label: 'Home' },
@@ -15,13 +15,12 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-background">
       {/* Top header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl border-b" style={{ background: 'hsl(340 30% 97% / 0.9)', borderColor: 'hsl(340 20% 88%)' }}>
+      <header className="sticky top-0 z-50 backdrop-blur-xl border-b" style={{ background: 'hsl(220 20% 97% / 0.92)', borderColor: 'hsl(220 15% 88%)' }}>
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-              <Music className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">SoundWave</span>
+          <Link to="/" className="flex items-center gap-2">
+            <span className="text-lg font-black tracking-tight" style={{ color: 'hsl(220 30% 10%)', letterSpacing: '-0.03em' }}>
+              Music Critics
+            </span>
           </Link>
           
           {/* Desktop nav */}
@@ -54,7 +53,7 @@ export default function Layout() {
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t" style={{ background: 'hsl(340 30% 97% / 0.95)', borderColor: 'hsl(340 20% 88%)' }}>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t" style={{ background: 'hsl(220 20% 97% / 0.95)', borderColor: 'hsl(220 15% 88%)' }}>
         <div className="flex justify-around items-center h-16 px-2">
           {navItems.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path ||
