@@ -114,19 +114,19 @@ const GENRE_ICONS = {
 };
 
 const CLUSTER_POSITIONS = [
-  { cx: 42,  cy: 50,  r: 1.05 },
-  { cx: 25,  cy: 44,  r: 0.95 },
-  { cx: 59,  cy: 44,  r: 0.90 },
-  { cx: 42,  cy: 28,  r: 0.88 },
-  { cx: 42,  cy: 72,  r: 0.88 },
-  { cx: 14,  cy: 60,  r: 0.82 },
-  { cx: 70,  cy: 60,  r: 0.82 },
-  { cx: 28,  cy: 22,  r: 0.78 },
-  { cx: 56,  cy: 22,  r: 0.78 },
-  { cx: 14,  cy: 38,  r: 0.75 },
-  { cx: 70,  cy: 38,  r: 0.75 },
-  { cx: 30,  cy: 76,  r: 0.72 },
-  { cx: 54,  cy: 76,  r: 0.72 },
+  { cx: 47,  cy: 50,  r: 1.05 },
+  { cx: 30,  cy: 44,  r: 0.95 },
+  { cx: 64,  cy: 44,  r: 0.90 },
+  { cx: 47,  cy: 28,  r: 0.88 },
+  { cx: 47,  cy: 72,  r: 0.88 },
+  { cx: 19,  cy: 60,  r: 0.82 },
+  { cx: 75,  cy: 60,  r: 0.82 },
+  { cx: 33,  cy: 22,  r: 0.78 },
+  { cx: 61,  cy: 22,  r: 0.78 },
+  { cx: 19,  cy: 38,  r: 0.75 },
+  { cx: 75,  cy: 38,  r: 0.75 },
+  { cx: 35,  cy: 76,  r: 0.72 },
+  { cx: 59,  cy: 76,  r: 0.72 },
 ];
 
 const BASE_SIZE = 240;
@@ -310,7 +310,7 @@ export default function Home() {
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.6, duration: 0.8 }}
-        className="pb-12 px-4 flex flex-col items-center -mt-32"
+        className="pb-12 px-4 flex flex-col items-center mt-4"
       >
         <div
           className="relative mx-auto"
