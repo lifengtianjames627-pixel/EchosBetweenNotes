@@ -123,7 +123,7 @@ export default function Home() {
     <div className="min-h-screen" style={{ background: 'hsl(220 20% 97%)' }}>
       {/* ── Animated Hero Title ── */}
       <div className="flex flex-col items-center justify-center pt-8 pb-4 px-4 text-center">
-        <div className="relative inline-block">
+        <div className="relative inline-block px-16 pt-10 pb-4">
           {/* Floating notes */}
           {titleNotes.map((n, i) => (
             <TitleNote key={i} {...n} />
