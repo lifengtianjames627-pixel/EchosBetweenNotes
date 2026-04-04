@@ -1,54 +1,79 @@
-import React, { useMemo, useRef } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GENRES } from '@/lib/genreConfig';
 
-/* ── Genre bubble colors (elegant slate/indigo palette, no pink) ── */
 const BUBBLE_COLORS = [
-  { bg: 'hsl(230 55% 92%)', border: 'hsl(230 50% 75%)', text: 'hsl(230 55% 28%)', dot: 'hsl(230 60% 45%)' },
-  { bg: 'hsl(250 50% 92%)', border: 'hsl(250 45% 73%)', text: 'hsl(250 50% 28%)', dot: 'hsl(250 55% 50%)' },
-  { bg: 'hsl(200 55% 90%)', border: 'hsl(200 50% 70%)', text: 'hsl(200 55% 22%)', dot: 'hsl(200 65% 42%)' },
-  { bg: 'hsl(160 45% 88%)', border: 'hsl(160 40% 62%)', text: 'hsl(160 50% 20%)', dot: 'hsl(160 50% 38%)' },
-  { bg: 'hsl(30 55% 90%)',  border: 'hsl(30 50% 68%)',  text: 'hsl(30 55% 22%)',  dot: 'hsl(30 65% 42%)' },
-  { bg: 'hsl(345 30% 91%)', border: 'hsl(345 28% 70%)', text: 'hsl(345 35% 25%)', dot: 'hsl(345 40% 45%)' },
-  { bg: 'hsl(270 40% 92%)', border: 'hsl(270 38% 72%)', text: 'hsl(270 45% 26%)', dot: 'hsl(270 50% 48%)' },
-  { bg: 'hsl(185 50% 89%)', border: 'hsl(185 45% 66%)', text: 'hsl(185 55% 20%)', dot: 'hsl(185 60% 38%)' },
-  { bg: 'hsl(45 55% 90%)',  border: 'hsl(45 50% 66%)',  text: 'hsl(45 55% 20%)',  dot: 'hsl(45 65% 40%)' },
-  { bg: 'hsl(215 45% 91%)', border: 'hsl(215 40% 70%)', text: 'hsl(215 50% 24%)', dot: 'hsl(215 55% 44%)' },
-  { bg: 'hsl(130 35% 90%)', border: 'hsl(130 32% 66%)', text: 'hsl(130 40% 22%)', dot: 'hsl(130 45% 38%)' },
-  { bg: 'hsl(12 45% 90%)',  border: 'hsl(12 40% 66%)',  text: 'hsl(12 50% 22%)',  dot: 'hsl(12 55% 42%)' },
-  { bg: 'hsl(260 40% 92%)', border: 'hsl(260 36% 72%)', text: 'hsl(260 44% 26%)', dot: 'hsl(260 48% 46%)' },
+  { bg: 'hsl(230 55% 92%)', border: 'hsl(230 50% 75%)', text: 'hsl(230 55% 28%)' },
+  { bg: 'hsl(250 50% 92%)', border: 'hsl(250 45% 73%)', text: 'hsl(250 50% 28%)' },
+  { bg: 'hsl(200 55% 90%)', border: 'hsl(200 50% 70%)', text: 'hsl(200 55% 22%)' },
+  { bg: 'hsl(160 45% 88%)', border: 'hsl(160 40% 62%)', text: 'hsl(160 50% 20%)' },
+  { bg: 'hsl(30 55% 90%)',  border: 'hsl(30 50% 68%)',  text: 'hsl(30 55% 22%)'  },
+  { bg: 'hsl(345 30% 91%)', border: 'hsl(345 28% 70%)', text: 'hsl(345 35% 25%)' },
+  { bg: 'hsl(270 40% 92%)', border: 'hsl(270 38% 72%)', text: 'hsl(270 45% 26%)' },
+  { bg: 'hsl(185 50% 89%)', border: 'hsl(185 45% 66%)', text: 'hsl(185 55% 20%)' },
+  { bg: 'hsl(45 55% 90%)',  border: 'hsl(45 50% 66%)',  text: 'hsl(45 55% 20%)'  },
+  { bg: 'hsl(215 45% 91%)', border: 'hsl(215 40% 70%)', text: 'hsl(215 50% 24%)' },
+  { bg: 'hsl(130 35% 90%)', border: 'hsl(130 32% 66%)', text: 'hsl(130 40% 22%)' },
+  { bg: 'hsl(12 45% 90%)',  border: 'hsl(12 40% 66%)',  text: 'hsl(12 50% 22%)'  },
+  { bg: 'hsl(260 40% 92%)', border: 'hsl(260 36% 72%)', text: 'hsl(260 44% 26%)' },
 ];
 
-/* ── Single genre bubble ── */
-function GenreBubble({ genre, colorIdx, navigate }) {
+function rand(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function FloatingBubble({ genre, colorIdx, size, floatX, floatY, duration, delay }) {
   const c = BUBBLE_COLORS[colorIdx % BUBBLE_COLORS.length];
 
   return (
     <motion.div
-      whileHover={{ scale: 1.12 }}
-      transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-      onClick={() => navigate('/discover')}
-      className="cursor-pointer select-none flex flex-col items-center justify-center rounded-full shadow-md"
-      style={{
-        background: c.bg,
-        border: `2px solid ${c.border}`,
-        width: 'clamp(110px, 14vw, 170px)',
-        height: 'clamp(110px, 14vw, 170px)',
+      animate={{
+        x: [0, floatX, -floatX * 0.6, floatX * 0.4, 0],
+        y: [0, floatY, -floatY * 0.5, floatY * 0.7, 0],
       }}
+      transition={{
+        duration,
+        delay,
+        repeat: Infinity,
+        ease: 'easeInOut',
+      }}
+      style={{ width: size, height: size }}
     >
-      <span className="text-3xl mb-1">{genre.icon}</span>
-      <span className="text-xs font-semibold tracking-wide" style={{ color: c.text }}>
-        {genre.label.toUpperCase()}
-      </span>
+      <motion.div
+        whileHover={{ scale: 1.18 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        className="w-full h-full rounded-full flex flex-col items-center justify-center cursor-pointer shadow-md"
+        style={{
+          background: c.bg,
+          border: `2px solid ${c.border}`,
+        }}
+      >
+        <span style={{ fontSize: size * 0.28 }}>{genre.icon}</span>
+        <span
+          className="font-semibold tracking-wide text-center leading-tight px-2"
+          style={{ color: c.text, fontSize: size * 0.115 }}
+        >
+          {genre.label.toUpperCase()}
+        </span>
+      </motion.div>
     </motion.div>
   );
 }
 
-/* ── Home ── */
 export default function Home() {
   const navigate = useNavigate();
+
+  // Generate random layout params once per mount
+  const bubbleParams = useMemo(() => {
+    return GENRES.map((_, i) => ({
+      size: Math.floor(rand(100, 175)),
+      floatX: rand(10, 30) * (Math.random() > 0.5 ? 1 : -1),
+      floatY: rand(10, 28) * (Math.random() > 0.5 ? 1 : -1),
+      duration: rand(5, 10),
+      delay: rand(0, 3),
+    }));
+  }, []);
 
   return (
     <div className="min-h-screen" style={{ background: 'hsl(220 20% 97%)' }}>
@@ -99,30 +124,48 @@ export default function Home() {
         </motion.div>
       </div>
 
-      {/* Genre bubbles */}
-      <div className="pb-20 px-6">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-center text-xs font-semibold uppercase tracking-widest mb-10"
-          style={{ color: 'hsl(220 15% 55%)' }}
-        >
+      {/* Bubble cluster */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.6 }}
+        className="pb-24 px-4"
+        onClick={() => navigate('/discover')}
+      >
+        <p className="text-center text-xs font-semibold uppercase tracking-widest mb-8"
+           style={{ color: 'hsl(220 15% 55%)' }}>
           Explore by Genre
-        </motion.p>
-        <div className="flex flex-wrap justify-center gap-5 max-w-5xl mx-auto">
-          {GENRES.map((genre, i) => (
-            <motion.div
-              key={genre.id}
-              initial={{ opacity: 0, scale: 0.7 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.55 + i * 0.05 }}
-            >
-              <GenreBubble genre={genre} colorIdx={i} navigate={navigate} />
-            </motion.div>
-          ))}
+        </p>
+
+        {/* Clustered flex with random-feeling layout via varying margins */}
+        <div
+          className="flex flex-wrap justify-center items-center"
+          style={{ gap: '0px', maxWidth: '860px', margin: '0 auto' }}
+        >
+          {GENRES.map((genre, i) => {
+            const p = bubbleParams[i];
+            // stagger vertical offsets so bubbles cluster & overlap naturally
+            const mt = Math.floor(rand(-30, 10));
+            const ml = Math.floor(rand(-18, 6));
+            return (
+              <div
+                key={genre.id}
+                style={{ marginTop: mt, marginLeft: ml, marginRight: ml * 0.4, zIndex: Math.floor(rand(1, 10)) }}
+              >
+                <FloatingBubble
+                  genre={genre}
+                  colorIdx={i}
+                  size={p.size}
+                  floatX={p.floatX}
+                  floatY={p.floatY}
+                  duration={p.duration}
+                  delay={p.delay}
+                />
+              </div>
+            );
+          })}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
