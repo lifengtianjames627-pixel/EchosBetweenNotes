@@ -3,18 +3,59 @@ import { motion } from 'framer-motion';
 import { Music, Loader2, ListMusic } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
+const MB_HEADERS = { 'User-Agent': 'MusicCritics/1.0 (musiccritics@app.com)' };
+
+async function searchReleases(query, limit = 10) {
+  const res = await fetch(
+    `https://musicbrainz.org/ws/2/release/?query=${encodeURIComponent(query)}&fmt=json&limit=${limit}`,
+    { headers: MB_HEADERS }
+  );
+  const data = await res.json();
+  return data.releases || [];
+}
+
+async function getCoverUrl(releaseId, releaseGroupId) {
+  // Try release cover first
+  try {
+    const res = await fetch(`https://coverartarchive.org/release/${releaseId}`, { headers: MB_HEADERS });
+    if (res.ok) {
+      const data = await res.json();
+      const front = data.images?.find(i => i.front) || data.images?.[0];
+      if (front) return front.thumbnails?.['500'] || front.thumbnails?.large || front.image;
+    }
+  } catch {}
+  // Fallback: release-group cover (catches albums where only the group has art)
+  if (releaseGroupId) {
+    try {
+      const res = await fetch(`https://coverartarchive.org/release-group/${releaseGroupId}`, { headers: MB_HEADERS });
+      if (res.ok) {
+        const data = await res.json();
+        const front = data.images?.find(i => i.front) || data.images?.[0];
+        if (front) return front.thumbnails?.['500'] || front.thumbnails?.large || front.image;
+      }
+    } catch {}
+  }
+  return null;
+}
+
 async function fetchTracklist(title, artist, year) {
   try {
-    const query = encodeURIComponent(`release:"${title}" AND artist:"${artist}"`);
-    const searchRes = await fetch(
-      `https://musicbrainz.org/ws/2/release/?query=${query}&fmt=json&limit=5`,
-      { headers: { 'User-Agent': 'MusicCritics/1.0 (musiccritics@app.com)' } }
-    );
-    const searchData = await searchRes.json();
-    const releases = searchData.releases || [];
+    // Strategy 1: exact phrase match
+    let releases = await searchReleases(`release:"${title}" AND artist:"${artist}"`);
+
+    // Strategy 2: unquoted broader search
+    if (!releases.length) {
+      releases = await searchReleases(`release:${title} AND artist:${artist}`);
+    }
+
+    // Strategy 3: title only (helps with non-latin / obscure artists)
+    if (!releases.length) {
+      releases = await searchReleases(`release:${title}`);
+    }
+
     if (!releases.length) return null;
 
-    // Pick best match (prefer matching year)
+    // Pick best match — prefer year match, then highest score
     let best = releases[0];
     if (year) {
       const withYear = releases.find(r => r.date && r.date.startsWith(String(year)));
@@ -24,25 +65,14 @@ async function fetchTracklist(title, artist, year) {
     // Fetch full release with recordings
     const releaseRes = await fetch(
       `https://musicbrainz.org/ws/2/release/${best.id}?inc=recordings&fmt=json`,
-      { headers: { 'User-Agent': 'MusicCritics/1.0 (musiccritics@app.com)' } }
+      { headers: MB_HEADERS }
     );
     const releaseData = await releaseRes.json();
     const media = releaseData.media || [];
     const tracks = [];
-    media.forEach(m => {
-      (m.tracks || []).forEach(t => tracks.push(t.title));
-    });
+    media.forEach(m => (m.tracks || []).forEach(t => tracks.push(t.title)));
 
-    // Also try to get cover art
-    let coverUrl = null;
-    try {
-      const caRes = await fetch(`https://coverartarchive.org/release/${best.id}`, { headers: { 'User-Agent': 'MusicCritics/1.0' } });
-      if (caRes.ok) {
-        const caData = await caRes.json();
-        const front = caData.images?.find(i => i.front) || caData.images?.[0];
-        if (front) coverUrl = front.thumbnails?.['500'] || front.image;
-      }
-    } catch {}
+    const coverUrl = await getCoverUrl(best.id, best['release-group']?.id);
 
     return { tracks, coverUrl, mbid: best.id };
   } catch {

@@ -148,12 +148,25 @@ export default function GenreSpace() {
   const albums = allItems.filter(i => !i.type || i.type === 'album');
   const singles = allItems.filter(i => i.type === 'single');
 
+  const [duplicateError, setDuplicateError] = useState(null);
+
   const addItem = useMutation({
-    mutationFn: (data) => base44.entities.Album.create({ ...data, genre: entityGenre || 'other', avg_rating: 0, review_count: 0 }),
+    mutationFn: (data) => {
+      // Check for duplicate (same title + artist, case-insensitive)
+      const exists = allItems.some(
+        item =>
+          item.title?.toLowerCase() === data.title?.toLowerCase() &&
+          item.artist?.toLowerCase() === data.artist?.toLowerCase()
+      );
+      if (exists) throw new Error(`"${data.title}" by ${data.artist} is already in this genre.`);
+      return base44.entities.Album.create({ ...data, genre: entityGenre || 'other', avg_rating: 0, review_count: 0 });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['genre-albums', genreId] });
+      setDuplicateError(null);
       setAddModal(null);
     },
+    onError: (err) => setDuplicateError(err.message),
   });
 
   if (!genre) {
@@ -258,9 +271,10 @@ export default function GenreSpace() {
           <AddMusicModal
             v={v}
             type={addModal}
-            onClose={() => setAddModal(null)}
+            onClose={() => { setAddModal(null); setDuplicateError(null); }}
             onSubmit={(data) => addItem.mutate(data)}
             isPending={addItem.isPending}
+            errorMessage={duplicateError}
           />
         )}
       </AnimatePresence>
