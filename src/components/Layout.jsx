@@ -1,10 +1,11 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, User } from 'lucide-react';
+import { Home, User, Info } from 'lucide-react';
 
 const navItems = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/profile', icon: User, label: 'Profile' },
+  { path: '/about', icon: Info, label: 'About' },
 ];
 
 export default function Layout() {

@@ -10,6 +10,7 @@ import Home from '@/pages/Home';
 import AlbumDetail from '@/pages/AlbumDetail';
 import GenreSpace from '@/pages/GenreSpace';
 import Profile from '@/pages/Profile';
+import About from '@/pages/About';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -38,6 +39,7 @@ const AuthenticatedApp = () => {
         <Route path="/genre/:genreId" element={<GenreSpace />} />
         <Route path="/album/:id" element={<AlbumDetail />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/about" element={<About />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
