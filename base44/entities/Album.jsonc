@@ -48,6 +48,10 @@
       "type": "string",
       "description": "Album cover image URL"
     },
+    "mv_url": {
+      "type": "string",
+      "description": "Link to the music video (e.g. YouTube)"
+    },
     "description": {
       "type": "string",
       "description": "Brief description"
