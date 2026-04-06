@@ -1,0 +1,63 @@
+{
+  "name": "Review",
+  "type": "object",
+  "properties": {
+    "album_id": {
+      "type": "string",
+      "description": "ID of the album being reviewed"
+    },
+    "album_title": {
+      "type": "string",
+      "description": "Album title for display"
+    },
+    "album_artist": {
+      "type": "string",
+      "description": "Album artist for display"
+    },
+    "album_cover_url": {
+      "type": "string",
+      "description": "Album cover for display"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Rating from 1 to 5"
+    },
+    "title": {
+      "type": "string",
+      "description": "Review title"
+    },
+    "content": {
+      "type": "string",
+      "description": "Review text"
+    },
+    "reviewer_name": {
+      "type": "string",
+      "description": "Name of the reviewer"
+    },
+    "likes_count": {
+      "type": "number",
+      "description": "Number of likes"
+    },
+    "band_style": {
+      "type": "string",
+      "description": "Specific sub-style or sub-genre of the band (e.g. thrash metal, dream pop, bebop)"
+    },
+    "band_background": {
+      "type": "string",
+      "description": "Background information about the band/artist"
+    },
+    "band_history": {
+      "type": "string",
+      "description": "History of the band/artist \u2014 formation, lineup changes, milestones"
+    },
+    "band_story": {
+      "type": "string",
+      "description": "The background story behind the band/artist"
+    }
+  },
+  "required": [
+    "album_id",
+    "rating",
+    "content"
+  ]
+}

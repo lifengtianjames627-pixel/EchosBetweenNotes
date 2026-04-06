@@ -104,7 +104,7 @@ function CommentSection({ reviewId, v, currentUser }) {
 }
 
 function ReviewForm({ albumId, album, v, currentUser, onSuccess }) {
-  const [data, setData] = useState({ rating: 0, title: '', content: '' });
+  const [data, setData] = useState({ rating: 0, title: '', content: '', band_style: '', band_background: '', band_history: '', band_story: '' });
   const queryClient = useQueryClient();
 
   const createReview = useMutation({
@@ -119,6 +119,10 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess }) {
         content: d.content,
         reviewer_name: currentUser?.full_name || 'Anonymous',
         likes_count: 0,
+        band_style: d.band_style,
+        band_background: d.band_background,
+        band_history: d.band_history,
+        band_story: d.band_story,
       });
       const newCount = (album.review_count || 0) + 1;
       const totalRating = (album.avg_rating || 0) * (album.review_count || 0) + d.rating;
@@ -155,6 +159,58 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess }) {
         onChange={e => setData({ ...data, content: e.target.value })}
         required
       />
+
+      {/* Band info section */}
+      <div className="pt-3 mt-1" style={{ borderTop: `1px solid ${v.accent}18` }}>
+        <p className="text-xs uppercase tracking-widest font-bold mb-3" style={{ color: v.muted }}>Band / Artist Info <span className="normal-case font-normal opacity-60">(optional)</span></p>
+
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs mb-1 block" style={{ color: v.muted }}>Specific Style / Sub-genre</label>
+            <input
+              className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+              style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }}
+              placeholder="e.g. Thrash Metal, Dream Pop, Bebop…"
+              value={data.band_style}
+              onChange={e => setData({ ...data, band_style: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="text-xs mb-1 block" style={{ color: v.muted }}>Band Background</label>
+            <textarea
+              className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
+              style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }}
+              rows={2}
+              placeholder="Who are they? Where are they from?"
+              value={data.band_background}
+              onChange={e => setData({ ...data, band_background: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="text-xs mb-1 block" style={{ color: v.muted }}>Band History</label>
+            <textarea
+              className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
+              style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }}
+              rows={2}
+              placeholder="Formation, lineup changes, key milestones…"
+              value={data.band_history}
+              onChange={e => setData({ ...data, band_history: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="text-xs mb-1 block" style={{ color: v.muted }}>Background Story</label>
+            <textarea
+              className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
+              style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }}
+              rows={2}
+              placeholder="The story behind the band — origins, inspiration, lore…"
+              value={data.band_story}
+              onChange={e => setData({ ...data, band_story: e.target.value })}
+            />
+          </div>
+        </div>
+      </div>
+
       <button
         type="submit"
         disabled={!data.rating || createReview.isPending}
@@ -289,6 +345,38 @@ export default function MusicItemDetail({ item, v, onClose }) {
                     </div>
                   </div>
                   <p className="text-sm leading-relaxed" style={{ color: v.muted }}>{review.content}</p>
+
+                  {/* Band info display */}
+                  {(review.band_style || review.band_background || review.band_history || review.band_story) && (
+                    <div className="mt-3 pt-3 space-y-2" style={{ borderTop: `1px solid ${v.accent}15` }}>
+                      {review.band_style && (
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full" style={{ background: `${v.accent}20`, color: v.accent }}>
+                            {review.band_style}
+                          </span>
+                        </div>
+                      )}
+                      {review.band_background && (
+                        <div>
+                          <p className="text-[10px] uppercase tracking-widest font-bold mb-0.5" style={{ color: v.accent }}>Background</p>
+                          <p className="text-xs leading-relaxed" style={{ color: v.muted }}>{review.band_background}</p>
+                        </div>
+                      )}
+                      {review.band_history && (
+                        <div>
+                          <p className="text-[10px] uppercase tracking-widest font-bold mb-0.5" style={{ color: v.accent }}>History</p>
+                          <p className="text-xs leading-relaxed" style={{ color: v.muted }}>{review.band_history}</p>
+                        </div>
+                      )}
+                      {review.band_story && (
+                        <div>
+                          <p className="text-[10px] uppercase tracking-widest font-bold mb-0.5" style={{ color: v.accent }}>Story</p>
+                          <p className="text-xs leading-relaxed" style={{ color: v.muted }}>{review.band_story}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <CommentSection reviewId={review.id} v={v} currentUser={currentUser} />
                 </motion.div>
               ))}
