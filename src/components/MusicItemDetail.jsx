@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send } from 'lucide-react';
+import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube } from 'lucide-react';
 
 function StarPicker({ rating, onRate, accent, muted }) {
   return (
@@ -294,6 +294,21 @@ export default function MusicItemDetail({ item, v, onClose }) {
 
         {item.description && (
           <p className="px-5 pb-4 text-sm leading-relaxed" style={{ color: v.muted }}>{item.description}</p>
+        )}
+
+        {item.mv_url && (
+          <div className="px-5 pb-4">
+            <a
+              href={item.mv_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105"
+              style={{ background: 'rgba(255,0,0,0.15)', border: '1px solid rgba(255,0,0,0.35)', color: '#ff4444' }}
+            >
+              <Youtube className="w-4 h-4" />
+              Watch Music Video
+            </a>
+          </div>
         )}
 
         <div className="px-5 pb-6">
