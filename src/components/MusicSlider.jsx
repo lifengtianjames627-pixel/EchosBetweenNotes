@@ -81,8 +81,8 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, label }
       ) : (
         /* Cards — centered when few, scrollable when many */
         <div
-          className="flex flex-wrap justify-center gap-5 overflow-x-auto pb-2"
-          style={{ scrollbarWidth: 'none' }}
+          className="flex gap-5 overflow-x-auto pb-3"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {items.map((item, i) => (
             <motion.div
