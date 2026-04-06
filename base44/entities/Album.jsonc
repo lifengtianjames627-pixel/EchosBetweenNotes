@@ -63,6 +63,22 @@
     "review_count": {
       "type": "number",
       "description": "Number of reviews"
+    },
+    "click_count": {
+      "type": "number",
+      "description": "Number of times this album has been clicked/viewed",
+      "default": 0
+    },
+    "tracklist": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of track titles (auto-fetched from MusicBrainz)"
+    },
+    "musicbrainz_id": {
+      "type": "string",
+      "description": "MusicBrainz release ID for data fetching"
     }
   },
   "required": [

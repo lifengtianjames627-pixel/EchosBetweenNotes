@@ -1,21 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Upload, ImageIcon, Loader2 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { X } from 'lucide-react';
 
 export default function AddMusicModal({ v, type, onClose, onSubmit, isPending }) {
-  const [data, setData] = useState({ title: '', artist: '', cover_url: '', mv_url: '', release_year: '', description: '' });
-  const [uploading, setUploading] = useState(false);
-  const fileRef = useRef();
-
-  const handleCoverUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setUploading(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    setData(d => ({ ...d, cover_url: file_url }));
-    setUploading(false);
-  };
+  const [data, setData] = useState({ title: '', artist: '', mv_url: '', release_year: '', description: '' });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,10 +31,13 @@ export default function AddMusicModal({ v, type, onClose, onSubmit, isPending })
           style={{ background: v.cardBg, border: `1px solid ${v.accent}40`, boxShadow: `0 0 40px ${v.accentGlow}` }}
           onClick={e => e.stopPropagation()}
         >
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold" style={{ color: v.text }}>Add {type === 'single' ? 'Single' : 'Album'}</h3>
             <button onClick={onClose} style={{ color: v.muted }}><X className="w-5 h-5" /></button>
           </div>
+          <p className="text-xs mb-5" style={{ color: `${v.muted}80` }}>
+            Cover art & tracklist will be fetched automatically from MusicBrainz once added.
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
@@ -57,61 +48,19 @@ export default function AddMusicModal({ v, type, onClose, onSubmit, isPending })
               <label className="text-xs uppercase tracking-widest mb-1 block" style={{ color: v.muted }}>Artist *</label>
               <input className={inp} style={inpStyle} value={data.artist} onChange={e => setData({ ...data, artist: e.target.value })} required />
             </div>
-
-            {/* Cover image upload */}
-            <div>
-              <label className="text-xs uppercase tracking-widest mb-1 block" style={{ color: v.muted }}>Cover Picture</label>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
-              <div
-                className="w-full rounded-xl overflow-hidden cursor-pointer flex items-center justify-center transition-all"
-                style={{
-                  height: data.cover_url ? 'auto' : 100,
-                  border: `1.5px dashed ${v.accent}40`,
-                  background: 'rgba(255,255,255,0.04)',
-                }}
-                onClick={() => fileRef.current.click()}
-              >
-                {uploading ? (
-                  <div className="flex flex-col items-center gap-2 py-6">
-                    <Loader2 className="w-5 h-5 animate-spin" style={{ color: v.accent }} />
-                    <span className="text-xs" style={{ color: v.muted }}>Uploading…</span>
-                  </div>
-                ) : data.cover_url ? (
-                  <div className="relative w-full">
-                    <img src={data.cover_url} alt="cover" className="w-full rounded-xl object-cover" style={{ maxHeight: 200 }} />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-xl" style={{ background: 'rgba(0,0,0,0.5)' }}>
-                      <span className="text-xs font-semibold" style={{ color: '#fff' }}>Change Photo</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center gap-2 py-6">
-                    <ImageIcon className="w-6 h-6" style={{ color: v.muted }} />
-                    <span className="text-xs" style={{ color: v.muted }}>Click to upload cover</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
             <div>
               <label className="text-xs uppercase tracking-widest mb-1 block" style={{ color: v.muted }}>Release Year</label>
               <input type="number" className={inp} style={inpStyle} value={data.release_year} onChange={e => setData({ ...data, release_year: e.target.value })} placeholder="2024" />
             </div>
-
-            {/* MV link */}
-            <div>
-              <label className="text-xs uppercase tracking-widest mb-1 block" style={{ color: v.muted }}>
-                Music Video Link
-                <span className="ml-1 normal-case font-normal opacity-60">(YouTube recommended)</span>
-              </label>
-              <input
-                className={inp}
-                style={inpStyle}
-                value={data.mv_url}
-                onChange={e => setData({ ...data, mv_url: e.target.value })}
-                placeholder="https://youtube.com/watch?v=…"
-              />
-            </div>
-
+            {type === 'single' && (
+              <div>
+                <label className="text-xs uppercase tracking-widest mb-1 block" style={{ color: v.muted }}>
+                  Music Video Link
+                  <span className="ml-1 normal-case font-normal opacity-60">(YouTube recommended)</span>
+                </label>
+                <input className={inp} style={inpStyle} value={data.mv_url} onChange={e => setData({ ...data, mv_url: e.target.value })} placeholder="https://youtube.com/watch?v=…" />
+              </div>
+            )}
             <div>
               <label className="text-xs uppercase tracking-widest mb-1 block" style={{ color: v.muted }}>Description</label>
               <textarea className={`${inp} resize-none`} style={inpStyle} rows={2} value={data.description} onChange={e => setData({ ...data, description: e.target.value })} />
@@ -119,9 +68,9 @@ export default function AddMusicModal({ v, type, onClose, onSubmit, isPending })
 
             <button
               type="submit"
-              disabled={isPending || uploading}
+              disabled={isPending}
               className="w-full py-2.5 rounded-full text-sm font-semibold mt-2"
-              style={{ background: v.accent, color: '#000', opacity: (isPending || uploading) ? 0.6 : 1, boxShadow: `0 0 16px ${v.accentGlow}` }}
+              style={{ background: v.accent, color: '#000', opacity: isPending ? 0.6 : 1, boxShadow: `0 0 16px ${v.accentGlow}` }}
             >
               {isPending ? 'Adding…' : `Add ${type === 'single' ? 'Single' : 'Album'}`}
             </button>

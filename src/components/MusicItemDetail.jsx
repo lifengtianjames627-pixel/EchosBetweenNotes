@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube } from 'lucide-react';
+import CivilityNotice from '@/components/CivilityNotice';
+import TrackList from '@/components/TrackList';
 
 function StarPicker({ rating, onRate, accent, muted }) {
   return (
@@ -77,7 +79,6 @@ function CommentSection({ reviewId, v, currentUser }) {
                 </div>
               ))}
             </div>
-            {/* Comment input */}
             <div className="mt-3 flex gap-2">
               <input
                 className="flex-1 px-3 py-1.5 rounded-lg text-xs outline-none"
@@ -103,7 +104,7 @@ function CommentSection({ reviewId, v, currentUser }) {
   );
 }
 
-function ReviewForm({ albumId, album, v, currentUser, onSuccess }) {
+function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
   const [data, setData] = useState({ rating: 0, title: '', content: '', band_style: '', band_background: '', band_history: '', band_story: '' });
   const queryClient = useQueryClient();
 
@@ -124,17 +125,19 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess }) {
         band_history: d.band_history,
         band_story: d.band_story,
       });
-      const newCount = (album.review_count || 0) + 1;
-      const totalRating = (album.avg_rating || 0) * (album.review_count || 0) + d.rating;
+      // Recalculate mean from all current reviews + new one
+      const allRatings = [...(allReviews || []).map(r => r.rating), d.rating];
+      const newCount = allRatings.length;
+      const newAvg = Math.round((allRatings.reduce((s, r) => s + r, 0) / newCount) * 10) / 10;
       await base44.entities.Album.update(albumId, {
         review_count: newCount,
-        avg_rating: Math.round((totalRating / newCount) * 10) / 10,
+        avg_rating: newAvg,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['item-reviews', albumId] });
       queryClient.invalidateQueries({ queryKey: ['genre-albums'] });
-      setData({ rating: 0, title: '', content: '' });
+      setData({ rating: 0, title: '', content: '', band_style: '', band_background: '', band_history: '', band_story: '' });
       onSuccess?.();
     },
   });
@@ -142,6 +145,9 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess }) {
   return (
     <form onSubmit={(e) => { e.preventDefault(); createReview.mutate(data); }} className="space-y-3 mt-4 rounded-xl p-4" style={{ background: `${v.accent}0d`, border: `1px solid ${v.accent}25` }}>
       <p className="text-xs uppercase tracking-widest font-bold" style={{ color: v.muted }}>Write a Review</p>
+
+      <CivilityNotice v={v} />
+
       <StarPicker rating={data.rating} onRate={r => setData({ ...data, rating: r })} accent={v.accent} muted={v.muted} />
       <input
         className="w-full px-3 py-2 rounded-lg text-sm outline-none"
@@ -163,50 +169,22 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess }) {
       {/* Band info section */}
       <div className="pt-3 mt-1" style={{ borderTop: `1px solid ${v.accent}18` }}>
         <p className="text-xs uppercase tracking-widest font-bold mb-3" style={{ color: v.muted }}>Band / Artist Info <span className="normal-case font-normal opacity-60">(optional)</span></p>
-
         <div className="space-y-3">
           <div>
             <label className="text-xs mb-1 block" style={{ color: v.muted }}>Specific Style / Sub-genre</label>
-            <input
-              className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-              style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }}
-              placeholder="e.g. Thrash Metal, Dream Pop, Bebop…"
-              value={data.band_style}
-              onChange={e => setData({ ...data, band_style: e.target.value })}
-            />
+            <input className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }} placeholder="e.g. Thrash Metal, Dream Pop, Bebop…" value={data.band_style} onChange={e => setData({ ...data, band_style: e.target.value })} />
           </div>
           <div>
             <label className="text-xs mb-1 block" style={{ color: v.muted }}>Band Background</label>
-            <textarea
-              className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
-              style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }}
-              rows={2}
-              placeholder="Who are they? Where are they from?"
-              value={data.band_background}
-              onChange={e => setData({ ...data, band_background: e.target.value })}
-            />
+            <textarea className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }} rows={2} placeholder="Who are they? Where are they from?" value={data.band_background} onChange={e => setData({ ...data, band_background: e.target.value })} />
           </div>
           <div>
             <label className="text-xs mb-1 block" style={{ color: v.muted }}>Band History</label>
-            <textarea
-              className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
-              style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }}
-              rows={2}
-              placeholder="Formation, lineup changes, key milestones…"
-              value={data.band_history}
-              onChange={e => setData({ ...data, band_history: e.target.value })}
-            />
+            <textarea className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }} rows={2} placeholder="Formation, lineup changes, key milestones…" value={data.band_history} onChange={e => setData({ ...data, band_history: e.target.value })} />
           </div>
           <div>
             <label className="text-xs mb-1 block" style={{ color: v.muted }}>Background Story</label>
-            <textarea
-              className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
-              style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }}
-              rows={2}
-              placeholder="The story behind the band — origins, inspiration, lore…"
-              value={data.band_story}
-              onChange={e => setData({ ...data, band_story: e.target.value })}
-            />
+            <textarea className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }} rows={2} placeholder="The story behind the band — origins, inspiration, lore…" value={data.band_story} onChange={e => setData({ ...data, band_story: e.target.value })} />
           </div>
         </div>
       </div>
@@ -223,8 +201,9 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess }) {
   );
 }
 
-export default function MusicItemDetail({ item, v, onClose }) {
+export default function MusicItemDetail({ item, v, onClose, onClickRegistered }) {
   const [showForm, setShowForm] = useState(false);
+  const [localItem, setLocalItem] = useState(item);
 
   const { data: currentUser } = useQuery({
     queryKey: ['me'],
@@ -236,6 +215,7 @@ export default function MusicItemDetail({ item, v, onClose }) {
     queryFn: () => base44.entities.Review.filter({ album_id: item.id }, '-created_date', 100),
   });
 
+  // Compute live avg from actual reviews (true mean)
   const avgRating = reviews.length
     ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
     : null;
@@ -261,8 +241,8 @@ export default function MusicItemDetail({ item, v, onClose }) {
         {/* Header */}
         <div className="flex gap-4 p-5 pb-4 sticky top-0 z-10 backdrop-blur-lg" style={{ background: v.cardBg }}>
           <div className="w-20 h-20 rounded-xl shrink-0 overflow-hidden" style={{ background: `${v.accent}15` }}>
-            {item.cover_url ? (
-              <img src={item.cover_url} alt={item.title} className="w-full h-full object-cover" />
+            {localItem.cover_url ? (
+              <img src={localItem.cover_url} alt={localItem.title} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-2xl">🎵</div>
             )}
@@ -270,9 +250,9 @@ export default function MusicItemDetail({ item, v, onClose }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <span className="text-xs uppercase tracking-widest" style={{ color: v.accent }}>{item.type || 'album'}</span>
-                <h2 className="text-lg font-bold leading-tight mt-0.5" style={{ color: v.text, ...v.headerStyle }}>{item.title}</h2>
-                <p className="text-sm" style={{ color: v.muted }}>{item.artist} {item.release_year && `· ${item.release_year}`}</p>
+                <span className="text-xs uppercase tracking-widest" style={{ color: v.accent }}>{localItem.type || 'album'}</span>
+                <h2 className="text-lg font-bold leading-tight mt-0.5" style={{ color: v.text, ...v.headerStyle }}>{localItem.title}</h2>
+                <p className="text-sm" style={{ color: v.muted }}>{localItem.artist} {localItem.release_year && `· ${localItem.release_year}`}</p>
               </div>
               <button onClick={onClose} className="shrink-0 mt-1" style={{ color: v.muted }}>
                 <X className="w-5 h-5" />
@@ -292,14 +272,22 @@ export default function MusicItemDetail({ item, v, onClose }) {
           </div>
         </div>
 
-        {item.description && (
-          <p className="px-5 pb-4 text-sm leading-relaxed" style={{ color: v.muted }}>{item.description}</p>
+        {localItem.description && (
+          <p className="px-5 pb-4 text-sm leading-relaxed" style={{ color: v.muted }}>{localItem.description}</p>
         )}
 
-        {item.mv_url && (
+        {/* Tracklist (albums only, auto-fetched) */}
+        <TrackList
+          item={localItem}
+          v={v}
+          onDataFetched={(update) => setLocalItem(prev => ({ ...prev, ...update }))}
+        />
+
+        {/* MV link for singles only */}
+        {localItem.type === 'single' && localItem.mv_url && (
           <div className="px-5 pb-4">
             <a
-              href={item.mv_url}
+              href={localItem.mv_url}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105"
@@ -312,7 +300,6 @@ export default function MusicItemDetail({ item, v, onClose }) {
         )}
 
         <div className="px-5 pb-6">
-          {/* Reviews */}
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs uppercase tracking-widest font-bold" style={{ color: v.muted }}>
               Reviews {reviews.length > 0 && <span style={{ color: v.accent }}>({reviews.length})</span>}
@@ -329,7 +316,7 @@ export default function MusicItemDetail({ item, v, onClose }) {
           <AnimatePresence>
             {showForm && (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                <ReviewForm albumId={item.id} album={item} v={v} currentUser={currentUser} onSuccess={() => setShowForm(false)} />
+                <ReviewForm albumId={item.id} album={localItem} v={v} currentUser={currentUser} allReviews={reviews} onSuccess={() => setShowForm(false)} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -361,15 +348,12 @@ export default function MusicItemDetail({ item, v, onClose }) {
                   </div>
                   <p className="text-sm leading-relaxed" style={{ color: v.muted }}>{review.content}</p>
 
-                  {/* Band info display */}
                   {(review.band_style || review.band_background || review.band_history || review.band_story) && (
                     <div className="mt-3 pt-3 space-y-2" style={{ borderTop: `1px solid ${v.accent}15` }}>
                       {review.band_style && (
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full" style={{ background: `${v.accent}20`, color: v.accent }}>
-                            {review.band_style}
-                          </span>
-                        </div>
+                        <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full" style={{ background: `${v.accent}20`, color: v.accent }}>
+                          {review.band_style}
+                        </span>
                       )}
                       {review.band_background && (
                         <div>

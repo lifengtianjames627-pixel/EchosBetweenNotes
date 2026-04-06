@@ -8,6 +8,7 @@ import { ArrowLeft } from 'lucide-react';
 import MusicSlider from '@/components/MusicSlider';
 import AddMusicModal from '@/components/AddMusicModal';
 import MusicItemDetail from '@/components/MusicItemDetail';
+import GenreRankings from '@/components/GenreRankings';
 
 // Per-genre visual configs
 const GENRE_VISUALS = {
@@ -125,6 +126,12 @@ export default function GenreSpace() {
   const [addModal, setAddModal] = useState(null); // 'album' | 'single' | null
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const handleItemClick = (item) => {
+    setSelectedItem(item);
+    // Increment click count for popularity tracking
+    base44.entities.Album.update(item.id, { click_count: (item.click_count || 0) + 1 });
+  };
+
   const genre = GENRES.find(g => g.id === genreId);
   const v = GENRE_VISUALS[genreId] || GENRE_VISUALS.electronic;
   const entityGenre = genre?.entityGenre;
@@ -217,12 +224,17 @@ export default function GenreSpace() {
           </div>
         ) : (
           <div className="mt-8 space-y-2">
+            {/* Rankings */}
+            <GenreRankings items={allItems} v={v} />
+
+            <div className="h-px my-6" style={{ background: `${v.accent}18` }} />
+
             {/* Albums slider */}
             <MusicSlider
               items={albums}
               v={v}
               label="Albums"
-              onItemClick={setSelectedItem}
+              onItemClick={handleItemClick}
               onAddClick={() => setAddModal('album')}
             />
 
@@ -233,7 +245,7 @@ export default function GenreSpace() {
               items={singles}
               v={v}
               label="Singles"
-              onItemClick={setSelectedItem}
+              onItemClick={handleItemClick}
               onAddClick={() => setAddModal('single')}
             />
           </div>
