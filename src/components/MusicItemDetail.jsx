@@ -179,12 +179,12 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
             <textarea className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }} rows={2} placeholder="Who are they? Where are they from?" value={data.band_background} onChange={e => setData({ ...data, band_background: e.target.value })} />
           </div>
           <div>
-            <label className="text-xs mb-1 block" style={{ color: v.muted }}>Band History</label>
-            <textarea className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }} rows={2} placeholder="Formation, lineup changes, key milestones…" value={data.band_history} onChange={e => setData({ ...data, band_history: e.target.value })} />
+            <label className="text-xs mb-1 block" style={{ color: v.muted }}>Album Background</label>
+            <textarea className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }} rows={2} placeholder="Context behind this album — concept, recording, inspiration…" value={data.band_story} onChange={e => setData({ ...data, band_story: e.target.value })} />
           </div>
           <div>
-            <label className="text-xs mb-1 block" style={{ color: v.muted }}>Background Story</label>
-            <textarea className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }} rows={2} placeholder="The story behind the band — origins, inspiration, lore…" value={data.band_story} onChange={e => setData({ ...data, band_story: e.target.value })} />
+            <label className="text-xs mb-1 block" style={{ color: v.muted }}>Band History</label>
+            <textarea className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${v.accent}25`, color: v.text }} rows={2} placeholder="Formation, lineup changes, key milestones…" value={data.band_history} onChange={e => setData({ ...data, band_history: e.target.value })} />
           </div>
         </div>
       </div>
