@@ -1,0 +1,68 @@
+{
+  "name": "Album",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Album/single title"
+    },
+    "artist": {
+      "type": "string",
+      "description": "Artist or band name"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "album",
+        "single"
+      ],
+      "default": "album",
+      "description": "Whether this is an album or a single"
+    },
+    "genre": {
+      "type": "string",
+      "enum": [
+        "rock",
+        "pop",
+        "hip_hop",
+        "r_and_b",
+        "jazz",
+        "classical",
+        "electronic",
+        "indie",
+        "metal",
+        "punk",
+        "folk",
+        "country",
+        "latin",
+        "k_pop",
+        "other"
+      ],
+      "description": "Music genre"
+    },
+    "release_year": {
+      "type": "number",
+      "description": "Year the album/single was released"
+    },
+    "cover_url": {
+      "type": "string",
+      "description": "Album cover image URL"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description"
+    },
+    "avg_rating": {
+      "type": "number",
+      "description": "Average rating from reviews"
+    },
+    "review_count": {
+      "type": "number",
+      "description": "Number of reviews"
+    }
+  },
+  "required": [
+    "title",
+    "artist"
+  ]
+}
