@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube } from 'lucide-react';
+import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube, Maximize2, Minimize2 } from 'lucide-react';
 import CivilityNotice from '@/components/CivilityNotice';
 import TrackList from '@/components/TrackList';
 
@@ -204,6 +204,7 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
 export default function MusicItemDetail({ item, v, onClose, onClickRegistered }) {
   const [showForm, setShowForm] = useState(false);
   const [localItem, setLocalItem] = useState(item);
+  const [fullscreen, setFullscreen] = useState(false);
 
   const { data: currentUser } = useQuery({
     queryKey: ['me'],
@@ -234,8 +235,8 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 60 }}
         transition={{ type: 'spring', damping: 22, stiffness: 260 }}
-        className="w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl"
-        style={{ background: v.cardBg, border: `1px solid ${v.accent}30`, boxShadow: `0 0 60px ${v.accentGlow}` }}
+        className={fullscreen ? "w-full h-full overflow-y-auto" : "w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl"}
+        style={{ background: v.cardBg, border: fullscreen ? 'none' : `1px solid ${v.accent}30`, boxShadow: fullscreen ? 'none' : `0 0 60px ${v.accentGlow}` }}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -254,9 +255,14 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
                 <h2 className="text-lg font-bold leading-tight mt-0.5" style={{ color: v.text, ...v.headerStyle }}>{localItem.title}</h2>
                 <p className="text-sm" style={{ color: v.muted }}>{localItem.artist} {localItem.release_year && `· ${localItem.release_year}`}</p>
               </div>
-              <button onClick={onClose} className="shrink-0 mt-1" style={{ color: v.muted }}>
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2 shrink-0 mt-1">
+                <button onClick={() => setFullscreen(f => !f)} style={{ color: v.muted }} title={fullscreen ? 'Exit fullscreen' : 'Fullscreen'}>
+                  {fullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                </button>
+                <button onClick={onClose} style={{ color: v.muted }}>
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
             {avgRating && (
               <div className="flex items-center gap-1.5 mt-2">
