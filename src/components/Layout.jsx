@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, User, Info, Shield } from 'lucide-react';
+import { Home, User, Info, Shield, LogOut, LogIn } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 
@@ -57,6 +57,25 @@ export default function Layout() {
                 </Link>
               );
             })}
+            {currentUser ? (
+              <button
+                onClick={() => base44.auth.logout()}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ml-1"
+                style={{ color: 'rgba(248,113,113,0.7)' }}
+              >
+                <LogOut className="w-4 h-4" />
+                Log out
+              </button>
+            ) : (
+              <button
+                onClick={() => base44.auth.redirectToLogin()}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ml-1"
+                style={{ background: 'rgba(124,111,255,0.18)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.3)' }}
+              >
+                <LogIn className="w-4 h-4" />
+                Log in
+              </button>
+            )}
           </nav>
         </div>
       </header>
