@@ -14,17 +14,24 @@ Deno.serve(async (req) => {
     }
 
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a content moderation AI. Analyze the following user-submitted text for a music review forum.
-The text may be in English or Chinese. Detect if it violates community guidelines.
+      prompt: `You are a lenient content moderation AI for a music review forum. Your job is to catch only genuinely harmful content — NOT casual strong language, music slang, passionate opinions, or enthusiastic writing.
 
-Detection categories:
-- hate: hate speech or discrimination based on race, gender, religion, etc.
-- harassment: personal attacks or targeted harassment
-- profanity: strong offensive language or swearing
-- spam: advertising, repetitive content, or off-topic promotion
-- sexual: sexual or explicit content
-- violence: violent or threatening content
-- privacy: sharing personal private information
+DO NOT FLAG:
+- Strong opinions about music ("this album is garbage", "worst album ever", "this sucks")
+- Casual swear words used as emphasis ("this is f***ing amazing", "holy shit what a banger")
+- Harsh but music-focused criticism
+- Enthusiastic caps ("WOW", "AMAZING", "BANGER")
+- Any content that is clearly about music, albums, or artists
+
+ONLY FLAG if the text contains:
+- hate: explicit hate speech targeting a person/group based on race, gender, religion, ethnicity (full sentences, not just a word)
+- harassment: direct personal attacks or threats aimed at a real person (not the music)
+- spam: obvious advertising or completely off-topic promotion
+- sexual: sexually explicit content
+- violence: direct threats of violence against a real person
+- privacy: sharing someone's private personal information
+
+A single strong word is NOT enough to flag. The entire line/sentence must be aggressive or harmful in context.
 
 Text to analyze:
 """
@@ -37,7 +44,7 @@ Respond with a JSON object only, no explanation:
   "confidence": number between 0.0 and 1.0,
   "categories": array of matched category strings from the list above,
   "reason": short one-sentence explanation in English,
-  "suggestedAction": "block" if confidence > 0.85 and isFlagged, "review" if confidence > 0.5 and isFlagged, otherwise "allow"
+  "suggestedAction": "block" if confidence > 0.9 and isFlagged, "review" if confidence > 0.75 and isFlagged, otherwise "allow"
 }`,
       response_json_schema: {
         type: 'object',
