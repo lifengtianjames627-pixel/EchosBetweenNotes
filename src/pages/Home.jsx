@@ -224,13 +224,19 @@ export default function Home() {
 
       {/* ── Ambient background decorations ── */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        {/* Floating vinyl records */}
+
+        {/* Big radial glows */}
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(124,111,255,0.18) 0%, transparent 70%)', transform: 'translate(-30%, -30%)' }} />
+        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(244,114,182,0.15) 0%, transparent 70%)', transform: 'translate(30%, 30%)' }} />
+        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%)', transform: 'translate(-50%, -50%)' }} />
+
+        {/* Floating vinyl records — bigger & brighter */}
         {[
-          { top: '8%', left: '4%', size: 90, rot: -18, opacity: 0.13, dur: 18 },
-          { top: '70%', left: '2%', size: 60, rot: 12, opacity: 0.09, dur: 22 },
-          { top: '20%', right: '3%', size: 110, rot: 25, opacity: 0.11, dur: 20 },
-          { top: '60%', right: '5%', size: 70, rot: -8, opacity: 0.10, dur: 25 },
-          { top: '85%', left: '45%', size: 50, rot: 5, opacity: 0.08, dur: 16 },
+          { top: '5%',  left: '3%',   size: 160, rot: -18, color: '#7c6fff', dur: 22 },
+          { top: '55%', left: '1%',   size: 110, rot: 12,  color: '#f472b6', dur: 28 },
+          { top: '15%', right: '2%',  size: 180, rot: 25,  color: '#38bdf8', dur: 24 },
+          { top: '60%', right: '3%',  size: 130, rot: -8,  color: '#34d399', dur: 30 },
+          { top: '82%', left: '42%',  size: 90,  rot: 5,   color: '#fbbf24', dur: 20 },
         ].map((v, i) => (
           <motion.div
             key={`vinyl-${i}`}
@@ -238,75 +244,77 @@ export default function Home() {
             style={{
               top: v.top, left: v.left, right: v.right,
               width: v.size, height: v.size,
-              opacity: v.opacity,
-              rotate: v.rot,
-              background: `conic-gradient(from 0deg, #1a1a2e, #16213e, #0f3460, #1a1a2e, #0d0d1a, #1a1a2e)`,
-              boxShadow: `0 0 0 ${v.size * 0.06}px rgba(255,255,255,0.06), 0 0 0 ${v.size * 0.12}px rgba(255,255,255,0.02), inset 0 0 ${v.size * 0.3}px rgba(0,0,0,0.8)`,
+              opacity: 0.28,
+              background: `conic-gradient(from 0deg, #111128, #1a1a3e, #0f2060 , #111128, #0d0d1a, #111128)`,
+              boxShadow: `0 0 30px 8px ${v.color}33, 0 0 0 2px ${v.color}22`,
             }}
             animate={{ rotate: [v.rot, v.rot + 360] }}
             transition={{ duration: v.dur, repeat: Infinity, ease: 'linear' }}
           >
-            {/* Center hole */}
-            <div className="absolute rounded-full bg-black" style={{ width: v.size * 0.15, height: v.size * 0.15, top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
-            {/* Groove rings */}
-            {[0.35, 0.5, 0.65, 0.78].map((r, j) => (
-              <div key={j} className="absolute rounded-full border" style={{ width: `${r * 100}%`, height: `${r * 100}%`, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', borderColor: 'rgba(255,255,255,0.06)' }} />
+            <div className="absolute rounded-full" style={{ width: v.size * 0.14, height: v.size * 0.14, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: '#000', boxShadow: `0 0 8px ${v.color}66` }} />
+            {[0.3, 0.45, 0.6, 0.75, 0.88].map((r, j) => (
+              <div key={j} className="absolute rounded-full border" style={{ width: `${r * 100}%`, height: `${r * 100}%`, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', borderColor: `${v.color}18` }} />
             ))}
           </motion.div>
         ))}
 
-        {/* Floating music notes */}
+        {/* Floating music notes — much bigger & glowing */}
         {[
-          { top: '15%', left: '12%', note: '♪', size: 22, color: '#7c6fff', dur: 6, delay: 0 },
-          { top: '35%', left: '8%', note: '♫', size: 18, color: '#f472b6', dur: 8, delay: 1 },
-          { top: '55%', left: '14%', note: '♩', size: 16, color: '#38bdf8', dur: 7, delay: 2 },
-          { top: '75%', left: '9%', note: '♬', size: 20, color: '#34d399', dur: 9, delay: 0.5 },
-          { top: '12%', right: '10%', note: '♫', size: 20, color: '#fbbf24', dur: 7, delay: 1.5 },
-          { top: '40%', right: '8%', note: '♪', size: 16, color: '#c084fc', dur: 6, delay: 3 },
-          { top: '65%', right: '12%', note: '♩', size: 24, color: '#f87171', dur: 10, delay: 0.8 },
-          { top: '88%', right: '18%', note: '♬', size: 15, color: '#2dd4bf', dur: 8, delay: 2.5 },
+          { top: '10%', left: '10%',  note: '♪', size: 48, color: '#7c6fff', dur: 6,  delay: 0   },
+          { top: '30%', left: '6%',   note: '♫', size: 38, color: '#f472b6', dur: 8,  delay: 1   },
+          { top: '52%', left: '11%',  note: '♩', size: 32, color: '#38bdf8', dur: 7,  delay: 2   },
+          { top: '72%', left: '7%',   note: '♬', size: 44, color: '#34d399', dur: 9,  delay: 0.5 },
+          { top: '88%', left: '20%',  note: '♪', size: 28, color: '#fbbf24', dur: 7,  delay: 3.5 },
+          { top: '8%',  right: '9%',  note: '♫', size: 42, color: '#fbbf24', dur: 7,  delay: 1.5 },
+          { top: '35%', right: '6%',  note: '♪', size: 34, color: '#c084fc', dur: 6,  delay: 3   },
+          { top: '62%', right: '10%', note: '♩', size: 50, color: '#f87171', dur: 10, delay: 0.8 },
+          { top: '85%', right: '15%', note: '♬', size: 30, color: '#2dd4bf', dur: 8,  delay: 2.5 },
         ].map((n, i) => (
           <motion.span
             key={`note-${i}`}
             className="absolute select-none font-bold"
-            style={{ top: n.top, left: n.left, right: n.right, fontSize: n.size, color: n.color, filter: `drop-shadow(0 0 8px ${n.color})`, opacity: 0.35 }}
-            animate={{ y: [-8, 8, -8], opacity: [0.2, 0.45, 0.2], rotate: [-5, 5, -5] }}
+            style={{
+              top: n.top, left: n.left, right: n.right,
+              fontSize: n.size,
+              color: n.color,
+              filter: `drop-shadow(0 0 14px ${n.color}) drop-shadow(0 0 30px ${n.color}88)`,
+              opacity: 0.6,
+              lineHeight: 1,
+            }}
+            animate={{ y: [-12, 12, -12], opacity: [0.45, 0.75, 0.45], rotate: [-8, 8, -8] }}
             transition={{ duration: n.dur, delay: n.delay, repeat: Infinity, ease: 'easeInOut' }}
           >
             {n.note}
           </motion.span>
         ))}
 
-        {/* Waveform lines left */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-[3px] opacity-[0.07] pl-2">
-          {Array.from({ length: 18 }).map((_, i) => {
-            const h = [14,22,38,55,70,82,90,78,60,45,68,85,72,50,32,20,12,8][i];
-            return (
-              <motion.div key={i} className="rounded-full" style={{ width: 3, height: h, background: 'linear-gradient(to top, #7c6fff, #c084fc)' }}
-                animate={{ scaleY: [1, 0.4 + Math.random() * 0.8, 1] }}
-                transition={{ duration: 1.4 + i * 0.1, repeat: Infinity, ease: 'easeInOut', delay: i * 0.07 }}
-              />
-            );
-          })}
+        {/* Waveform left — taller & brighter */}
+        <div className="absolute left-2 top-1/2 -translate-y-1/2 flex items-end gap-[4px]" style={{ opacity: 0.35 }}>
+          {[14,22,40,58,75,88,96,82,64,48,70,90,76,54,36,22,14,8].map((h, i) => (
+            <motion.div key={i} className="rounded-full" style={{ width: 4, height: h, background: 'linear-gradient(to top, #7c6fff, #c084fc)', boxShadow: '0 0 6px #7c6fff88' }}
+              animate={{ scaleY: [1, 0.3 + (i % 3) * 0.3, 1] }}
+              transition={{ duration: 1.2 + i * 0.08, repeat: Infinity, ease: 'easeInOut', delay: i * 0.06 }}
+            />
+          ))}
         </div>
 
-        {/* Waveform lines right */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-[3px] opacity-[0.07] pr-2">
-          {Array.from({ length: 18 }).map((_, i) => {
-            const h = [8,12,20,32,50,72,85,68,45,60,78,90,82,70,55,38,22,14][i];
-            return (
-              <motion.div key={i} className="rounded-full" style={{ width: 3, height: h, background: 'linear-gradient(to top, #f472b6, #c084fc)' }}
-                animate={{ scaleY: [1, 0.4 + Math.random() * 0.8, 1] }}
-                transition={{ duration: 1.4 + i * 0.1, repeat: Infinity, ease: 'easeInOut', delay: i * 0.07 }}
-              />
-            );
-          })}
+        {/* Waveform right — taller & brighter */}
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-end gap-[4px]" style={{ opacity: 0.35 }}>
+          {[8,14,22,36,54,76,90,70,48,64,82,96,88,75,58,40,22,14].map((h, i) => (
+            <motion.div key={i} className="rounded-full" style={{ width: 4, height: h, background: 'linear-gradient(to top, #f472b6, #c084fc)', boxShadow: '0 0 6px #f472b688' }}
+              animate={{ scaleY: [1, 0.3 + (i % 3) * 0.3, 1] }}
+              transition={{ duration: 1.2 + i * 0.08, repeat: Infinity, ease: 'easeInOut', delay: i * 0.06 }}
+            />
+          ))}
         </div>
 
-        {/* Subtle radial glows in corners */}
-        <div className="absolute top-0 left-0 w-64 h-64 rounded-full" style={{ background: 'radial-gradient(circle, rgba(124,111,255,0.07) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full" style={{ background: 'radial-gradient(circle, rgba(244,114,182,0.07) 0%, transparent 70%)' }} />
-        <div className="absolute top-1/3 right-0 w-48 h-48 rounded-full" style={{ background: 'radial-gradient(circle, rgba(56,189,248,0.05) 0%, transparent 70%)' }} />
+        {/* Horizontal scan line */}
+        <motion.div
+          className="absolute left-0 right-0 h-px"
+          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(124,111,255,0.25) 30%, rgba(192,132,252,0.4) 50%, rgba(124,111,255,0.25) 70%, transparent 100%)' }}
+          animate={{ top: ['10%', '90%', '10%'] }}
+          transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+        />
       </div>
 
       {/* ── Hero ── */}
