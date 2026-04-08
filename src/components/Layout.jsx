@@ -1,8 +1,10 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, User, Info } from 'lucide-react';
+import { Home, User, Info, Shield } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
 
-const navItems = [
+const baseNavItems = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/profile', icon: User, label: 'Profile' },
   { path: '/about', icon: Info, label: 'About' },
@@ -10,6 +12,10 @@ const navItems = [
 
 export default function Layout() {
   const location = useLocation();
+  const { data: currentUser } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const navItems = currentUser?.role === 'admin'
+    ? [...baseNavItems, { path: '/moderation', icon: Shield, label: 'Moderation' }]
+    : baseNavItems;
 
   return (
     <div className="min-h-screen" style={{ background: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)' }}>

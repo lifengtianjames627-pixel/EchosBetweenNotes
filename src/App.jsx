@@ -11,6 +11,7 @@ import AlbumDetail from '@/pages/AlbumDetail';
 import GenreSpace from '@/pages/GenreSpace';
 import Profile from '@/pages/Profile';
 import About from '@/pages/About';
+import ModerationQueue from '@/pages/ModerationQueue';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -40,6 +41,7 @@ const AuthenticatedApp = () => {
         <Route path="/album/:id" element={<AlbumDetail />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/about" element={<About />} />
+        <Route path="/moderation" element={<ModerationQueue />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

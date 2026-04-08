@@ -53,6 +53,31 @@
     "band_story": {
       "type": "string",
       "description": "The background story behind the band/artist"
+    },
+    "moderation_status": {
+      "type": "string",
+      "enum": [
+        "approved",
+        "pending_review",
+        "blocked"
+      ],
+      "default": "approved",
+      "description": "AI moderation status"
+    },
+    "moderation_categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Flagged categories from AI moderation"
+    },
+    "moderation_reason": {
+      "type": "string",
+      "description": "AI explanation for flagging"
+    },
+    "moderation_confidence": {
+      "type": "number",
+      "description": "AI confidence score 0.0-1.0"
     }
   },
   "required": [

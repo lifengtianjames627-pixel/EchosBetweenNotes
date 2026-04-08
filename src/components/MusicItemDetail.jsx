@@ -106,10 +106,26 @@ function CommentSection({ reviewId, v, currentUser }) {
 
 function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
   const [data, setData] = useState({ rating: 0, title: '', content: '', band_style: '', band_background: '', band_history: '', band_story: '' });
+  const [moderationMsg, setModerationMsg] = useState(null); // null | 'blocked' | 'pending'
   const queryClient = useQueryClient();
 
   const createReview = useMutation({
     mutationFn: async (d) => {
+      // Run AI moderation on the review content
+      setModerationMsg(null);
+      const textToCheck = [d.title, d.content, d.band_background, d.band_history, d.band_story].filter(Boolean).join('\n');
+      let modResult = { isFlagged: false, confidence: 0, categories: [], reason: '', suggestedAction: 'allow' };
+      try {
+        const res = await base44.functions.invoke('moderateContent', { text: textToCheck });
+        modResult = res.data;
+      } catch (_) { /* AI failure → allow */ }
+
+      if (modResult.suggestedAction === 'block') {
+        throw new Error('BLOCKED');
+      }
+
+      const modStatus = modResult.suggestedAction === 'review' ? 'pending_review' : 'approved';
+
       await base44.entities.Review.create({
         album_id: albumId,
         album_title: album.title,
@@ -124,23 +140,57 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
         band_background: d.band_background,
         band_history: d.band_history,
         band_story: d.band_story,
+        moderation_status: modStatus,
+        moderation_categories: modResult.categories,
+        moderation_reason: modResult.reason,
+        moderation_confidence: modResult.confidence,
       });
-      // Recalculate mean from all current reviews + new one
-      const allRatings = [...(allReviews || []).map(r => r.rating), d.rating];
-      const newCount = allRatings.length;
-      const newAvg = Math.round((allRatings.reduce((s, r) => s + r, 0) / newCount) * 10) / 10;
-      await base44.entities.Album.update(albumId, {
-        review_count: newCount,
-        avg_rating: newAvg,
-      });
+
+      // Only update avg rating for approved reviews
+      if (modStatus === 'approved') {
+        const allRatings = [...(allReviews || []).filter(r => r.moderation_status !== 'blocked').map(r => r.rating), d.rating];
+        const newCount = allRatings.length;
+        const newAvg = Math.round((allRatings.reduce((s, r) => s + r, 0) / newCount) * 10) / 10;
+        await base44.entities.Album.update(albumId, { review_count: newCount, avg_rating: newAvg });
+      }
+
+      return modStatus;
     },
-    onSuccess: () => {
+    onSuccess: (modStatus) => {
       queryClient.invalidateQueries({ queryKey: ['item-reviews', albumId] });
       queryClient.invalidateQueries({ queryKey: ['genre-albums'] });
       setData({ rating: 0, title: '', content: '', band_style: '', band_background: '', band_history: '', band_story: '' });
-      onSuccess?.();
+      if (modStatus === 'pending_review') {
+        setModerationMsg('pending');
+      } else {
+        onSuccess?.();
+      }
+    },
+    onError: (err) => {
+      if (err.message === 'BLOCKED') setModerationMsg('blocked');
     },
   });
+
+  if (moderationMsg === 'blocked') {
+    return (
+      <div className="mt-4 rounded-xl p-5 text-center space-y-3" style={{ background: 'rgba(220,50,50,0.1)', border: '1px solid rgba(220,50,50,0.3)' }}>
+        <p className="text-2xl">🚫</p>
+        <p className="text-sm font-semibold" style={{ color: '#ff6b6b' }}>Your content may not meet community guidelines.</p>
+        <p className="text-xs" style={{ color: v.muted }}>Please revise your review and try again. Hate speech, harassment, and spam are not allowed.</p>
+        <button onClick={() => setModerationMsg(null)} className="text-xs px-4 py-1.5 rounded-full" style={{ border: `1px solid ${v.accent}40`, color: v.accent }}>Edit Review</button>
+      </div>
+    );
+  }
+
+  if (moderationMsg === 'pending') {
+    return (
+      <div className="mt-4 rounded-xl p-5 text-center space-y-3" style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)' }}>
+        <p className="text-2xl">⏳</p>
+        <p className="text-sm font-semibold" style={{ color: '#fbbf24' }}>Review submitted for approval</p>
+        <p className="text-xs" style={{ color: v.muted }}>Your review is being checked by our team and will appear once approved.</p>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); createReview.mutate(data); }} className="space-y-3 mt-4 rounded-xl p-4" style={{ background: `${v.accent}0d`, border: `1px solid ${v.accent}25` }}>
@@ -195,7 +245,7 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
         className="px-5 py-2 rounded-full text-sm font-semibold"
         style={{ background: v.accent, color: '#000', opacity: (!data.rating || createReview.isPending) ? 0.5 : 1, boxShadow: `0 0 14px ${v.accentGlow}` }}
       >
-        {createReview.isPending ? 'Posting…' : 'Post Review'}
+        {createReview.isPending ? 'Checking content…' : 'Post Review'}
       </button>
     </form>
   );
@@ -211,10 +261,12 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
     queryFn: () => base44.auth.me(),
   });
 
-  const { data: reviews = [], isLoading } = useQuery({
+  const { data: allReviewsRaw = [], isLoading } = useQuery({
     queryKey: ['item-reviews', item.id],
     queryFn: () => base44.entities.Review.filter({ album_id: item.id }, '-created_date', 100),
   });
+  // Only show approved reviews publicly
+  const reviews = allReviewsRaw.filter(r => !r.moderation_status || r.moderation_status === 'approved');
 
   // Compute live avg from actual reviews (true mean)
   const avgRating = reviews.length
