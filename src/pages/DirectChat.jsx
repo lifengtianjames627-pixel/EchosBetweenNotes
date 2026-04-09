@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
-import { Send, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Send, ArrowLeft, Search, MessageSquare } from 'lucide-react';
 
 const V = {
   bg: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)',
@@ -24,6 +24,7 @@ export default function DirectChat() {
   const peerEmail = params.get('with');
   const peerName = params.get('name') || peerEmail;
   const [text, setText] = useState('');
+  const [search, setSearch] = useState('');
   const bottomRef = useRef(null);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
@@ -54,7 +55,74 @@ export default function DirectChat() {
     queryClient.invalidateQueries({ queryKey: ['chat', chatId] });
   };
 
+  const { data: searchResults = [] } = useQuery({
+    queryKey: ['user-search', search],
+    queryFn: () => base44.entities.User.list(),
+    enabled: search.length >= 1,
+    select: (users) => {
+      const q = search.toLowerCase();
+      return users
+        .filter(u => u.email !== user?.email)
+        .filter(u => u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q))
+        .slice(0, 8);
+    },
+  });
+
   if (!user) return null;
+
+  // No peer selected — show search landing
+  if (!peerEmail) {
+    return (
+      <div className="min-h-screen flex flex-col" style={{ background: V.bg }}>
+        <div className="px-5 py-4 sticky top-0 z-10"
+          style={{ background: 'rgba(5,7,20,0.9)', borderBottom: `1px solid ${V.border}`, backdropFilter: 'blur(12px)' }}>
+          <p className="text-base font-bold" style={{ color: V.text }}>Messages</p>
+          <p className="text-xs mt-0.5" style={{ color: V.muted }}>Search for someone to start a conversation</p>
+        </div>
+        <div className="px-5 pt-6 max-w-lg w-full mx-auto">
+          {/* Search bar */}
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: V.muted }} />
+            <input
+              autoFocus
+              className="w-full pl-10 pr-4 py-3 rounded-2xl text-sm outline-none"
+              style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${V.border}`, color: V.text }}
+              placeholder="Search by name or email…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+          {/* Results */}
+          {search.length >= 1 && (
+            <div className="mt-3 space-y-1">
+              {searchResults.length === 0 ? (
+                <p className="text-sm text-center py-6" style={{ color: V.muted }}>No users found</p>
+              ) : (
+                searchResults.map(u => (
+                  <button
+                    key={u.id}
+                    onClick={() => navigate(`/chat?with=${encodeURIComponent(u.email)}&name=${encodeURIComponent(u.full_name || u.email)}`)}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.01]"
+                    style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${V.border}` }}
+                  >
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                      style={{ background: 'rgba(124,111,255,0.2)', color: V.accent }}>
+                      {(u.full_name || u.email || '?')[0].toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm truncate" style={{ color: V.text }}>{u.full_name || u.email}</p>
+                      <p className="text-xs truncate" style={{ color: V.muted }}>{u.email}</p>
+                    </div>
+                    <MessageSquare className="w-4 h-4 ml-auto shrink-0" style={{ color: V.muted }} />
+                  </button>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: V.bg }}>
