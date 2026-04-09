@@ -181,48 +181,73 @@ export default function GenreSpace() {
   return (
     <div className="min-h-screen" style={{ background: v.bg }}>
       {/* Top bar */}
-      <div className="sticky top-0 z-40 backdrop-blur-xl border-b" style={{ background: 'rgba(0,0,0,0.6)', borderColor: `${v.accent}20` }}>
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div className="sticky top-0 z-40 backdrop-blur-xl" style={{ background: 'rgba(0,0,0,0.5)', borderBottom: `1px solid ${v.accent}12` }}>
+        <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
+            className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest transition-opacity hover:opacity-60"
             style={{ color: v.muted }}
           >
-            <ArrowLeft className="w-4 h-4" /> Home
+            <ArrowLeft className="w-3.5 h-3.5" /> Home
           </button>
-          <span className="text-xs uppercase tracking-widest font-bold" style={{ color: v.accent, textShadow: `0 0 12px ${v.accent}` }}>
-            {genre.label}
+          <span className="text-[10px] uppercase tracking-[0.22em]" style={{ color: `${v.muted}60` }}>
+            {genre.label} Space
           </span>
           <div className="w-16" />
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 pt-10 pb-20">
-        {/* Genre hero */}
+      <div className="max-w-5xl mx-auto px-6 pt-14 pb-24">
+        {/* Genre hero — editorial, asymmetric */}
         <motion.div
-          initial={{ opacity: 0, y: -16 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-12 text-center"
+          transition={{ duration: 0.8, ease: [0.2, 0, 0.1, 1] }}
+          className="mb-20 relative"
         >
-          <h1
-            className="leading-none mb-3"
-            style={{
-              ...v.headerStyle,
-              fontSize: 'clamp(3.5rem, 10vw, 7rem)',
-              color: v.accent,
-              textShadow: `0 0 40px ${v.accentGlow}, 0 0 80px ${v.accentGlow}`,
-            }}
+          {/* Ghost large number / letter behind */}
+          <div
+            className="absolute -top-8 -left-4 select-none pointer-events-none font-playfair"
+            style={{ fontSize: 'clamp(8rem, 22vw, 18rem)', color: `${v.accent}06`, letterSpacing: '-0.06em', lineHeight: 1 }}
           >
-            {genre.label}
-          </h1>
-          <p className="text-sm uppercase tracking-widest" style={{ color: v.muted }}>{v.tagline}</p>
-          <p className="mt-3 max-w-lg mx-auto text-sm leading-relaxed" style={{ color: v.muted }}>{genre.desc}</p>
-          <div className="mt-4 h-px mx-auto max-w-xs" style={{ background: `linear-gradient(90deg, transparent, ${v.accent}, transparent)` }} />
-        </motion.div>
+            {genre.label.slice(0, 2)}
+          </div>
 
-        {/* Divider */}
-        <div className="mb-2 h-px" style={{ background: `${v.accent}18` }} />
+          <div className="relative">
+            {/* Small label above */}
+            <p className="text-[10px] uppercase tracking-[0.28em] mb-4" style={{ color: `${v.muted}60` }}>
+              {v.tagline}
+            </p>
+
+            {/* Main title — large serif, left-aligned */}
+            <h1
+              className="font-playfair leading-none mb-6"
+              style={{
+                ...v.headerStyle,
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontWeight: v.headerStyle?.fontWeight || 700,
+                fontSize: 'clamp(3.5rem, 9vw, 6.5rem)',
+                color: v.accent,
+                textShadow: `0 0 60px ${v.accentGlow}, 0 0 120px ${v.accentGlow}`,
+                letterSpacing: '-0.03em',
+              }}
+            >
+              {genre.label}
+            </h1>
+
+            {/* Description — right-offset, constrained */}
+            <div className="max-w-sm ml-auto">
+              <p className="text-sm leading-relaxed font-light" style={{ color: `${v.muted}90` }}>{genre.desc}</p>
+            </div>
+
+            {/* Thin accent rule */}
+            <div className="mt-10 flex items-center gap-5">
+              <div className="h-px flex-1" style={{ background: `${v.accent}20` }} />
+              <span className="text-[9px] uppercase tracking-[0.3em]" style={{ color: `${v.muted}40` }}>{genre.label}</span>
+              <div className="h-px w-8" style={{ background: `${v.accent}20` }} />
+            </div>
+          </div>
+        </motion.div>
 
         {isLoading ? (
           <div className="space-y-8 mt-8">
