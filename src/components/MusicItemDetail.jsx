@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube, Maximize2, Minimize2 } from 'lucide-react';
+import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube, Maximize2, Minimize2, Share2 } from 'lucide-react';
 import CivilityNotice from '@/components/CivilityNotice';
 import TrackList from '@/components/TrackList';
 import ReviewActions from '@/components/ReviewActions';
+import ReviewShareCard from '@/components/ReviewShareCard';
 
 function StarPicker({ rating, onRate, accent, muted }) {
   return (
@@ -258,6 +259,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
   const [showForm, setShowForm] = useState(false);
   const [localItem, setLocalItem] = useState(item);
   const [fullscreen, setFullscreen] = useState(false);
+  const [shareReview, setShareReview] = useState(null); // review to share
 
   const { data: currentUser } = useQuery({
     queryKey: ['me'],
@@ -277,6 +279,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
     : null;
 
   return (
+    <>
     <motion.div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
       initial={{ opacity: 0 }}
@@ -446,7 +449,17 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
                     </div>
                   )}
 
-                  <ReviewActions review={review} v={v} currentUser={currentUser} />
+                  <div className="flex items-center justify-between mt-2">
+                    <ReviewActions review={review} v={v} currentUser={currentUser} />
+                    <button
+                      onClick={() => setShareReview(review)}
+                      className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full transition-all hover:scale-105"
+                      style={{ background: 'rgba(167,139,250,0.12)', color: 'rgba(167,139,250,0.8)', border: '1px solid rgba(167,139,250,0.25)' }}
+                    >
+                      <Share2 className="w-3 h-3" />
+                      分享卡片
+                    </button>
+                  </div>
                   <CommentSection reviewId={review.id} v={v} currentUser={currentUser} />
                 </motion.div>
               ))}
@@ -462,5 +475,17 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
         </div>
       </motion.div>
     </motion.div>
+
+    {/* Share card modal */}
+    <AnimatePresence>
+      {shareReview && (
+        <ReviewShareCard
+          review={shareReview}
+          album={localItem}
+          onClose={() => setShareReview(null)}
+        />
+      )}
+    </AnimatePresence>
+    </>
   );
 }
