@@ -40,6 +40,13 @@
       ],
       "description": "Music genre"
     },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Sub-genre and style tags (e.g. #alternative rock, #lo-fi, #shoegaze)"
+    },
     "release_year": {
       "type": "number",
       "description": "Year the album/single was released"

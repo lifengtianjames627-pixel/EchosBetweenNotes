@@ -334,7 +334,16 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
         </div>
 
         {localItem.description && (
-          <p className="px-5 pb-4 text-sm leading-relaxed" style={{ color: v.muted }}>{localItem.description}</p>
+          <p className="px-5 pb-2 text-sm leading-relaxed" style={{ color: v.muted }}>{localItem.description}</p>
+        )}
+        {localItem.tags?.length > 0 && (
+          <div className="px-5 pb-4 flex flex-wrap gap-1.5">
+            {localItem.tags.map(tag => (
+              <span key={tag} className="text-xs px-2.5 py-0.5 rounded-full font-medium" style={{ background: `${v.accent}18`, color: v.accent, border: `1px solid ${v.accent}30` }}>
+                #{tag}
+              </span>
+            ))}
+          </div>
         )}
 
         {/* Tracklist (albums only, auto-fetched) */}

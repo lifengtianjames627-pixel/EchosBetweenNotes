@@ -135,6 +135,18 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, label }
 
               <p className="text-sm font-semibold truncate" style={{ color: v.text }}>{item.title}</p>
               <p className="text-xs truncate mt-0.5" style={{ color: v.muted }}>{item.artist}</p>
+              {item.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1.5">
+                  {item.tags.slice(0, 2).map(tag => (
+                    <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: `${v.accent}18`, color: `${v.accent}cc` }}>
+                      #{tag}
+                    </span>
+                  ))}
+                  {item.tags.length > 2 && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ color: `${v.muted}80` }}>+{item.tags.length - 2}</span>
+                  )}
+                </div>
+              )}
               {item.avg_rating > 0 && (
                 <div className="flex items-center gap-1 mt-1">
                   <Star className="w-3 h-3" fill="currentColor" style={{ color: v.accent }} />

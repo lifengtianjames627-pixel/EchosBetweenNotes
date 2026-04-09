@@ -2,9 +2,10 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ImageIcon, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import TagPicker from '@/components/TagPicker';
 
 export default function AddMusicModal({ v, type, onClose, onSubmit, isPending, errorMessage }) {
-  const [data, setData] = useState({ title: '', artist: '', cover_url: '', mv_url: '', release_year: '', description: '' });
+  const [data, setData] = useState({ title: '', artist: '', cover_url: '', mv_url: '', release_year: '', description: '', tags: [] });
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef();
 
@@ -19,7 +20,7 @@ export default function AddMusicModal({ v, type, onClose, onSubmit, isPending, e
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ ...data, type, release_year: data.release_year ? Number(data.release_year) : undefined });
+    onSubmit({ ...data, type, release_year: data.release_year ? Number(data.release_year) : undefined, tags: data.tags });
   };
 
   const inp = "w-full px-3 py-2 rounded-lg text-sm outline-none";
@@ -112,6 +113,11 @@ export default function AddMusicModal({ v, type, onClose, onSubmit, isPending, e
             <div>
               <label className="text-xs uppercase tracking-widest mb-1 block" style={{ color: v.muted }}>Description</label>
               <textarea className={`${inp} resize-none`} style={inpStyle} rows={2} value={data.description} onChange={e => setData({ ...data, description: e.target.value })} />
+            </div>
+
+            <div>
+              <label className="text-xs uppercase tracking-widest mb-1 block" style={{ color: v.muted }}>Tags <span className="normal-case font-normal opacity-60">(sub-genre, style…)</span></label>
+              <TagPicker tags={data.tags} onChange={tags => setData({ ...data, tags })} v={v} />
             </div>
 
             {errorMessage && (
