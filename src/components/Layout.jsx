@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV_ITEMS = [
   { path: '/', icon: Home, label: 'Home' },
-  { path: '/about', icon: Info, label: 'About' },
   { path: '/chat', icon: MessageSquare, label: 'Messages' },
 ];
 
@@ -312,6 +311,13 @@ export default function Layout() {
         {/* Top bar */}
         <div className="sticky top-0 z-40 flex items-center justify-end px-5 h-12"
           style={{ background: 'rgba(5,7,20,0.85)', borderBottom: '1px solid rgba(124,111,255,0.1)', backdropFilter: 'blur(16px)' }}>
+          <Link
+            to="/about"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-105 mr-2"
+            style={{ color: 'rgba(160,175,220,0.6)', border: '1px solid rgba(124,111,255,0.15)' }}
+          >
+            <Info className="w-3.5 h-3.5" /> About
+          </Link>
           {currentUser ? (
             <Link
               to="/profile"
