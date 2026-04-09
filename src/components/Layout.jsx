@@ -1,0 +1,251 @@
+import React, { useState } from 'react';
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Home, User, Info, Shield, LogOut, LogIn, ChevronLeft, ChevronRight, Music2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const NAV_ITEMS = [
+  { path: '/', icon: Home, label: 'Home' },
+  { path: '/profile', icon: User, label: 'My Account' },
+  { path: '/about', icon: Info, label: 'About' },
+];
+
+const ADMIN_ITEMS = [
+  { path: '/moderation', icon: Shield, label: 'Moderation' },
+];
+
+export default function Layout() {
+  const location = useLocation();
+  const [collapsed, setCollapsed] = useState(false);
+
+  const { data: currentUser } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => base44.auth.me(),
+  });
+
+  const isAdmin = currentUser?.role === 'admin';
+
+  const isActive = (path) =>
+    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+
+  const NavLink = ({ path, icon: Icon, label }) => {
+    const active = isActive(path);
+    return (
+      <Link
+        to={path}
+        title={collapsed ? label : undefined}
+        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative"
+        style={active
+          ? { background: 'rgba(124,111,255,0.18)', color: '#a5b4fc', boxShadow: '0 0 12px rgba(124,111,255,0.2)' }
+          : { color: 'rgba(160,175,220,0.55)' }
+        }
+      >
+        <Icon className="w-4 h-4 shrink-0" style={active ? { filter: 'drop-shadow(0 0 6px rgba(165,138,252,0.7))' } : {}} />
+        <AnimatePresence initial={false}>
+          {!collapsed && (
+            <motion.span
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 'auto' }}
+              exit={{ opacity: 0, width: 0 }}
+              transition={{ duration: 0.18 }}
+              className="overflow-hidden whitespace-nowrap"
+            >
+              {label}
+            </motion.span>
+          )}
+        </AnimatePresence>
+        {collapsed && (
+          <div
+            className="absolute left-full ml-3 px-2.5 py-1.5 rounded-lg text-xs font-medium pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap"
+            style={{ background: 'rgba(15,18,40,0.95)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.25)', boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}
+          >
+            {label}
+          </div>
+        )}
+      </Link>
+    );
+  };
+
+  return (
+    <div className="min-h-screen flex" style={{ background: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)' }}>
+
+      {/* ── Sidebar ── */}
+      <motion.aside
+        animate={{ width: collapsed ? 64 : 220 }}
+        transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+        className="fixed top-0 left-0 h-full z-50 flex flex-col overflow-hidden"
+        style={{
+          background: 'rgba(5,7,20,0.92)',
+          borderRight: '1px solid rgba(124,111,255,0.12)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+        }}
+      >
+        {/* Logo */}
+        <div className="flex items-center gap-3 px-3 h-16 shrink-0" style={{ borderBottom: '1px solid rgba(124,111,255,0.1)' }}>
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+            style={{ background: 'linear-gradient(135deg, rgba(124,111,255,0.3), rgba(192,132,252,0.3))', border: '1px solid rgba(124,111,255,0.35)' }}
+          >
+            <Music2 className="w-4 h-4" style={{ color: '#a5b4fc' }} />
+          </div>
+          <AnimatePresence initial={false}>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="font-black text-sm whitespace-nowrap"
+                style={{
+                  background: 'linear-gradient(135deg, #a5b4fc, #c084fc)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  letterSpacing: '-0.03em',
+                }}
+              >
+                Music Critics
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Nav items */}
+        <nav className="flex-1 px-2 pt-4 space-y-1 overflow-y-auto overflow-x-hidden">
+          {NAV_ITEMS.map(item => <NavLink key={item.path} {...item} />)}
+
+          {isAdmin && (
+            <>
+              <div className="pt-4 pb-1 px-3">
+                <AnimatePresence initial={false}>
+                  {!collapsed ? (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="text-[10px] uppercase tracking-widest font-bold"
+                      style={{ color: 'rgba(124,111,255,0.45)' }}
+                    >
+                      Admin
+                    </motion.p>
+                  ) : (
+                    <div className="h-px w-full" style={{ background: 'rgba(124,111,255,0.15)' }} />
+                  )}
+                </AnimatePresence>
+              </div>
+              {ADMIN_ITEMS.map(item => <NavLink key={item.path} {...item} />)}
+            </>
+          )}
+        </nav>
+
+        {/* User + logout */}
+        <div className="px-2 pb-4 space-y-1 shrink-0" style={{ borderTop: '1px solid rgba(124,111,255,0.1)', paddingTop: 12 }}>
+          {currentUser ? (
+            <>
+              <div
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl overflow-hidden"
+                style={{ background: 'rgba(124,111,255,0.08)' }}
+              >
+                <div
+                  className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
+                  style={{ background: 'linear-gradient(135deg, rgba(124,111,255,0.4), rgba(192,132,252,0.4))', color: '#c4baff' }}
+                >
+                  {(currentUser.full_name || currentUser.email || 'U')[0].toUpperCase()}
+                </div>
+                <AnimatePresence initial={false}>
+                  {!collapsed && (
+                    <motion.div
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: 'auto' }}
+                      exit={{ opacity: 0, width: 0 }}
+                      className="overflow-hidden min-w-0"
+                    >
+                      <p className="text-xs font-semibold truncate whitespace-nowrap" style={{ color: '#c4baff' }}>
+                        {currentUser.full_name || 'User'}
+                      </p>
+                      <p className="text-[10px] truncate whitespace-nowrap" style={{ color: 'rgba(160,175,220,0.4)' }}>
+                        {currentUser.email}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <button
+                onClick={() => base44.auth.logout()}
+                title={collapsed ? 'Log out' : undefined}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative"
+                style={{ color: 'rgba(248,113,113,0.6)' }}
+              >
+                <LogOut className="w-4 h-4 shrink-0" />
+                <AnimatePresence initial={false}>
+                  {!collapsed && (
+                    <motion.span
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: 'auto' }}
+                      exit={{ opacity: 0, width: 0 }}
+                      className="overflow-hidden whitespace-nowrap"
+                    >
+                      Log out
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+                {collapsed && (
+                  <div
+                    className="absolute left-full ml-3 px-2.5 py-1.5 rounded-lg text-xs font-medium pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap"
+                    style={{ background: 'rgba(15,18,40,0.95)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}
+                  >
+                    Log out
+                  </div>
+                )}
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => base44.auth.redirectToLogin()}
+              title={collapsed ? 'Log in' : undefined}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+              style={{ background: 'rgba(124,111,255,0.15)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.25)' }}
+            >
+              <LogIn className="w-4 h-4 shrink-0" />
+              <AnimatePresence initial={false}>
+                {!collapsed && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: 'auto' }}
+                    exit={{ opacity: 0, width: 0 }}
+                    className="overflow-hidden whitespace-nowrap"
+                  >
+                    Log in
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
+          )}
+        </div>
+
+        {/* Collapse toggle */}
+        <button
+          onClick={() => setCollapsed(c => !c)}
+          className="absolute -right-3 top-[72px] w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
+          style={{ background: 'rgba(15,18,40,0.98)', border: '1px solid rgba(124,111,255,0.3)', color: '#a5b4fc', boxShadow: '0 0 10px rgba(124,111,255,0.2)' }}
+        >
+          {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+        </button>
+      </motion.aside>
+
+      {/* ── Main content ── */}
+      <motion.div
+        animate={{ marginLeft: collapsed ? 64 : 220 }}
+        transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+        className="flex-1 min-h-screen"
+      >
+        <main>
+          <Outlet />
+        </main>
+      </motion.div>
+    </div>
+  );
+}
