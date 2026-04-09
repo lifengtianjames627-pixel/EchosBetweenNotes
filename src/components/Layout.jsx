@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV_ITEMS = [
   { path: '/', icon: Home, label: 'Home' },
-  { path: '/profile', icon: User, label: 'My Account' },
   { path: '/about', icon: Info, label: 'About' },
   { path: '/chat', icon: MessageSquare, label: 'Messages' },
 ];
@@ -310,6 +309,34 @@ export default function Layout() {
         transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
         className="flex-1 min-h-screen"
       >
+        {/* Top bar */}
+        <div className="sticky top-0 z-40 flex items-center justify-end px-5 h-12"
+          style={{ background: 'rgba(5,7,20,0.85)', borderBottom: '1px solid rgba(124,111,255,0.1)', backdropFilter: 'blur(16px)' }}>
+          {currentUser ? (
+            <Link
+              to="/profile"
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-full transition-all hover:scale-105"
+              style={{ background: 'rgba(124,111,255,0.1)', border: '1px solid rgba(124,111,255,0.25)' }}
+            >
+              <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                style={{ background: 'linear-gradient(135deg, rgba(124,111,255,0.4), rgba(192,132,252,0.4))', color: '#c4baff' }}>
+                {(currentUser.full_name || currentUser.email || 'U')[0].toUpperCase()}
+              </div>
+              <span className="text-xs font-semibold" style={{ color: '#a5b4fc' }}>
+                {currentUser.full_name || 'My Account'}
+              </span>
+              <User className="w-3.5 h-3.5" style={{ color: '#a5b4fc' }} />
+            </Link>
+          ) : (
+            <button
+              onClick={() => base44.auth.redirectToLogin()}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold"
+              style={{ background: 'rgba(124,111,255,0.15)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.25)' }}
+            >
+              <LogIn className="w-3.5 h-3.5" /> Log in
+            </button>
+          )}
+        </div>
         <main>
           <Outlet />
         </main>
