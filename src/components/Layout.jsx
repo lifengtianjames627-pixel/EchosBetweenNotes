@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, User, Info, Shield, LogOut, LogIn, ChevronLeft, ChevronRight, Music2 } from 'lucide-react';
+import { Home, User, Info, Shield, LogOut, LogIn, ChevronLeft, ChevronRight, Music2, MessageSquare } from 'lucide-react';
+import MiniChat from '@/components/MiniChat';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,6 +10,7 @@ const NAV_ITEMS = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/profile', icon: User, label: 'My Account' },
   { path: '/about', icon: Info, label: 'About' },
+  { path: '/chat', icon: MessageSquare, label: 'Messages' },
 ];
 
 const ADMIN_ITEMS = [
@@ -18,6 +20,13 @@ const ADMIN_ITEMS = [
 export default function Layout() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const [miniChat, setMiniChat] = useState(null); // { email, name }
+
+  useEffect(() => {
+    const handler = (e) => setMiniChat(e.detail);
+    window.addEventListener('openMiniChat', handler);
+    return () => window.removeEventListener('openMiniChat', handler);
+  }, []);
 
   const { data: currentUser } = useQuery({
     queryKey: ['me'],
@@ -305,6 +314,17 @@ export default function Layout() {
           <Outlet />
         </main>
       </motion.div>
+
+      {/* Mini Chat popup */}
+      <AnimatePresence>
+        {miniChat && currentUser && (
+          <MiniChat
+            peer={miniChat}
+            currentUser={currentUser}
+            onClose={() => setMiniChat(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -430,7 +430,18 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
                 >
                   <div className="flex items-start justify-between gap-2 mb-1.5">
                     <div>
-                      <span className="text-sm font-semibold" style={{ color: v.text }}>{review.reviewer_name || 'Anonymous'}</span>
+                      <button
+                        className="text-sm font-semibold hover:underline transition-all"
+                        style={{ color: v.accent, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                        onClick={() => {
+                          if (currentUser?.email && review.reviewer_email && review.reviewer_email !== currentUser.email) {
+                            window.dispatchEvent(new CustomEvent('openMiniChat', { detail: { email: review.reviewer_email, name: review.reviewer_name || review.reviewer_email } }));
+                          }
+                        }}
+                        title={review.reviewer_email !== currentUser?.email ? 'Start a chat' : undefined}
+                      >
+                        {review.reviewer_name || 'Anonymous'}
+                      </button>
                       {review.title && <span className="text-xs ml-2 italic" style={{ color: v.accent }}>"{review.title}"</span>}
                       {/* Equipped badges */}
                       {review.reviewer_equipped_badges?.length > 0 && (
