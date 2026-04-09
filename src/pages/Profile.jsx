@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import ReviewCard from '@/components/ReviewCard';
 import { Link } from 'react-router-dom';
-import { Users, Star, UserPlus, Check, X, Music } from 'lucide-react';
+import { Users, Star, UserPlus, Check, X, Music, Shield } from 'lucide-react';
+import UserBadges from '@/components/UserBadges';
+import BadgeIcon from '@/components/BadgeIcon';
+import { awardBadge } from '@/lib/badgeUtils';
 
 export default function Profile() {
   const queryClient = useQueryClient();
@@ -26,6 +29,20 @@ export default function Profile() {
     queryFn: () => base44.entities.Review.filter({ created_by: user.email }, '-created_date', 50),
     enabled: !!user,
   });
+
+  const { data: earnedBadges = [] } = useQuery({
+    queryKey: ['earned-badges', user?.email],
+    queryFn: () => base44.entities.UserBadge.filter({ user_email: user.email }),
+    enabled: !!user,
+  });
+  const earnedBadgeIds = earnedBadges.map(b => b.badge_id);
+
+  // Award welcome badge if first login
+  useEffect(() => {
+    if (user?.email && earnedBadges !== undefined) {
+      awardBadge(user.email, 'critic_welcome', queryClient);
+    }
+  }, [user?.email, earnedBadges.length === 0]);
 
   const { data: myBands = [] } = useQuery({
     queryKey: ['my-bands', user?.email],
@@ -82,6 +99,14 @@ export default function Profile() {
         <div className="flex-1 text-center sm:text-left">
           <h1 className="text-2xl font-bold">{user.full_name}</h1>
           <p className="text-muted-foreground text-sm">{user.email}</p>
+          {/* Equipped badges */}
+          {user?.equipped_badges?.length > 0 && (
+            <div className="flex gap-2 mt-2 flex-wrap justify-center sm:justify-start">
+              {user.equipped_badges.map(id => (
+                <BadgeIcon key={id} badgeId={id} size="xs" />
+              ))}
+            </div>
+          )}
           <div className="flex flex-wrap justify-center sm:justify-start gap-4 mt-4">
             <div className="text-center">
               <p className="text-xl font-bold">{myReviews.length}</p>
@@ -94,6 +119,10 @@ export default function Profile() {
             <div className="text-center">
               <p className="text-xl font-bold">{friends.length + acceptedSent.length}</p>
               <p className="text-xs text-muted-foreground">Friends</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold">{earnedBadgeIds.length}</p>
+              <p className="text-xs text-muted-foreground">Badges</p>
             </div>
           </div>
         </div>
@@ -127,6 +156,9 @@ export default function Profile() {
           <TabsTrigger value="reviews" className="flex-1 rounded-lg">
             <Star className="w-4 h-4 mr-1.5" /> Reviews
           </TabsTrigger>
+          <TabsTrigger value="badges" className="flex-1 rounded-lg">
+            <Shield className="w-4 h-4 mr-1.5" /> Badges {earnedBadgeIds.length > 0 && <span className="ml-1 text-xs font-bold text-primary">{earnedBadgeIds.length}</span>}
+          </TabsTrigger>
           <TabsTrigger value="bands" className="flex-1 rounded-lg">
             <Music className="w-4 h-4 mr-1.5" /> Bands
           </TabsTrigger>
@@ -152,6 +184,11 @@ export default function Profile() {
               <Link to="/discover" className="mt-2 inline-block text-sm text-primary font-medium">Discover Albums →</Link>
             </div>
           )}
+        </TabsContent>
+
+        {/* Badges Tab */}
+        <TabsContent value="badges" className="mt-4">
+          <UserBadges user={user} earnedBadgeIds={earnedBadgeIds} />
         </TabsContent>
 
         {/* Bands Tab */}

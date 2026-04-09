@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, User, Info, Shield, LogOut, LogIn, ChevronLeft, ChevronRight, Music2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -23,6 +23,65 @@ export default function Layout() {
     queryKey: ['me'],
     queryFn: () => base44.auth.me(),
   });
+
+  // ── Time tracking ──────────────────────────────────────────────────────────
+  const sessionStartRef = useRef(Date.now());
+
+  useEffect(() => {
+    if (!currentUser?.email) return;
+
+    const flush = async () => {
+      const elapsed = Math.round((Date.now() - sessionStartRef.current) / 60000); // minutes
+      if (elapsed < 1) return;
+      sessionStartRef.current = Date.now();
+
+      const now = new Date();
+      const todayStr = now.toISOString().slice(0, 10);
+      const weekKey = (() => {
+        const startOfYear = new Date(now.getFullYear(), 0, 1);
+        const week = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+        return `${now.getFullYear()}-W${String(week).padStart(2, '0')}`;
+      })();
+      const monthKey = now.toISOString().slice(0, 7);
+
+      const prev = await base44.auth.me();
+      const newTotal = (prev.total_browsing_minutes || 0) + elapsed;
+
+      const newDaily = prev.daily_minutes_date === todayStr
+        ? (prev.daily_minutes || 0) + elapsed : elapsed;
+      const newWeekly = prev.weekly_minutes_week === weekKey
+        ? (prev.weekly_minutes || 0) + elapsed : elapsed;
+      const newMonthly = prev.monthly_minutes_month === monthKey
+        ? (prev.monthly_minutes || 0) + elapsed : elapsed;
+
+      await base44.auth.updateMe({
+        total_browsing_minutes: newTotal,
+        daily_minutes: newDaily,
+        daily_minutes_date: todayStr,
+        weekly_minutes: newWeekly,
+        weekly_minutes_week: weekKey,
+        monthly_minutes: newMonthly,
+        monthly_minutes_month: monthKey,
+      });
+
+      // Import dynamically to avoid circular issues
+      const { awardBadge } = await import('@/lib/badgeUtils');
+      if (newDaily >= 45) awardBadge(prev.email, 'daily_listener', null);
+      if (newWeekly >= 180) awardBadge(prev.email, 'weekly_devotee', null);
+      if (newMonthly >= 1800) awardBadge(prev.email, 'monthly_obsessive', null);
+      if (newTotal >= 600) awardBadge(prev.email, 'time_10h', null);
+      if (newTotal >= 6000) awardBadge(prev.email, 'time_100h', null);
+      if (newTotal >= 60000) awardBadge(prev.email, 'time_1000h', null);
+    };
+
+    const interval = setInterval(flush, 5 * 60 * 1000); // flush every 5 min
+    const handleUnload = () => flush();
+    window.addEventListener('beforeunload', handleUnload);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('beforeunload', handleUnload);
+    };
+  }, [currentUser?.email]);
 
   const isAdmin = currentUser?.role === 'admin';
 

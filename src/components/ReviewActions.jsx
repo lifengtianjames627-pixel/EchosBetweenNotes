@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ThumbsUp, ThumbsDown, Bell, BellOff } from 'lucide-react';
+import { awardBadge } from '@/lib/badgeUtils';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -52,6 +53,14 @@ export default function ReviewActions({ review, v, currentUser }) {
         await base44.entities.ReviewVote.create({ review_id: review.id, voter_email: currentUser.email, vote: voteType });
       }
       await base44.entities.Review.update(review.id, { likes_count: newLikes, dislikes_count: newDislikes });
+      // Check quality badges for reviewer
+      if (review.reviewer_email && voteType === 'like' && !isSame) {
+        const allReviews = await base44.entities.Review.filter({ reviewer_email: review.reviewer_email });
+        const totalLikes = allReviews.reduce((s, r) => s + (r.likes_count || 0), 0) + likeDelta;
+        if (totalLikes >= 100) awardBadge(review.reviewer_email, 'likes_100', queryClient);
+        if (totalLikes >= 300) awardBadge(review.reviewer_email, 'likes_300', queryClient);
+        if (totalLikes >= 500) awardBadge(review.reviewer_email, 'likes_500', queryClient);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-vote', review.id, currentUser?.email] });

@@ -1,0 +1,46 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user"
+      ],
+      "default": "user"
+    },
+    "equipped_badges": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Up to 4 equipped badge IDs shown on reviews and profile"
+    },
+    "total_browsing_minutes": {
+      "type": "number",
+      "default": 0
+    },
+    "daily_minutes": {
+      "type": "number",
+      "default": 0
+    },
+    "daily_minutes_date": {
+      "type": "string"
+    },
+    "weekly_minutes": {
+      "type": "number",
+      "default": 0
+    },
+    "weekly_minutes_week": {
+      "type": "string"
+    },
+    "monthly_minutes": {
+      "type": "number",
+      "default": 0
+    },
+    "monthly_minutes_month": {
+      "type": "string"
+    }
+  }
+}

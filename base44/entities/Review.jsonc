@@ -36,7 +36,14 @@
     },
     "reviewer_email": {
       "type": "string",
-      "description": "Email of the reviewer (for subscriptions)"
+      "description": "Email of the reviewer"
+    },
+    "reviewer_equipped_badges": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Reviewer's equipped badge IDs at time of posting"
     },
     "likes_count": {
       "type": "number",
@@ -49,20 +56,16 @@
       "default": 0
     },
     "band_style": {
-      "type": "string",
-      "description": "Specific sub-style or sub-genre of the band"
+      "type": "string"
     },
     "band_background": {
-      "type": "string",
-      "description": "Background information about the band/artist"
+      "type": "string"
     },
     "band_history": {
-      "type": "string",
-      "description": "History of the band/artist"
+      "type": "string"
     },
     "band_story": {
-      "type": "string",
-      "description": "The background story behind the band/artist"
+      "type": "string"
     },
     "moderation_status": {
       "type": "string",
@@ -71,23 +74,19 @@
         "pending_review",
         "blocked"
       ],
-      "default": "approved",
-      "description": "AI moderation status"
+      "default": "approved"
     },
     "moderation_categories": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Flagged categories from AI moderation"
+      }
     },
     "moderation_reason": {
-      "type": "string",
-      "description": "AI explanation for flagging"
+      "type": "string"
     },
     "moderation_confidence": {
-      "type": "number",
-      "description": "AI confidence score 0.0-1.0"
+      "type": "number"
     }
   },
   "required": [

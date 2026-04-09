@@ -4,6 +4,8 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube, Maximize2, Minimize2, Share2 } from 'lucide-react';
 import CivilityNotice from '@/components/CivilityNotice';
+import BadgeIcon from '@/components/BadgeIcon';
+import { awardBadge } from '@/lib/badgeUtils';
 import TrackList from '@/components/TrackList';
 import ReviewActions from '@/components/ReviewActions';
 import ReviewShareCard from '@/components/ReviewShareCard';
@@ -42,9 +44,26 @@ function CommentSection({ reviewId, v, currentUser }) {
       author_name: currentUser?.full_name || 'Anonymous',
       author_email: currentUser?.email || '',
     }),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['comments', reviewId] });
       setText('');
+      // Check community badges for review author
+      const review = await base44.entities.Review.filter({ id: reviewId });
+      const reviewerEmail = review[0]?.reviewer_email;
+      if (reviewerEmail) {
+        const allComments = await base44.entities.Comment.filter({ review_id: reviewId });
+        // Count total comments across all reviewer's reviews
+        const allReviews = await base44.entities.Review.filter({ reviewer_email: reviewerEmail });
+        let total = 0;
+        for (const r of allReviews) {
+          const c = await base44.entities.Comment.filter({ review_id: r.id });
+          total += c.length;
+        }
+        if (total >= 10) awardBadge(reviewerEmail, 'comments_10', queryClient);
+        if (total >= 50) awardBadge(reviewerEmail, 'comments_50', queryClient);
+        if (total >= 100) awardBadge(reviewerEmail, 'comments_100', queryClient);
+        if (total >= 200) awardBadge(reviewerEmail, 'comments_200', queryClient);
+      }
     },
   });
 
@@ -138,6 +157,7 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
         content: d.content,
         reviewer_name: currentUser?.full_name || 'Anonymous',
         reviewer_email: currentUser?.email || '',
+        reviewer_equipped_badges: currentUser?.equipped_badges || [],
         likes_count: 0,
         dislikes_count: 0,
         band_style: d.band_style,
@@ -412,11 +432,14 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
                     <div>
                       <span className="text-sm font-semibold" style={{ color: v.text }}>{review.reviewer_name || 'Anonymous'}</span>
                       {review.title && <span className="text-xs ml-2 italic" style={{ color: v.accent }}>"{review.title}"</span>}
-                    </div>
-                    <div className="flex gap-0.5 shrink-0">
-                      {[1,2,3,4,5].map(n => (
-                        <Star key={n} className="w-3 h-3" style={{ color: n <= review.rating ? v.accent : v.muted }} fill={n <= review.rating ? 'currentColor' : 'none'} />
-                      ))}
+                      {/* Equipped badges */}
+                      {review.reviewer_equipped_badges?.length > 0 && (
+                        <div className="flex gap-1 mt-1">
+                          {review.reviewer_equipped_badges.map(id => (
+                            <BadgeIcon key={id} badgeId={id} size="xs" />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <p className="text-sm leading-relaxed" style={{ color: v.muted }}>{review.content}</p>
