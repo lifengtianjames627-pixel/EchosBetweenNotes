@@ -34,13 +34,23 @@
       "type": "string",
       "description": "Name of the reviewer"
     },
+    "reviewer_email": {
+      "type": "string",
+      "description": "Email of the reviewer (for subscriptions)"
+    },
     "likes_count": {
       "type": "number",
-      "description": "Number of likes"
+      "description": "Number of likes",
+      "default": 0
+    },
+    "dislikes_count": {
+      "type": "number",
+      "description": "Number of dislikes",
+      "default": 0
     },
     "band_style": {
       "type": "string",
-      "description": "Specific sub-style or sub-genre of the band (e.g. thrash metal, dream pop, bebop)"
+      "description": "Specific sub-style or sub-genre of the band"
     },
     "band_background": {
       "type": "string",
@@ -48,7 +58,7 @@
     },
     "band_history": {
       "type": "string",
-      "description": "History of the band/artist \u2014 formation, lineup changes, milestones"
+      "description": "History of the band/artist"
     },
     "band_story": {
       "type": "string",

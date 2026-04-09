@@ -1,0 +1,27 @@
+{
+  "name": "ReviewVote",
+  "type": "object",
+  "properties": {
+    "review_id": {
+      "type": "string",
+      "description": "ID of the review being voted on"
+    },
+    "voter_email": {
+      "type": "string",
+      "description": "Email of the voter"
+    },
+    "vote": {
+      "type": "string",
+      "enum": [
+        "like",
+        "dislike"
+      ],
+      "description": "Vote type"
+    }
+  },
+  "required": [
+    "review_id",
+    "voter_email",
+    "vote"
+  ]
+}

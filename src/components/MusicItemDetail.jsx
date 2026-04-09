@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube, Maximize2, Minimize2 } from 'lucide-react';
 import CivilityNotice from '@/components/CivilityNotice';
 import TrackList from '@/components/TrackList';
+import ReviewActions from '@/components/ReviewActions';
 
 function StarPicker({ rating, onRate, accent, muted }) {
   return (
@@ -135,7 +136,9 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
         title: d.title,
         content: d.content,
         reviewer_name: currentUser?.full_name || 'Anonymous',
+        reviewer_email: currentUser?.email || '',
         likes_count: 0,
+        dislikes_count: 0,
         band_style: d.band_style,
         band_background: d.band_background,
         band_history: d.band_history,
@@ -434,6 +437,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
                     </div>
                   )}
 
+                  <ReviewActions review={review} v={v} currentUser={currentUser} />
                   <CommentSection reviewId={review.id} v={v} currentUser={currentUser} />
                 </motion.div>
               ))}

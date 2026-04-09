@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-import Layout from '@/components/Layout';
+import Layout from '@/components/Layout.jsx';
 import Home from '@/pages/Home';
 import AlbumDetail from '@/pages/AlbumDetail';
 import GenreSpace from '@/pages/GenreSpace';

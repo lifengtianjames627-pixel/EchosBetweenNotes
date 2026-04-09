@@ -1,0 +1,26 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "properties": {
+    "subscriber_email": {
+      "type": "string",
+      "description": "Email of the subscriber"
+    },
+    "subscriber_name": {
+      "type": "string",
+      "description": "Name of the subscriber"
+    },
+    "target_email": {
+      "type": "string",
+      "description": "Email of the reviewer being subscribed to"
+    },
+    "target_name": {
+      "type": "string",
+      "description": "Name of the reviewer being subscribed to"
+    }
+  },
+  "required": [
+    "subscriber_email",
+    "target_email"
+  ]
+}
