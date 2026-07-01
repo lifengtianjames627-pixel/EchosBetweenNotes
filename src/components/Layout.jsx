@@ -172,7 +172,7 @@ export default function Layout() {
                   letterSpacing: '-0.03em',
                 }}
               >
-                Music Critics
+                Echo Between Notes
               </motion.span>
             )}
           </AnimatePresence>
