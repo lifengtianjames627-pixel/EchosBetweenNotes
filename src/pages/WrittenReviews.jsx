@@ -103,7 +103,7 @@ export default function WrittenReviews() {
           transition={{ delay: 0.1 }}
           className="font-playfair italic"
           style={{
-            fontSize: 'clamp(2.2rem, 6vw, 3.5rem)',
+            fontSize: 'clamp(3.3rem, 9vw, 5.25rem)',
             background: 'linear-gradient(135deg, #a5b4fc 0%, #818cf8 40%, #c084fc 80%, #f472b6 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',

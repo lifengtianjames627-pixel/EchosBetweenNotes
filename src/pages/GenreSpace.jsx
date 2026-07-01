@@ -116,6 +116,22 @@ const GENRE_VISUALS = {
     headerStyle: { fontWeight: 500, letterSpacing: '0.04em' },
     tagline: 'Synthetic · Future · Dance',
   },
+  funk: {
+    bg: 'radial-gradient(ellipse at 50% 0%, #1f1a02 0%, #120e01 60%, #0a0700 100%)',
+    accent: '#fbbf24', accentGlow: 'rgba(251,191,36,0.4)',
+    text: '#fde68a', muted: '#a08a50',
+    cardBg: 'rgba(45,38,8,0.85)', cardBorder: 'rgba(251,191,36,0.2)',
+    headerStyle: { fontWeight: 700, letterSpacing: '-0.01em' },
+    tagline: 'Groovy · Loose · Alive',
+  },
+  acg: {
+    bg: 'radial-gradient(ellipse at 50% 0%, #021f1f 0%, #011212 60%, #000a0a 100%)',
+    accent: '#22d3ee', accentGlow: 'rgba(34,211,238,0.4)',
+    text: '#a5f3fc', muted: '#4a9098',
+    cardBg: 'rgba(8,40,45,0.85)', cardBorder: 'rgba(34,211,238,0.2)',
+    headerStyle: { fontWeight: 600, letterSpacing: '0.01em' },
+    tagline: 'Nostalgic · Epic · Playful',
+  },
 };
 
 export default function GenreSpace() {
