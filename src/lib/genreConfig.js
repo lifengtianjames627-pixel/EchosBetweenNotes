@@ -4,16 +4,16 @@ export const GENRES = [
   { id: 'classical',  label: 'Classical',  entityGenre: 'classical',  icon: '🎻', tagline: 'Timeless · Precise · Profound',            desc: 'Centuries of craft distilled into structured beauty.' },
   { id: 'metal',      label: 'Metal',      entityGenre: 'metal',      icon: '🤘', tagline: 'Heavy · Dark · Relentless',               desc: 'Pure intensity. No compromise. Total commitment.' },
   { id: 'jazz',       label: 'Jazz',       entityGenre: 'jazz',       icon: '🎷', tagline: 'Improvised · Intimate · Late Night',       desc: 'Where conversation becomes music. Every note a deliberate choice.' },
-  { id: 'blues',      label: 'Blues',      entityGenre: null,         icon: '🎺', tagline: 'Slow · Honest · Deep',                    desc: 'The roots of everything. Pain turned into beauty.' },
+  { id: 'blues',      label: 'Blues',      entityGenre: 'blues',      icon: '🎺', tagline: 'Slow · Honest · Deep',                    desc: 'The roots of everything. Pain turned into beauty.' },
   { id: 'r_and_b',    label: 'R&B',        entityGenre: 'r_and_b',    icon: '🎙️', tagline: 'Smooth · Soulful · Night',                desc: 'Rhythm, soul, and the warmth of 2am.' },
   { id: 'hardcore',   label: 'Hardcore',   entityGenre: 'punk',       icon: '💢', tagline: 'Fast · Loud · No Filler',                 desc: 'Zero pretense. Maximum energy. Pure.' },
   { id: 'country',    label: 'Country',    entityGenre: 'country',    icon: '🤠', tagline: 'Warm · Story-driven · Real',              desc: 'Life, roads, and the people you never forget.' },
   { id: 'hip_hop',    label: 'Hip-hop',    entityGenre: 'hip_hop',    icon: '🎧', tagline: 'Culture · Rhythm · Truth',                desc: 'A whole culture compressed into beats and bars.' },
   { id: 'indie',      label: 'Indie',      entityGenre: 'indie',      icon: '🌿', tagline: 'Curious · Unfiltered · Yours',            desc: 'Made on your own terms. Nothing to prove.' },
-  { id: 'grunge',     label: 'Grunge',     entityGenre: null,         icon: '📻', tagline: 'Distorted · Raw · Unapologetic',          desc: 'Flannel, feedback, and feelings too big to name.' },
+  { id: 'grunge',     label: 'Grunge',     entityGenre: 'grunge',     icon: '📻', tagline: 'Distorted · Raw · Unapologetic',          desc: 'Flannel, feedback, and feelings too big to name.' },
   { id: 'electronic', label: 'Electronic', entityGenre: 'electronic', icon: '⚡', tagline: 'Synthetic · Future · Dance',              desc: 'Sound as architecture. The machine with a soul.' },
-  { id: 'funk',       label: 'Funk',       entityGenre: null,         icon: '🕺', tagline: 'Groovy · Loose · Alive',                  desc: 'The bassline runs the show. Rhythm you can feel in your chest.' },
-  { id: 'acg',        label: 'ACG',        entityGenre: null,         icon: '🎮', tagline: 'Nostalgic · Epic · Playful',              desc: 'Anime, comics, and games — the soundtrack to other worlds.' },
+  { id: 'funk',       label: 'Funk',       entityGenre: 'funk',       icon: '🕺', tagline: 'Groovy · Loose · Alive',                  desc: 'The bassline runs the show. Rhythm you can feel in your chest.' },
+  { id: 'acg',        label: 'ACG',        entityGenre: 'acg',        icon: '🎮', tagline: 'Nostalgic · Epic · Playful',              desc: 'Anime, comics, and games — the soundtrack to other worlds.' },
 ];
 
 export const genreThemes = {

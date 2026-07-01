@@ -36,6 +36,10 @@
         "country",
         "latin",
         "k_pop",
+        "blues",
+        "grunge",
+        "funk",
+        "acg",
         "other"
       ],
       "description": "Music genre"
