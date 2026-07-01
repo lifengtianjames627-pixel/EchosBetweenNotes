@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from '@/components/Layout.jsx';
 import Home from '@/pages/Home';
+import WrittenReviews from '@/pages/WrittenReviews';
+import Podcasts from '@/pages/Podcasts';
 import AlbumDetail from '@/pages/AlbumDetail';
 import GenreSpace from '@/pages/GenreSpace';
 import Profile from '@/pages/Profile';
@@ -39,6 +41,8 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/reviews" element={<WrittenReviews />} />
+        <Route path="/podcasts" element={<Podcasts />} />
         <Route path="/genre/:genreId" element={<GenreSpace />} />
         <Route path="/album/:id" element={<AlbumDetail />} />
         <Route path="/profile" element={<Profile />} />

@@ -1,0 +1,47 @@
+{
+  "name": "Podcast",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Episode title"
+    },
+    "host_name": {
+      "type": "string",
+      "description": "Host or creator name"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "amateur_review",
+        "artist_take",
+        "industry_insider",
+        "deep_dive",
+        "genre_roundtable",
+        "listening_session"
+      ],
+      "description": "Type of podcast episode"
+    },
+    "description": {
+      "type": "string",
+      "description": "Short episode summary"
+    },
+    "cover_url": {
+      "type": "string",
+      "description": "Episode cover art URL"
+    },
+    "audio_url": {
+      "type": "string",
+      "description": "Link to the audio file/episode"
+    },
+    "duration_minutes": {
+      "type": "number",
+      "description": "Episode length in minutes"
+    }
+  },
+  "required": [
+    "title",
+    "host_name",
+    "category"
+  ]
+}

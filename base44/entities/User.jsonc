@@ -42,5 +42,11 @@
     "monthly_minutes_month": {
       "type": "string"
     }
-  }
+  },
+  "required": [
+    "equipped_badges",
+    "daily_minutes_date",
+    "weekly_minutes_week",
+    "monthly_minutes_month"
+  ]
 }
