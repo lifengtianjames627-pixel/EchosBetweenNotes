@@ -1,0 +1,90 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { BUBBLE_COLORS, GENRE_ICONS } from '@/lib/genreVisuals';
+
+const ANGLES = [-52, 0, 52]; // degrees from vertical (left, center, right)
+const PIVOT = { x: 300, y: 300 };
+const PIN_RADIUS = 225;
+const NEEDLE_LEN = 170;
+
+function polar(angleDeg, radius) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return { x: PIVOT.x + radius * Math.sin(rad), y: PIVOT.y - radius * Math.cos(rad) };
+}
+
+function describeArc(radius, startAngle, endAngle) {
+  const start = polar(endAngle, radius);
+  const end = polar(startAngle, radius);
+  return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 0 ${end.x} ${end.y}`;
+}
+
+export default function GenreGauge({ items, onSelect }) {
+  const [hovered, setHovered] = useState(1); // default: center genre
+  const needlePoint = polar(ANGLES[hovered], NEEDLE_LEN);
+
+  return (
+    <div className="relative mx-auto" style={{ width: 600, maxWidth: '100%', height: 320 }}>
+      <svg viewBox="0 0 600 320" className="absolute inset-0 w-full h-full pointer-events-none">
+        <path d={describeArc(268, -72, 72)} fill="none" stroke="rgba(124,111,255,0.18)" strokeWidth="2" />
+        {Array.from({ length: 15 }).map((_, i) => {
+          const a = -70 + (140 / 14) * i;
+          const p1 = polar(a, 250);
+          const p2 = polar(a, 262);
+          return (
+            <line key={i} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
+              stroke="rgba(165,138,252,0.3)" strokeWidth={i % 2 === 0 ? 2 : 1} />
+          );
+        })}
+        <motion.line
+          x1={PIVOT.x} y1={PIVOT.y}
+          animate={{ x2: needlePoint.x, y2: needlePoint.y }}
+          transition={{ type: 'spring', stiffness: 130, damping: 15 }}
+          stroke="#a5b4fc" strokeWidth="3" strokeLinecap="round"
+          style={{ filter: 'drop-shadow(0 0 8px #7c6fff)' }}
+        />
+        <circle cx={PIVOT.x} cy={PIVOT.y} r="7" fill="#a5b4fc" style={{ filter: 'drop-shadow(0 0 8px #7c6fff)' }} />
+      </svg>
+
+      {items.map((item, i) => {
+        const pos = polar(ANGLES[i], PIN_RADIUS);
+        const isActive = hovered === i;
+        const size = isActive ? 148 : 104;
+        const c = BUBBLE_COLORS[item.colorIdx % BUBBLE_COLORS.length];
+        const IconSvg = GENRE_ICONS[item.genre.id] || GENRE_ICONS['electronic'];
+        return (
+          <motion.div
+            key={item.genre.id}
+            className="absolute rounded-full flex flex-col items-center justify-center cursor-pointer select-none"
+            style={{
+              left: pos.x,
+              top: pos.y,
+              width: size,
+              height: size,
+              transform: 'translate(-50%, -50%)',
+              background: isActive ? c.bg.replace('0.6', '0.85') : c.bg,
+              border: `${isActive ? 2 : 1.5}px solid ${c.border}`,
+              boxShadow: isActive ? `0 0 40px 12px ${c.border}55, 0 0 90px 16px ${c.border}22` : c.glow,
+              backdropFilter: 'blur(18px)',
+              WebkitBackdropFilter: 'blur(18px)',
+              zIndex: isActive ? 10 : 1,
+            }}
+            animate={{ scale: isActive ? 1.04 : 1 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            onHoverStart={() => setHovered(i)}
+            onClick={() => onSelect(item.genre.id)}
+          >
+            <div style={{ width: size * 0.36, height: size * 0.36, filter: `drop-shadow(0 0 8px ${c.border})` }}>
+              {IconSvg(c.border)}
+            </div>
+            <span
+              className="font-bold uppercase mt-1 text-center"
+              style={{ color: c.text, fontSize: size * 0.1, letterSpacing: '0.1em', textShadow: `0 0 8px ${c.border}` }}
+            >
+              {item.genre.label}
+            </span>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
