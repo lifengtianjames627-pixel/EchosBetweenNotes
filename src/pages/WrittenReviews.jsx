@@ -101,13 +101,15 @@ export default function WrittenReviews() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-3xl sm:text-4xl font-black"
+          className="font-playfair italic"
           style={{
-            background: 'linear-gradient(135deg, #c4baff, #93e4ff)',
+            fontSize: 'clamp(2.2rem, 6vw, 3.5rem)',
+            background: 'linear-gradient(135deg, #a5b4fc 0%, #818cf8 40%, #c084fc 80%, #f472b6 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.01em',
+            filter: 'drop-shadow(0 0 30px rgba(165,138,252,0.4))',
           }}
         >
           Written Review
@@ -124,7 +126,7 @@ export default function WrittenReviews() {
       </div>
 
       <motion.div
-        className="relative z-10 pb-8 px-4 flex flex-col items-center mt-2"
+        className="relative z-10 pb-8 px-4 flex flex-col items-center mt-2 lg:pr-56 xl:pr-72"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.35, duration: 0.7 }}

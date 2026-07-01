@@ -163,13 +163,13 @@ export default function Layout() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="font-black text-sm whitespace-nowrap"
+                className="font-playfair italic text-base whitespace-nowrap"
                 style={{
                   background: 'linear-gradient(135deg, #a5b4fc, #c084fc)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
-                  letterSpacing: '-0.03em',
+                  letterSpacing: '-0.01em',
                 }}
               >
                 Echo Between Notes

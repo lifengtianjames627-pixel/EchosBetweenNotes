@@ -78,7 +78,7 @@ export default function Home() {
             filter: 'drop-shadow(0 0 30px rgba(165,138,252,0.4))',
           }}
         >
-          Echoes Between Notes
+          Echo Between Notes
         </motion.h1>
         <motion.div
           className="h-px mt-4 mx-auto"
