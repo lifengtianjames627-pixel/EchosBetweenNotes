@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BUBBLE_COLORS, GENRE_ICONS } from '@/lib/genreVisuals';
 
-const ANGLES = [-38, 0, 38]; // degrees from vertical (left, center, right) — tighter cluster
-const PIVOT = { x: 300, y: 268 };
-const PIN_RADIUS = 178;
-const NEEDLE_LEN = 130;
+const ANGLES = [-48, 0, 48]; // degrees from vertical (left, center, right) — wide, natural spread
+const PIVOT = { x: 400, y: 380 };
+const PIN_RADIUS = 258;
+const NEEDLE_LEN = 190;
 
 function polar(angleDeg, radius) {
   const rad = (angleDeg * Math.PI) / 180;
@@ -23,13 +23,13 @@ export default function GenreGauge({ items, onSelect }) {
   const needlePoint = polar(ANGLES[hovered], NEEDLE_LEN);
 
   return (
-    <div className="relative mx-auto" style={{ width: 600, maxWidth: '100%', height: 300 }}>
-      <svg viewBox="0 0 600 300" className="absolute inset-0 w-full h-full pointer-events-none">
-        <path d={describeArc(212, -58, 58)} fill="none" stroke="rgba(124,111,255,0.18)" strokeWidth="2" />
+    <div className="relative mx-auto" style={{ width: 800, maxWidth: '100%', height: 420 }}>
+      <svg viewBox="0 0 800 420" className="absolute inset-0 w-full h-full pointer-events-none">
+        <path d={describeArc(300, -68, 68)} fill="none" stroke="rgba(124,111,255,0.18)" strokeWidth="2" />
         {Array.from({ length: 13 }).map((_, i) => {
-          const a = -56 + (112 / 12) * i;
-          const p1 = polar(a, 196);
-          const p2 = polar(a, 207);
+          const a = -66 + (132 / 12) * i;
+          const p1 = polar(a, 282);
+          const p2 = polar(a, 296);
           return (
             <line key={i} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
               stroke="rgba(165,138,252,0.3)" strokeWidth={i % 2 === 0 ? 2 : 1} />
@@ -39,16 +39,16 @@ export default function GenreGauge({ items, onSelect }) {
           x1={PIVOT.x} y1={PIVOT.y}
           animate={{ x2: needlePoint.x, y2: needlePoint.y }}
           transition={{ type: 'spring', stiffness: 130, damping: 15 }}
-          stroke="#a5b4fc" strokeWidth="3" strokeLinecap="round"
+          stroke="#a5b4fc" strokeWidth="3.5" strokeLinecap="round"
           style={{ filter: 'drop-shadow(0 0 8px #7c6fff)' }}
         />
-        <circle cx={PIVOT.x} cy={PIVOT.y} r="7" fill="#a5b4fc" style={{ filter: 'drop-shadow(0 0 8px #7c6fff)' }} />
+        <circle cx={PIVOT.x} cy={PIVOT.y} r="8" fill="#a5b4fc" style={{ filter: 'drop-shadow(0 0 8px #7c6fff)' }} />
       </svg>
 
       {items.map((item, i) => {
         const pos = polar(ANGLES[i], PIN_RADIUS);
         const isActive = hovered === i;
-        const size = isActive ? 168 : 140;
+        const size = isActive ? 232 : 194;
         const c = BUBBLE_COLORS[item.colorIdx % BUBBLE_COLORS.length];
         const IconSvg = GENRE_ICONS[item.genre.id] || GENRE_ICONS['electronic'];
         return (
@@ -63,7 +63,7 @@ export default function GenreGauge({ items, onSelect }) {
               transform: 'translate(-50%, -50%)',
               background: isActive ? c.bg.replace('0.6', '0.85') : c.bg,
               border: `${isActive ? 2 : 1.5}px solid ${c.border}`,
-              boxShadow: isActive ? `0 0 40px 12px ${c.border}55, 0 0 90px 16px ${c.border}22` : c.glow,
+              boxShadow: isActive ? `0 0 50px 14px ${c.border}55, 0 0 100px 20px ${c.border}22` : c.glow,
               backdropFilter: 'blur(18px)',
               WebkitBackdropFilter: 'blur(18px)',
               zIndex: isActive ? 10 : 1,
@@ -73,12 +73,12 @@ export default function GenreGauge({ items, onSelect }) {
             onHoverStart={() => setHovered(i)}
             onClick={() => onSelect(item.genre.id)}
           >
-            <div style={{ width: size * 0.36, height: size * 0.36, filter: `drop-shadow(0 0 8px ${c.border})` }}>
+            <div style={{ width: size * 0.34, height: size * 0.34, filter: `drop-shadow(0 0 8px ${c.border})` }}>
               {IconSvg(c.border)}
             </div>
             <span
-              className="font-bold uppercase mt-1 text-center"
-              style={{ color: c.text, fontSize: size * 0.1, letterSpacing: '0.1em', textShadow: `0 0 8px ${c.border}` }}
+              className="font-bold uppercase mt-1.5 text-center"
+              style={{ color: c.text, fontSize: size * 0.095, letterSpacing: '0.1em', textShadow: `0 0 8px ${c.border}` }}
             >
               {item.genre.label}
             </span>
