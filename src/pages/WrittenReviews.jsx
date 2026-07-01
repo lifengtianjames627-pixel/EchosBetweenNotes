@@ -86,20 +86,13 @@ export default function WrittenReviews() {
         </div>
       </div>
 
-      <div className="relative z-10 flex items-center justify-between px-4 pt-6">
+      <div className="relative z-10 flex items-center px-4 pt-6">
         <button
           onClick={() => navigate('/')}
           className="flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
           style={{ color: 'rgba(160,175,215,0.6)' }}
         >
           <ArrowLeft className="w-4 h-4" /> Back
-        </button>
-        <button
-          onClick={() => setShowAll(true)}
-          className="flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-full transition-all hover:scale-105"
-          style={{ background: 'rgba(124,111,255,0.12)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.25)' }}
-        >
-          <LayoutGrid className="w-3.5 h-3.5" /> All Genres
         </button>
       </div>
 
@@ -157,6 +150,14 @@ export default function WrittenReviews() {
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
+
+        <button
+          onClick={() => setShowAll(true)}
+          className="flex items-center gap-1.5 text-xs font-semibold px-3.5 py-1.5 rounded-full transition-all hover:scale-105 mt-4"
+          style={{ background: 'rgba(124,111,255,0.1)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.2)' }}
+        >
+          <LayoutGrid className="w-3.5 h-3.5" /> All Genres
+        </button>
       </motion.div>
 
       <AnimatePresence>

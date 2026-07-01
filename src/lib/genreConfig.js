@@ -12,6 +12,8 @@ export const GENRES = [
   { id: 'indie',      label: 'Indie',      entityGenre: 'indie',      icon: '🌿', tagline: 'Curious · Unfiltered · Yours',            desc: 'Made on your own terms. Nothing to prove.' },
   { id: 'grunge',     label: 'Grunge',     entityGenre: null,         icon: '📻', tagline: 'Distorted · Raw · Unapologetic',          desc: 'Flannel, feedback, and feelings too big to name.' },
   { id: 'electronic', label: 'Electronic', entityGenre: 'electronic', icon: '⚡', tagline: 'Synthetic · Future · Dance',              desc: 'Sound as architecture. The machine with a soul.' },
+  { id: 'funk',       label: 'Funk',       entityGenre: null,         icon: '🕺', tagline: 'Groovy · Loose · Alive',                  desc: 'The bassline runs the show. Rhythm you can feel in your chest.' },
+  { id: 'acg',        label: 'ACG',        entityGenre: null,         icon: '🎮', tagline: 'Nostalgic · Epic · Playful',              desc: 'Anime, comics, and games — the soundtrack to other worlds.' },
 ];
 
 export const genreThemes = {

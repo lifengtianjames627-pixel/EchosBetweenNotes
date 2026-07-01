@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BUBBLE_COLORS, GENRE_ICONS } from '@/lib/genreVisuals';
 
-const ANGLES = [-52, 0, 52]; // degrees from vertical (left, center, right)
-const PIVOT = { x: 300, y: 300 };
-const PIN_RADIUS = 225;
-const NEEDLE_LEN = 170;
+const ANGLES = [-38, 0, 38]; // degrees from vertical (left, center, right) — tighter cluster
+const PIVOT = { x: 300, y: 268 };
+const PIN_RADIUS = 178;
+const NEEDLE_LEN = 130;
 
 function polar(angleDeg, radius) {
   const rad = (angleDeg * Math.PI) / 180;
@@ -23,13 +23,13 @@ export default function GenreGauge({ items, onSelect }) {
   const needlePoint = polar(ANGLES[hovered], NEEDLE_LEN);
 
   return (
-    <div className="relative mx-auto" style={{ width: 600, maxWidth: '100%', height: 320 }}>
-      <svg viewBox="0 0 600 320" className="absolute inset-0 w-full h-full pointer-events-none">
-        <path d={describeArc(268, -72, 72)} fill="none" stroke="rgba(124,111,255,0.18)" strokeWidth="2" />
-        {Array.from({ length: 15 }).map((_, i) => {
-          const a = -70 + (140 / 14) * i;
-          const p1 = polar(a, 250);
-          const p2 = polar(a, 262);
+    <div className="relative mx-auto" style={{ width: 600, maxWidth: '100%', height: 300 }}>
+      <svg viewBox="0 0 600 300" className="absolute inset-0 w-full h-full pointer-events-none">
+        <path d={describeArc(212, -58, 58)} fill="none" stroke="rgba(124,111,255,0.18)" strokeWidth="2" />
+        {Array.from({ length: 13 }).map((_, i) => {
+          const a = -56 + (112 / 12) * i;
+          const p1 = polar(a, 196);
+          const p2 = polar(a, 207);
           return (
             <line key={i} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
               stroke="rgba(165,138,252,0.3)" strokeWidth={i % 2 === 0 ? 2 : 1} />
@@ -48,7 +48,7 @@ export default function GenreGauge({ items, onSelect }) {
       {items.map((item, i) => {
         const pos = polar(ANGLES[i], PIN_RADIUS);
         const isActive = hovered === i;
-        const size = isActive ? 148 : 104;
+        const size = isActive ? 168 : 140;
         const c = BUBBLE_COLORS[item.colorIdx % BUBBLE_COLORS.length];
         const IconSvg = GENRE_ICONS[item.genre.id] || GENRE_ICONS['electronic'];
         return (
@@ -68,7 +68,7 @@ export default function GenreGauge({ items, onSelect }) {
               WebkitBackdropFilter: 'blur(18px)',
               zIndex: isActive ? 10 : 1,
             }}
-            animate={{ scale: isActive ? 1.04 : 1 }}
+            animate={{ scale: isActive ? 1.03 : 1 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
             onHoverStart={() => setHovered(i)}
             onClick={() => onSelect(item.genre.id)}
