@@ -5,6 +5,38 @@ import { base44 } from '@/api/base44Client';
 
 const MB_HEADERS = { 'User-Agent': 'MusicCritics/1.0 (musiccritics@app.com)' };
 
+// ── Matching helpers ──────────────────────────────────────────────────────
+// Used to pick the candidate whose name is actually closest to what the user typed,
+// instead of blindly trusting the first result (this is what caused mismatches on JP titles).
+
+function normalize(str) {
+  return (str || '').toLowerCase().normalize('NFKC').replace(/[^\p{L}\p{N}]+/gu, '');
+}
+
+function bigramSet(str) {
+  const s = normalize(str);
+  if (s.length < 2) return new Set([s]);
+  const set = new Set();
+  for (let i = 0; i < s.length - 1; i++) set.add(s.slice(i, i + 2));
+  return set;
+}
+
+// Dice coefficient — works well for both Latin and CJK text
+function similarity(a, b) {
+  const na = normalize(a), nb = normalize(b);
+  if (!na || !nb) return 0;
+  if (na === nb) return 1;
+  if (na.includes(nb) || nb.includes(na)) return 0.85;
+  const setA = bigramSet(na), setB = bigramSet(nb);
+  let overlap = 0;
+  setA.forEach(g => { if (setB.has(g)) overlap++; });
+  return (2 * overlap) / (setA.size + setB.size);
+}
+
+function matchScore(candidateTitle, candidateArtist, title, artist) {
+  return similarity(candidateTitle, title) * 0.65 + similarity(candidateArtist, artist) * 0.35;
+}
+
 // ── MusicBrainz helpers ──────────────────────────────────────────────────────
 
 async function mbSearch(query, limit = 10) {
@@ -56,15 +88,16 @@ async function fetchFromMusicBrainz(title, artist, year) {
   ];
 
   let best = null;
+  let bestScore = -1;
   for (const q of queries) {
     const releases = await mbSearch(q);
     if (!releases.length) continue;
-    best = releases[0];
-    if (year) {
-      const withYear = releases.find(r => r.date?.startsWith(String(year)));
-      if (withYear) { best = withYear; break; }
+    for (const r of releases) {
+      let score = matchScore(r.title, r['artist-credit']?.[0]?.name || '', title, artist);
+      if (year && r.date?.startsWith(String(year))) score += 0.1;
+      if (score > bestScore) { bestScore = score; best = r; }
     }
-    break;
+    if (best) break;
   }
   if (!best) return null;
 
@@ -76,28 +109,42 @@ async function fetchFromMusicBrainz(title, artist, year) {
 }
 
 // ── iTunes Search API (Apple) ────────────────────────────────────────────────
-// Excellent coverage of Japanese, Korean, and Asian music markets
+// Free, no key needed. Each country storefront carries its own local catalog,
+// so we query the regional stores that matter most (KR, JP, CN, US) in parallel
+// instead of relying only on the default US catalog.
+
+const ITUNES_STOREFRONTS = ['us', 'kr', 'jp', 'cn'];
+
+async function itunesSearchAlbums(title, artist, country) {
+  try {
+    const q = encodeURIComponent(`${artist} ${title}`);
+    const res = await fetch(
+      `https://itunes.apple.com/search?term=${q}&entity=album&limit=5&country=${country}`
+    );
+    const data = await res.json();
+    return (data.results || []).map(r => ({ ...r, _country: country }));
+  } catch { return []; }
+}
 
 async function fetchFromItunes(title, artist) {
   try {
-    // Search for the album
-    const q = encodeURIComponent(`${artist} ${title}`);
-    const res = await fetch(
-      `https://itunes.apple.com/search?term=${q}&entity=album&limit=5`
+    const resultsByStore = await Promise.all(
+      ITUNES_STOREFRONTS.map(c => itunesSearchAlbums(title, artist, c))
     );
-    const data = await res.json();
-    const results = data.results || [];
-    if (!results.length) return null;
+    const allResults = resultsByStore.flat();
+    if (!allResults.length) return null;
 
-    // Find best match
-    const album = results.find(r =>
-      r.collectionName?.toLowerCase().includes(title.toLowerCase()) ||
-      title.toLowerCase().includes(r.collectionName?.toLowerCase())
-    ) || results[0];
+    // Pick whichever candidate (from any storefront) best matches the user's input
+    let album = null, bestScore = -1;
+    for (const r of allResults) {
+      const score = matchScore(r.collectionName, r.artistName, title, artist);
+      if (score > bestScore) { bestScore = score; album = r; }
+    }
+    if (!album) return null;
 
-    // Fetch tracks for this album
+    // Fetch tracks for this album from the same storefront it was found in
     const trackRes = await fetch(
-      `https://itunes.apple.com/lookup?id=${album.collectionId}&entity=song`
+      `https://itunes.apple.com/lookup?id=${album.collectionId}&entity=song&country=${album._country}`
     );
     const trackData = await trackRes.json();
     const tracks = (trackData.results || [])
@@ -108,7 +155,7 @@ async function fetchFromItunes(title, artist) {
     // Cover: iTunes gives 100x100, upgrade to 600x600
     const coverUrl = album.artworkUrl100?.replace('100x100', '600x600') || null;
 
-    return tracks.length ? { tracks, coverUrl, source: 'iTunes' } : null;
+    return tracks.length ? { tracks, coverUrl, source: `iTunes (${album._country.toUpperCase()})` } : null;
   } catch { return null; }
 }
 
