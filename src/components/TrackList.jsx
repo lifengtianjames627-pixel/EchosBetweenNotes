@@ -196,9 +196,9 @@ async function resolveAcgTitle(title, artist) {
 
 // ── Main fetch orchestrator ──────────────────────────────────────────────────
 
-async function fetchTracklist(title, artist, year, genre) {
+async function fetchTracklist(title, artist, year, genre, skipAcgResolve) {
   let searchTitle = title, searchArtist = artist;
-  if (genre === 'acg') {
+  if (genre === 'acg' && !skipAcgResolve) {
     const resolved = await resolveAcgTitle(title, artist);
     if (resolved?.title) { searchTitle = resolved.title; searchArtist = resolved.artist || artist; }
   }
@@ -228,7 +228,7 @@ export default function TrackList({ item, v, onDataFetched }) {
 
   const runFetch = (title, artist, isRetry) => {
     setLoading(true);
-    fetchTracklist(title, artist, item.release_year, item.genre).then(result => {
+    fetchTracklist(title, artist, item.release_year, item.genre, isRetry).then(result => {
       setLoading(false);
       setFetched(true);
       setSource(result?.source || null);
