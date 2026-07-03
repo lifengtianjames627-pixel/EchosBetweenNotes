@@ -198,6 +198,17 @@ async function resolveAcgTitle(title, artist) {
   } catch { return null; }
 }
 
+// ── NetEase Cloud Music ────────────────────────────────────────────────────
+// Best coverage for anime/game soundtracks (way ahead of MusicBrainz/iTunes/
+// Last.fm here) — used as the primary source for ACG albums.
+
+async function fetchFromNetease(title, artist) {
+  try {
+    const res = await base44.functions.invoke('fetchNetease', { title, artist });
+    return res.data?.tracks?.length ? res.data : null;
+  } catch { return null; }
+}
+
 // ── Main fetch orchestrator ──────────────────────────────────────────────────
 
 async function fetchTracklist(title, artist, year, genre, skipAcgResolve) {
@@ -205,6 +216,11 @@ async function fetchTracklist(title, artist, year, genre, skipAcgResolve) {
   if (genre === 'acg' && !skipAcgResolve) {
     const resolved = await resolveAcgTitle(title, artist);
     if (resolved?.title) { searchTitle = resolved.title; searchArtist = resolved.artist || artist; }
+  }
+
+  if (genre === 'acg') {
+    const netease = await fetchFromNetease(searchTitle, searchArtist);
+    if (netease) return netease;
   }
 
   const results = (await Promise.all([
