@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Music, Loader2, ListMusic, ChevronDown } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import AlbumMatchPreview from '@/components/AlbumMatchPreview';
 
 const MB_HEADERS = { 'User-Agent': 'MusicCritics/1.0 (musiccritics@app.com)' };
 
@@ -181,25 +182,65 @@ async function fetchFromLastfm(title, artist) {
   } catch { return null; }
 }
 
+// ── VGMdb ─────────────────────────────────────────────────────────────────────
+// Community-run database specialized in anime/game/Japanese soundtrack releases —
+// covers ACG (anime/comic/game) music that MusicBrainz/iTunes often miss.
+
+async function fetchFromVgmdb(title, artist) {
+  try {
+    const searchRes = await fetch(`https://vgmdb.info/search/albums/${encodeURIComponent(title)}?format=json`);
+    if (!searchRes.ok) return null;
+    const searchData = await searchRes.json();
+    const results = searchData.results?.albums || [];
+    if (!results.length) return null;
+
+    let best = null, bestScore = -1;
+    for (const r of results) {
+      const name = r.title?.en || r.title?.ja || Object.values(r.title || {})[0] || '';
+      const score = similarity(name, title);
+      if (score > bestScore) { bestScore = score; best = r; }
+    }
+    if (!best?.link) return null;
+
+    const albumId = best.link.split('/').pop();
+    const albumRes = await fetch(`https://vgmdb.info/album/${albumId}?format=json`);
+    if (!albumRes.ok) return null;
+    const albumData = await albumRes.json();
+
+    const tracks = (albumData.discs?.[0]?.tracks || [])
+      .map(t => t.names?.en || t.names?.Japanese || Object.values(t.names || {})[0])
+      .filter(Boolean);
+    const coverUrl = albumData.picture_full || albumData.picture_small || null;
+
+    return tracks.length ? { tracks, coverUrl, source: 'VGMdb' } : null;
+  } catch { return null; }
+}
+
 // ── Main fetch orchestrator ──────────────────────────────────────────────────
 
-async function fetchTracklist(title, artist, year) {
-  // Run MusicBrainz + iTunes in parallel first (fastest)
-  const [mbResult, itunesResult] = await Promise.all([
-    fetchFromMusicBrainz(title, artist, year),
-    fetchFromItunes(title, artist),
-  ]);
+async function fetchTracklist(title, artist, year, genre) {
+  const lookups = [fetchFromMusicBrainz(title, artist, year), fetchFromItunes(title, artist)];
+  if (genre === 'acg') lookups.push(fetchFromVgmdb(title, artist));
 
-  // Prefer MusicBrainz (most accurate tracklist), fallback iTunes, then Last.fm
-  if (mbResult?.tracks?.length) return mbResult;
-  if (itunesResult?.tracks?.length) {
-    // If iTunes found tracks but no cover, try to get MB cover still
-    if (!itunesResult.coverUrl && mbResult?.coverUrl) itunesResult.coverUrl = mbResult.coverUrl;
-    return itunesResult;
+  const results = (await Promise.all(lookups)).filter(r => r?.tracks?.length);
+  if (!results.length) return await fetchFromLastfm(title, artist);
+
+  // Prefer VGMdb for ACG genre (specialized database), else MusicBrainz, else iTunes
+  let best;
+  if (genre === 'acg') {
+    const vgm = results.find(r => r.source === 'VGMdb');
+    if (vgm) best = vgm;
+    else best = results.find(r => r.source === 'MusicBrainz') || results[0];
+  } else {
+    best = results.find(r => r.source === 'MusicBrainz') || results[0];
   }
 
-  // Last resort: Last.fm
-  return await fetchFromLastfm(title, artist);
+  // Backfill missing cover from another source
+  if (!best.coverUrl) {
+    const withCover = results.find(r => r.coverUrl);
+    if (withCover) best.coverUrl = withCover.coverUrl;
+  }
+  return best;
 }
 
 export default function TrackList({ item, v, onDataFetched }) {
@@ -207,23 +248,29 @@ export default function TrackList({ item, v, onDataFetched }) {
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState(item.tracklist?.length > 0);
   const [expanded, setExpanded] = useState(false);
+  const [source, setSource] = useState(null);
+
+  const runFetch = (title, artist, isRetry) => {
+    setLoading(true);
+    fetchTracklist(title, artist, item.release_year, item.genre).then(result => {
+      setLoading(false);
+      setFetched(true);
+      setSource(result?.source || null);
+      if (result?.tracks?.length) {
+        setTracks(result.tracks);
+        const update = { tracklist: result.tracks };
+        if ((isRetry || !item.cover_url) && result.coverUrl) update.cover_url = result.coverUrl;
+        base44.entities.Album.update(item.id, update);
+        onDataFetched?.(update);
+      } else if (isRetry) {
+        setTracks([]);
+      }
+    });
+  };
 
   useEffect(() => {
     if (item.type === 'single' || fetched) return;
-    setLoading(true);
-    fetchTracklist(item.title, item.artist, item.release_year).then(result => {
-      setLoading(false);
-      if (result?.tracks?.length) {
-        setTracks(result.tracks);
-        setFetched(true);
-        // Save back to DB
-        const update = { tracklist: result.tracks };
-        if (!item.cover_url && result.coverUrl) update.cover_url = result.coverUrl;
-        if (result.mbid) update.musicbrainz_id = result.mbid;
-        base44.entities.Album.update(item.id, update);
-        onDataFetched?.(update);
-      }
-    });
+    runFetch(item.title, item.artist, false);
   }, [item.id]);
 
   if (item.type === 'single') return null;
@@ -285,6 +332,18 @@ export default function TrackList({ item, v, onDataFetched }) {
         </AnimatePresence>
       ) : (
         <p className="text-xs py-2" style={{ color: `${v.muted}80` }}>Tracklist not found across MusicBrainz, iTunes & Last.fm.</p>
+      )}
+
+      {fetched && (
+        <AlbumMatchPreview
+          v={v}
+          source={source}
+          found={tracks.length > 0}
+          defaultTitle={item.title}
+          defaultArtist={item.artist}
+          retrying={loading}
+          onRetry={(title, artist) => runFetch(title, artist, true)}
+        />
       )}
     </div>
   );
