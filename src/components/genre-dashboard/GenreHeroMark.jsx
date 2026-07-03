@@ -9,10 +9,14 @@ export default function GenreHeroMark({ genreId, accent }) {
 
   return (
     <div
-      className="hidden md:block absolute right-0 top-1/2 pointer-events-none select-none"
+      className="absolute right-0 top-1/2 pointer-events-none select-none"
       style={{ transform: 'translateY(-50%)', zIndex: 0 }}
     >
-      <Icon style={{ width: 220, height: 220, color: accent, opacity: 0.07 }} strokeWidth={1} />
+      <Icon
+        className="w-28 h-28 sm:w-44 sm:h-44 md:w-56 md:h-56"
+        style={{ color: accent, opacity: 0.12 }}
+        strokeWidth={1}
+      />
     </div>
   );
 }
