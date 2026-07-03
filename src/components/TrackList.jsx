@@ -38,6 +38,10 @@ function matchScore(candidateTitle, candidateArtist, title, artist) {
   return similarity(candidateTitle, title) * 0.65 + similarity(candidateArtist, artist) * 0.35;
 }
 
+// Below this, a candidate is considered "not actually the same album" and gets rejected
+// instead of being returned as a false-positive match.
+const MIN_MATCH_SCORE = 0.4;
+
 // ── MusicBrainz helpers ──────────────────────────────────────────────────────
 
 async function mbSearch(query, limit = 10) {
@@ -100,7 +104,7 @@ async function fetchFromMusicBrainz(title, artist, year) {
     }
     if (best) break;
   }
-  if (!best) return null;
+  if (!best || bestScore < MIN_MATCH_SCORE) return null;
 
   const [tracks, coverUrl] = await Promise.all([
     mbGetTracks(best.id),
@@ -141,7 +145,7 @@ async function fetchFromItunes(title, artist) {
       const score = matchScore(r.collectionName, r.artistName, title, artist);
       if (score > bestScore) { bestScore = score; album = r; }
     }
-    if (!album) return null;
+    if (!album || bestScore < MIN_MATCH_SCORE) return null;
 
     // Fetch tracks for this album from the same storefront it was found in
     const trackRes = await fetch(
