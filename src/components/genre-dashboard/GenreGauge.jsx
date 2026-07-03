@@ -3,9 +3,10 @@ import { motion } from 'framer-motion';
 import { BUBBLE_COLORS, GENRE_ICONS } from '@/lib/genreVisuals';
 
 const ANGLES = [-52, 0, 52]; // degrees from vertical (left, center, right) — wide, natural spread
-const PIVOT = { x: 400, y: 340 };
+const PIVOT = { x: 400, y: 390 };
 const PIN_RADIUS = 270;
 const NEEDLE_LEN = 150;
+const BUBBLE_Y_OFFSET = 50; // shift bubbles up only, needle stays at PIVOT
 
 function polar(angleDeg, radius) {
   const rad = (angleDeg * Math.PI) / 180;
@@ -57,7 +58,7 @@ export default function GenreGauge({ items, onSelect }) {
             className="absolute rounded-full flex flex-col items-center justify-center cursor-pointer select-none"
             style={{
               left: pos.x,
-              top: pos.y,
+              top: pos.y - BUBBLE_Y_OFFSET,
               width: size,
               height: size,
               transform: 'translate(-50%, -50%)',
