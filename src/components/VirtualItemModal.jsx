@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { X, Star, Search } from 'lucide-react';
+import { loadDraft, saveDraft, clearDraft } from '@/lib/reviewDraft';
 
 // A "virtual" music item modal — used for tracks clicked inside an album (type='single')
 // or an album searched for from a single (type='album'). The underlying Album/Single
@@ -32,6 +33,24 @@ export default function VirtualItemModal({ v, initialTitle = '', initialArtist =
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [blocked, setBlocked] = useState(false);
+
+  // Draft scope only stable once title/artist are known (after search, or immediately if not allowSearch)
+  const draftScope = searched ? `${type}_${title.toLowerCase()}_${artist.toLowerCase()}` : null;
+
+  useEffect(() => {
+    if (!draftScope) return;
+    const draft = loadDraft(draftScope);
+    if (draft) {
+      setRating(draft.rating || 0);
+      setContent(draft.content || '');
+      setShowForm(true);
+    }
+  }, [draftScope]);
+
+  useEffect(() => {
+    if (!draftScope || (!rating && !content)) return;
+    saveDraft(draftScope, { rating, content });
+  }, [draftScope, rating, content]);
 
   const checkMatch = async () => {
     setChecking(true);
@@ -113,6 +132,7 @@ export default function VirtualItemModal({ v, initialTitle = '', initialArtist =
     setContent('');
     setShowForm(false);
     setSubmitting(false);
+    if (draftScope) clearDraft(draftScope);
   };
 
   return (

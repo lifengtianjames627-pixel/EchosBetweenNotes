@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -12,6 +12,7 @@ import ReviewShareCard from '@/components/ReviewShareCard';
 import GenreDecoration from '@/components/GenreDecoration';
 import VirtualItemModal from '@/components/VirtualItemModal';
 import { Search } from 'lucide-react';
+import { loadDraft, saveDraft, clearDraft } from '@/lib/reviewDraft';
 
 function StarPicker({ rating, onRate, accent, muted }) {
   return (
@@ -128,10 +129,15 @@ function CommentSection({ reviewId, v, currentUser }) {
   );
 }
 
+const EMPTY_REVIEW_DATA = { rating: 0, title: '', content: '', band_style: '', band_background: '', band_history: '', band_story: '' };
+
 function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
-  const [data, setData] = useState({ rating: 0, title: '', content: '', band_style: '', band_background: '', band_history: '', band_story: '' });
+  const draftScope = `album_${albumId}`;
+  const [data, setData] = useState(() => loadDraft(draftScope) || EMPTY_REVIEW_DATA);
   const [moderationMsg, setModerationMsg] = useState(null); // null | 'blocked' | 'pending'
   const queryClient = useQueryClient();
+
+  useEffect(() => { saveDraft(draftScope, data); }, [data]);
 
   const createReview = useMutation({
     mutationFn: async (d) => {
@@ -186,7 +192,8 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
     onSuccess: (modStatus) => {
       queryClient.invalidateQueries({ queryKey: ['item-reviews', albumId] });
       queryClient.invalidateQueries({ queryKey: ['genre-albums'] });
-      setData({ rating: 0, title: '', content: '', band_style: '', band_background: '', band_history: '', band_story: '' });
+      setData(EMPTY_REVIEW_DATA);
+      clearDraft(draftScope);
       if (modStatus === 'pending_review') {
         setModerationMsg('pending');
       } else {
