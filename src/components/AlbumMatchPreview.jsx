@@ -12,7 +12,7 @@ export default function AlbumMatchPreview({ v, source, found, defaultTitle, defa
     <div className="pt-2">
       <div className="flex items-center justify-between gap-2 text-xs">
         <span style={{ color: v.muted }}>
-          {found ? <>Matched via <span style={{ color: v.accent }}>{source}</span></> : 'No match found'}
+          {found ? (source ? <>Matched via <span style={{ color: v.accent }}>{source}</span></> : 'Saved tracklist') : 'No match found'}
         </span>
         <button
           onClick={() => setOpen(o => !o)}
