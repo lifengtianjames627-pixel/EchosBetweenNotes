@@ -9,6 +9,7 @@ import MusicSlider from '@/components/MusicSlider';
 import AddMusicModal from '@/components/AddMusicModal';
 import MusicItemDetail from '@/components/MusicItemDetail';
 import GenreRankings from '@/components/GenreRankings';
+import GenreHeroMark from '@/components/genre-dashboard/GenreHeroMark';
 
 // Per-genre visual configs
 const GENRE_VISUALS = {
@@ -221,6 +222,8 @@ export default function GenreSpace() {
           transition={{ duration: 0.8, ease: [0.2, 0, 0.1, 1] }}
           className="mb-20 relative"
         >
+          <GenreHeroMark genreId={genreId} accent={v.accent} />
+
           {/* Ghost large number / letter behind */}
           <div
             className="absolute -top-8 -left-4 select-none pointer-events-none font-playfair"

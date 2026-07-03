@@ -1,27 +1,9 @@
 import React from 'react';
-import { Guitar, Skull, Sparkles, Music2, Mic2, Music4, Radio, Flame, Disc3, Leaf, Volume2, Zap, PartyPopper, Gamepad2, Compass } from 'lucide-react';
-
-const ICONS = {
-  rock: Guitar,
-  pop: Sparkles,
-  classical: Music2,
-  metal: Skull,
-  jazz: Mic2,
-  blues: Music4,
-  r_and_b: Radio,
-  hardcore: Flame,
-  country: Compass,
-  hip_hop: Disc3,
-  indie: Leaf,
-  grunge: Volume2,
-  electronic: Zap,
-  funk: PartyPopper,
-  acg: Gamepad2,
-};
+import { GENRE_DECOR_ICONS } from '@/lib/genreIcons';
 
 // Subtle themed watermark icon shown in the corner of the review modal, per genre.
 export default function GenreDecoration({ genreId, accent }) {
-  const Icon = ICONS[genreId];
+  const Icon = GENRE_DECOR_ICONS[genreId];
   if (!Icon) return null;
 
   return (
