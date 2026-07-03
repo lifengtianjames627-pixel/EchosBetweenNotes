@@ -9,6 +9,7 @@ import { awardBadge } from '@/lib/badgeUtils';
 import TrackList from '@/components/TrackList';
 import ReviewActions from '@/components/ReviewActions';
 import ReviewShareCard from '@/components/ReviewShareCard';
+import GenreDecoration from '@/components/GenreDecoration';
 
 function StarPicker({ rating, onRate, accent, muted }) {
   return (
@@ -318,15 +319,16 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex gap-4 p-5 pb-4 sticky top-0 z-10 backdrop-blur-lg" style={{ background: v.cardBg }}>
-          <div className="w-20 h-20 rounded-xl shrink-0 overflow-hidden" style={{ background: `${v.accent}15` }}>
+        <div className="flex gap-4 p-5 pb-4 sticky top-0 z-10 backdrop-blur-lg relative overflow-hidden" style={{ background: v.cardBg }}>
+          <GenreDecoration genreId={localItem.genre} accent={v.accent} />
+          <div className="w-20 h-20 rounded-xl shrink-0 overflow-hidden relative z-[1]" style={{ background: `${v.accent}15` }}>
             {localItem.cover_url ? (
               <img src={localItem.cover_url} alt={localItem.title} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-2xl">🎵</div>
             )}
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 relative z-[1]">
             <div className="flex items-start justify-between gap-2">
               <div>
                 <span className="text-xs uppercase tracking-widest" style={{ color: v.accent }}>{localItem.type || 'album'}</span>
