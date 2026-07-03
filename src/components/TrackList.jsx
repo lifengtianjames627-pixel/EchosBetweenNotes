@@ -182,58 +182,34 @@ async function fetchFromLastfm(title, artist) {
   } catch { return null; }
 }
 
-// ── VGMdb ─────────────────────────────────────────────────────────────────────
-// Community-run database specialized in anime/game/Japanese soundtrack releases —
-// covers ACG (anime/comic/game) music that MusicBrainz/iTunes often miss.
+// ── ACG title resolution ──────────────────────────────────────────────────────
+// ACG (anime/game/comic) albums are often saved under a Chinese fan title
+// (e.g. 死神, 恶魔城) which no music database indexes. Resolve the official
+// Japanese/English title + composer via an LLM before searching.
 
-async function fetchFromVgmdb(title, artist) {
+async function resolveAcgTitle(title, artist) {
   try {
-    const searchRes = await fetch(`https://vgmdb.info/search/albums/${encodeURIComponent(title)}?format=json`);
-    if (!searchRes.ok) return null;
-    const searchData = await searchRes.json();
-    const results = searchData.results?.albums || [];
-    if (!results.length) return null;
-
-    let best = null, bestScore = -1;
-    for (const r of results) {
-      const name = r.title?.en || r.title?.ja || Object.values(r.title || {})[0] || '';
-      const score = similarity(name, title);
-      if (score > bestScore) { bestScore = score; best = r; }
-    }
-    if (!best?.link) return null;
-
-    const albumId = best.link.split('/').pop();
-    const albumRes = await fetch(`https://vgmdb.info/album/${albumId}?format=json`);
-    if (!albumRes.ok) return null;
-    const albumData = await albumRes.json();
-
-    const tracks = (albumData.discs?.[0]?.tracks || [])
-      .map(t => t.names?.en || t.names?.Japanese || Object.values(t.names || {})[0])
-      .filter(Boolean);
-    const coverUrl = albumData.picture_full || albumData.picture_small || null;
-
-    return tracks.length ? { tracks, coverUrl, source: 'VGMdb' } : null;
+    const res = await base44.functions.invoke('resolveAcgTitle', { title, artist });
+    return res.data;
   } catch { return null; }
 }
 
 // ── Main fetch orchestrator ──────────────────────────────────────────────────
 
 async function fetchTracklist(title, artist, year, genre) {
-  const lookups = [fetchFromMusicBrainz(title, artist, year), fetchFromItunes(title, artist)];
-  if (genre === 'acg') lookups.push(fetchFromVgmdb(title, artist));
-
-  const results = (await Promise.all(lookups)).filter(r => r?.tracks?.length);
-  if (!results.length) return await fetchFromLastfm(title, artist);
-
-  // Prefer VGMdb for ACG genre (specialized database), else MusicBrainz, else iTunes
-  let best;
+  let searchTitle = title, searchArtist = artist;
   if (genre === 'acg') {
-    const vgm = results.find(r => r.source === 'VGMdb');
-    if (vgm) best = vgm;
-    else best = results.find(r => r.source === 'MusicBrainz') || results[0];
-  } else {
-    best = results.find(r => r.source === 'MusicBrainz') || results[0];
+    const resolved = await resolveAcgTitle(title, artist);
+    if (resolved?.title) { searchTitle = resolved.title; searchArtist = resolved.artist || artist; }
   }
+
+  const results = (await Promise.all([
+    fetchFromMusicBrainz(searchTitle, searchArtist, year),
+    fetchFromItunes(searchTitle, searchArtist),
+  ])).filter(r => r?.tracks?.length);
+  if (!results.length) return await fetchFromLastfm(searchTitle, searchArtist);
+
+  const best = results.find(r => r.source === 'MusicBrainz') || results[0];
 
   // Backfill missing cover from another source
   if (!best.coverUrl) {
