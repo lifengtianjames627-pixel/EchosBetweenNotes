@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube, Maximize2, Minimize2, Share2 } from 'lucide-react';
+import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube, Maximize2, Minimize2, Share2, Trash2 } from 'lucide-react';
 import CivilityNotice from '@/components/CivilityNotice';
 import BadgeIcon from '@/components/BadgeIcon';
 import { awardBadge } from '@/lib/badgeUtils';
@@ -282,9 +282,21 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
   const [fullscreen, setFullscreen] = useState(false);
   const [shareReview, setShareReview] = useState(null); // review to share
 
+  const queryClient = useQueryClient();
+
   const { data: currentUser } = useQuery({
     queryKey: ['me'],
     queryFn: () => base44.auth.me(),
+  });
+
+  const canDelete = currentUser?.role === 'admin' && currentUser?.full_name?.trim().toLowerCase() === 'fengtian james li';
+
+  const deleteAlbum = useMutation({
+    mutationFn: () => base44.entities.Album.delete(item.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['genre-albums'] });
+      onClose();
+    },
   });
 
   const { data: allReviewsRaw = [], isLoading } = useQuery({
@@ -336,6 +348,16 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
                 <p className="text-sm" style={{ color: v.muted }}>{localItem.artist} {localItem.release_year && `· ${localItem.release_year}`}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0 mt-1">
+                {canDelete && (
+                  <button
+                    onClick={() => { if (window.confirm(`Delete "${localItem.title}"? This cannot be undone.`)) deleteAlbum.mutate(); }}
+                    disabled={deleteAlbum.isPending}
+                    style={{ color: '#f87171' }}
+                    title="Delete album"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
                 <button onClick={() => setFullscreen(f => !f)} style={{ color: v.muted }} title={fullscreen ? 'Exit fullscreen' : 'Fullscreen'}>
                   {fullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                 </button>
