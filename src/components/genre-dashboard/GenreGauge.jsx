@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { BUBBLE_COLORS, GENRE_ICONS } from '@/lib/genreVisuals';
 
 const ANGLES = [-52, 0, 52]; // degrees from vertical (left, center, right) — wide, natural spread
-const PIVOT = { x: 400, y: 390 };
+const PIVOT = { x: 400, y: 340 };
 const PIN_RADIUS = 270;
 const NEEDLE_LEN = 150;
 
