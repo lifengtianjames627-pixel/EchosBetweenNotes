@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Music, Loader2, ListMusic } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Music, Loader2, ListMusic, ChevronDown } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
 const MB_HEADERS = { 'User-Agent': 'MusicCritics/1.0 (musiccritics@app.com)' };
@@ -159,6 +159,7 @@ export default function TrackList({ item, v, onDataFetched }) {
   const [tracks, setTracks] = useState(item.tracklist || []);
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState(item.tracklist?.length > 0);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (item.type === 'single' || fetched) return;
@@ -182,7 +183,11 @@ export default function TrackList({ item, v, onDataFetched }) {
 
   return (
     <div className="px-5 pb-4">
-      <div className="flex items-center gap-2 mb-3">
+      <button
+        onClick={() => tracks.length > 0 && setExpanded(e => !e)}
+        className="flex items-center gap-2 mb-3 w-full text-left"
+        style={{ cursor: tracks.length > 0 ? 'pointer' : 'default' }}
+      >
         <ListMusic className="w-3.5 h-3.5" style={{ color: v.accent }} />
         <p className="text-xs uppercase tracking-widest font-bold" style={{ color: v.muted }}>Tracklist</p>
         {tracks.length > 0 && (
@@ -190,7 +195,12 @@ export default function TrackList({ item, v, onDataFetched }) {
             {tracks.length} tracks
           </span>
         )}
-      </div>
+        {tracks.length > 0 && (
+          <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }} className="ml-auto">
+            <ChevronDown className="w-4 h-4" style={{ color: v.muted }} />
+          </motion.div>
+        )}
+      </button>
 
       {loading ? (
         <div className="flex items-center gap-2 py-3" style={{ color: v.muted }}>
@@ -198,22 +208,34 @@ export default function TrackList({ item, v, onDataFetched }) {
           <span className="text-xs">Fetching tracklist…</span>
         </div>
       ) : tracks.length > 0 ? (
-        <div className="space-y-1">
-          {tracks.map((track, i) => (
+        <AnimatePresence initial={false}>
+          {expanded && (
             <motion.div
-              key={i}
-              initial={{ opacity: 0, x: -6 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.03 }}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg"
-              style={{ background: `${v.accent}07` }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
             >
-              <span className="text-xs w-5 text-right shrink-0 font-mono" style={{ color: `${v.muted}80` }}>{i + 1}</span>
-              <Music className="w-3 h-3 shrink-0" style={{ color: `${v.accent}60` }} />
-              <span className="text-sm" style={{ color: v.text }}>{track}</span>
+              <div className="space-y-1">
+                {tracks.map((track, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg"
+                    style={{ background: `${v.accent}07` }}
+                  >
+                    <span className="text-xs w-5 text-right shrink-0 font-mono" style={{ color: `${v.muted}80` }}>{i + 1}</span>
+                    <Music className="w-3 h-3 shrink-0" style={{ color: `${v.accent}60` }} />
+                    <span className="text-sm" style={{ color: v.text }}>{track}</span>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
-          ))}
-        </div>
+          )}
+        </AnimatePresence>
       ) : (
         <p className="text-xs py-2" style={{ color: `${v.muted}80` }}>Tracklist not found across MusicBrainz, iTunes & Last.fm.</p>
       )}
