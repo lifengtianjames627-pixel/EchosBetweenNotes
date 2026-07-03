@@ -239,7 +239,7 @@ async function fetchTracklist(title, artist, year, genre, skipAcgResolve) {
   return best;
 }
 
-export default function TrackList({ item, v, onDataFetched }) {
+export default function TrackList({ item, v, onDataFetched, onTrackClick }) {
   const [tracks, setTracks] = useState(item.tracklist || []);
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState(item.tracklist?.length > 0);
@@ -309,18 +309,20 @@ export default function TrackList({ item, v, onDataFetched }) {
             >
               <div className="space-y-1">
                 {tracks.map((track, i) => (
-                  <motion.div
+                  <motion.button
                     key={i}
+                    type="button"
+                    onClick={() => onTrackClick?.(track)}
                     initial={{ opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.03 }}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg w-full text-left transition-colors hover:brightness-125"
                     style={{ background: `${v.accent}07` }}
                   >
                     <span className="text-xs w-5 text-right shrink-0 font-mono" style={{ color: `${v.muted}80` }}>{i + 1}</span>
                     <Music className="w-3 h-3 shrink-0" style={{ color: `${v.accent}60` }} />
                     <span className="text-sm" style={{ color: v.text }}>{track}</span>
-                  </motion.div>
+                  </motion.button>
                 ))}
               </div>
             </motion.div>

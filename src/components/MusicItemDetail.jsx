@@ -10,6 +10,8 @@ import TrackList from '@/components/TrackList';
 import ReviewActions from '@/components/ReviewActions';
 import ReviewShareCard from '@/components/ReviewShareCard';
 import GenreDecoration from '@/components/GenreDecoration';
+import VirtualItemModal from '@/components/VirtualItemModal';
+import { Search } from 'lucide-react';
 
 function StarPicker({ rating, onRate, accent, muted }) {
   return (
@@ -281,6 +283,8 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
   const [localItem, setLocalItem] = useState(item);
   const [fullscreen, setFullscreen] = useState(false);
   const [shareReview, setShareReview] = useState(null); // review to share
+  const [virtualTrack, setVirtualTrack] = useState(null); // track clicked inside an album
+  const [findingAlbum, setFindingAlbum] = useState(false); // "find album" from a single
 
   const queryClient = useQueryClient();
 
@@ -398,6 +402,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
           item={localItem}
           v={v}
           onDataFetched={(update) => setLocalItem(prev => ({ ...prev, ...update }))}
+          onTrackClick={(track) => setVirtualTrack(track)}
         />
 
         {/* MV link for singles only */}
@@ -413,6 +418,18 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
               <Youtube className="w-4 h-4" />
               Watch Music Video
             </a>
+          </div>
+        )}
+
+        {localItem.type === 'single' && (
+          <div className="px-5 pb-4">
+            <button
+              onClick={() => setFindingAlbum(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+              style={{ border: `1px solid ${v.accent}40`, color: v.accent }}
+            >
+              <Search className="w-3.5 h-3.5" /> Find Album
+            </button>
           </div>
         )}
 
@@ -541,6 +558,37 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
           review={shareReview}
           album={localItem}
           onClose={() => setShareReview(null)}
+        />
+      )}
+    </AnimatePresence>
+
+    {/* Track clicked inside an album — virtual single, only saved once reviewed */}
+    <AnimatePresence>
+      {virtualTrack && (
+        <VirtualItemModal
+          v={v}
+          type="single"
+          initialTitle={virtualTrack}
+          initialArtist={localItem.artist}
+          genre={localItem.genre}
+          coverUrl={localItem.cover_url}
+          currentUser={currentUser}
+          onClose={() => setVirtualTrack(null)}
+        />
+      )}
+    </AnimatePresence>
+
+    {/* Find the parent album from a single — virtual album, only saved once reviewed */}
+    <AnimatePresence>
+      {findingAlbum && (
+        <VirtualItemModal
+          v={v}
+          type="album"
+          allowSearch
+          initialArtist={localItem.artist}
+          genre={localItem.genre}
+          currentUser={currentUser}
+          onClose={() => setFindingAlbum(false)}
         />
       )}
     </AnimatePresence>
