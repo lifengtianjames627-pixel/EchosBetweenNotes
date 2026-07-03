@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BUBBLE_COLORS, GENRE_ICONS } from '@/lib/genreVisuals';
 
-const ANGLES = [-48, 0, 48]; // degrees from vertical (left, center, right) — wide, natural spread
-const PIVOT = { x: 400, y: 380 };
-const PIN_RADIUS = 258;
-const NEEDLE_LEN = 190;
+const ANGLES = [-52, 0, 52]; // degrees from vertical (left, center, right) — wide, natural spread
+const PIVOT = { x: 400, y: 390 };
+const PIN_RADIUS = 270;
+const NEEDLE_LEN = 150;
 
 function polar(angleDeg, radius) {
   const rad = (angleDeg * Math.PI) / 180;
@@ -48,7 +48,7 @@ export default function GenreGauge({ items, onSelect }) {
       {items.map((item, i) => {
         const pos = polar(ANGLES[i], PIN_RADIUS);
         const isActive = hovered === i;
-        const size = isActive ? 232 : 194;
+        const size = isActive ? 204 : 172;
         const c = BUBBLE_COLORS[item.colorIdx % BUBBLE_COLORS.length];
         const IconSvg = GENRE_ICONS[item.genre.id] || GENRE_ICONS['electronic'];
         return (
