@@ -172,7 +172,11 @@ async function renderCard(canvas, review, album) {
   ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
   ctx.textBaseline = 'alphabetic';
 
-  // Background
+  // Background — fill the full rect opaque first so the corners outside the
+  // rounded card never end up transparent (which some viewers flash white on).
+  ctx.fillStyle = '#050308';
+  ctx.fillRect(0, 0, W, H);
+
   ctx.save();
   roundRect(ctx, 0, 0, W, H, 20);
   ctx.clip();
