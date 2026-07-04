@@ -73,7 +73,7 @@ function CardCanvas({ review, album, cardRef }) {
       <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(167,139,250,0.4), transparent)', marginBottom: 16 }} />
 
       {/* Reviewer + title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12 }}>
         <div style={{
           width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
           background: 'linear-gradient(135deg, rgba(167,139,250,0.4), rgba(96,165,250,0.3))',
@@ -113,9 +113,9 @@ function CardCanvas({ review, album, cardRef }) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
           {album.tags.slice(0, 4).map(tag => (
             <span key={tag} style={{
-              fontSize: 10, lineHeight: '14px', color: accent, padding: '2px 8px', borderRadius: 999,
+              fontSize: 10, height: 18, lineHeight: '18px', color: accent, padding: '0 8px', borderRadius: 999,
               background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.25)',
-              letterSpacing: '0.05em', display: 'inline-block',
+              letterSpacing: '0.05em', display: 'inline-block', boxSizing: 'border-box',
             }}>
               #{tag}
             </span>
