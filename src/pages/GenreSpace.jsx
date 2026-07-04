@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
@@ -176,6 +176,21 @@ export default function GenreSpace() {
       return data.results?.[0]?.artworkUrl100?.replace('100x100', '600x600') || null;
     } catch { return null; }
   };
+
+  // Backfill covers for singles that were already created before covers were fetched automatically.
+  const backfilledRef = useRef(new Set());
+  useEffect(() => {
+    const singlesMissingCover = allItems.filter(i => i.type === 'single' && !i.cover_url && !backfilledRef.current.has(i.id));
+    if (!singlesMissingCover.length) return;
+    singlesMissingCover.forEach(async (item) => {
+      backfilledRef.current.add(item.id);
+      const cover_url = await fetchSingleCover(item.title, item.artist);
+      if (cover_url) {
+        await base44.entities.Album.update(item.id, { cover_url });
+        queryClient.invalidateQueries({ queryKey: ['genre-albums', genreId] });
+      }
+    });
+  }, [allItems, genreId]);
 
   const addItem = useMutation({
     mutationFn: async (data) => {
