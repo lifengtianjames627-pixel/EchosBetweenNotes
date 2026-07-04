@@ -3,7 +3,44 @@ import { motion } from 'framer-motion';
 import { X, Download, Copy, Check } from 'lucide-react';
 
 const FONT = "'Inter','PingFang SC','Microsoft YaHei',sans-serif";
-const ACCENT = '#a78bfa';
+
+// Per-genre color themes — each card gets its own personality instead of always purple.
+const GENRE_THEMES = {
+  rock: { accent: '#ef4444', secondary: '#f59e0b' },
+  pop: { accent: '#ec4899', secondary: '#a78bfa' },
+  hip_hop: { accent: '#f5c518', secondary: '#ef4444' },
+  r_and_b: { accent: '#b47fff', secondary: '#ec4899' },
+  jazz: { accent: '#d4a017', secondary: '#5c8ab5' },
+  classical: { accent: '#e8c468', secondary: '#8a7a60' },
+  electronic: { accent: '#4080ff', secondary: '#22d3ee' },
+  indie: { accent: '#8bc34a', secondary: '#d4a017' },
+  metal: { accent: '#e11d1d', secondary: '#888888' },
+  punk: { accent: '#ff2d55', secondary: '#f5c518' },
+  folk: { accent: '#a0784f', secondary: '#8bc34a' },
+  country: { accent: '#a0522d', secondary: '#d4a017' },
+  latin: { accent: '#ff7a00', secondary: '#ec4899' },
+  k_pop: { accent: '#ff5fae', secondary: '#4080ff' },
+  blues: { accent: '#5c8ab5', secondary: '#b47fff' },
+  grunge: { accent: '#8b7355', secondary: '#a0522d' },
+  funk: { accent: '#fbbf24', secondary: '#ec4899' },
+  acg: { accent: '#22d3ee', secondary: '#b47fff' },
+  other: { accent: '#a78bfa', secondary: '#60a5fa' },
+};
+const DEFAULT_THEME = GENRE_THEMES.other;
+
+function hexToRgba(hex, alpha) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16), g = parseInt(h.substring(2, 4), 16), b = parseInt(h.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// Blends a color into near-black at a low factor, for opaque background gradient stops.
+function tintDark(hex, factor) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16), g = parseInt(h.substring(2, 4), 16), b = parseInt(h.substring(4, 6), 16);
+  const mix = (c) => Math.round(c * factor + 8);
+  return `rgb(${mix(r)},${mix(g)},${mix(b)})`;
+}
 
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -99,6 +136,9 @@ async function renderCard(canvas, review, album) {
   const W = 420, PAD = 28, SCALE = 2;
   const contentW = W - PAD * 2;
   const ctx = canvas.getContext('2d');
+  const theme = GENRE_THEMES[album?.genre] || DEFAULT_THEME;
+  const ACCENT = theme.accent;
+  const SECONDARY = theme.secondary;
 
   const truncatedContent = review.content?.length > 160
     ? review.content.slice(0, 160).trimEnd() + '…'
@@ -181,13 +221,13 @@ async function renderCard(canvas, review, album) {
   roundRect(ctx, 0, 0, W, H, 20);
   ctx.clip();
   const grad = ctx.createLinearGradient(0, 0, W, H);
-  grad.addColorStop(0, '#0d0820'); grad.addColorStop(0.4, '#150d30'); grad.addColorStop(1, '#0a1020');
+  grad.addColorStop(0, tintDark(ACCENT, 0.09)); grad.addColorStop(0.4, tintDark(ACCENT, 0.16)); grad.addColorStop(1, tintDark(SECONDARY, 0.1));
   ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
   const rg1 = ctx.createRadialGradient(W * 0.85, H * 0.05, 0, W * 0.85, H * 0.05, W * 0.6);
-  rg1.addColorStop(0, 'rgba(167,139,250,0.18)'); rg1.addColorStop(1, 'rgba(167,139,250,0)');
+  rg1.addColorStop(0, hexToRgba(ACCENT, 0.18)); rg1.addColorStop(1, hexToRgba(ACCENT, 0));
   ctx.fillStyle = rg1; ctx.fillRect(0, 0, W, H);
   const rg2 = ctx.createRadialGradient(W * 0.05, H * 0.95, 0, W * 0.05, H * 0.95, W * 0.5);
-  rg2.addColorStop(0, 'rgba(96,165,250,0.12)'); rg2.addColorStop(1, 'rgba(96,165,250,0)');
+  rg2.addColorStop(0, hexToRgba(SECONDARY, 0.12)); rg2.addColorStop(1, hexToRgba(SECONDARY, 0));
   ctx.fillStyle = rg2; ctx.fillRect(0, 0, W, H);
   ctx.restore();
 
@@ -195,9 +235,9 @@ async function renderCard(canvas, review, album) {
   const img = await loadImage(album?.cover_url);
   ctx.save();
   roundRect(ctx, PAD, albumRowTop, 80, 80, 12);
-  ctx.fillStyle = 'rgba(167,139,250,0.1)';
+  ctx.fillStyle = hexToRgba(ACCENT, 0.1);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(167,139,250,0.35)';
+  ctx.strokeStyle = hexToRgba(ACCENT, 0.35);
   ctx.lineWidth = 1.5;
   ctx.stroke();
   if (img) {
@@ -246,9 +286,9 @@ async function renderCard(canvas, review, album) {
 
   // Divider
   const divGrad = ctx.createLinearGradient(PAD, 0, W - PAD, 0);
-  divGrad.addColorStop(0, 'rgba(167,139,250,0)');
-  divGrad.addColorStop(0.5, 'rgba(167,139,250,0.4)');
-  divGrad.addColorStop(1, 'rgba(167,139,250,0)');
+  divGrad.addColorStop(0, hexToRgba(ACCENT, 0));
+  divGrad.addColorStop(0.5, hexToRgba(ACCENT, 0.4));
+  divGrad.addColorStop(1, hexToRgba(ACCENT, 0));
   ctx.fillStyle = divGrad;
   ctx.fillRect(PAD, dividerY, contentW, 1);
 
@@ -258,16 +298,16 @@ async function renderCard(canvas, review, album) {
   ctx.beginPath();
   ctx.arc(avatarCx, avatarCy, 16, 0, Math.PI * 2);
   const avGrad = ctx.createLinearGradient(PAD, reviewerTop, PAD + 32, reviewerTop + 32);
-  avGrad.addColorStop(0, 'rgba(167,139,250,0.4)');
-  avGrad.addColorStop(1, 'rgba(96,165,250,0.3)');
+  avGrad.addColorStop(0, hexToRgba(ACCENT, 0.4));
+  avGrad.addColorStop(1, hexToRgba(SECONDARY, 0.3));
   ctx.fillStyle = avGrad;
   ctx.fill();
-  ctx.strokeStyle = 'rgba(167,139,250,0.4)';
+  ctx.strokeStyle = hexToRgba(ACCENT, 0.4);
   ctx.lineWidth = 1.5;
   ctx.stroke();
   ctx.restore();
   ctx.font = `800 13px ${FONT}`;
-  ctx.fillStyle = '#c4baff';
+  ctx.fillStyle = ACCENT;
   ctx.textAlign = 'center';
   ctx.fillText((review.reviewer_name || 'A')[0].toUpperCase(), avatarCx, avatarCy + 5);
   ctx.textAlign = 'left';
@@ -275,20 +315,20 @@ async function renderCard(canvas, review, album) {
   // Reviewer name + title
   const textX = PAD + 32 + 10;
   ctx.font = `700 13px ${FONT}`;
-  ctx.fillStyle = '#e0d8ff';
+  ctx.fillStyle = '#e8e4f5';
   ctx.fillText(name, textX, nameBaseline);
   if (reviewTitle) {
     ctx.font = `italic 11px ${FONT}`;
-    ctx.fillStyle = 'rgba(167,139,250,0.75)';
+    ctx.fillStyle = hexToRgba(ACCENT, 0.75);
     ctx.fillText(reviewTitle, textX, reviewerTitleBaseline);
   }
 
   // Excerpt box
   ctx.save();
   roundRect(ctx, PAD, excerptTop, contentW, excerptBoxHeight, 12);
-  ctx.fillStyle = 'rgba(167,139,250,0.07)';
+  ctx.fillStyle = hexToRgba(ACCENT, 0.07);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(167,139,250,0.15)';
+  ctx.strokeStyle = hexToRgba(ACCENT, 0.15);
   ctx.lineWidth = 1;
   ctx.stroke();
   ctx.restore();
@@ -309,9 +349,9 @@ async function renderCard(canvas, review, album) {
       row.forEach(({ label, w }) => {
         ctx.save();
         roundRect(ctx, tx, ty, w, 18, 9);
-        ctx.fillStyle = 'rgba(167,139,250,0.12)';
+        ctx.fillStyle = hexToRgba(ACCENT, 0.12);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(167,139,250,0.25)';
+        ctx.strokeStyle = hexToRgba(ACCENT, 0.25);
         ctx.lineWidth = 1;
         ctx.stroke();
         ctx.restore();
@@ -325,25 +365,25 @@ async function renderCard(canvas, review, album) {
   }
 
   // Footer
-  ctx.fillStyle = 'rgba(167,139,250,0.12)';
+  ctx.fillStyle = hexToRgba(ACCENT, 0.12);
   ctx.fillRect(PAD, footerBorderY, contentW, 1);
 
   ctx.save();
   roundRect(ctx, PAD, footerContentY, 20, 20, 5);
   const fGrad = ctx.createLinearGradient(PAD, footerContentY, PAD + 20, footerContentY + 20);
-  fGrad.addColorStop(0, 'rgba(124,111,255,0.5)');
-  fGrad.addColorStop(1, 'rgba(192,132,252,0.5)');
+  fGrad.addColorStop(0, hexToRgba(ACCENT, 0.5));
+  fGrad.addColorStop(1, hexToRgba(SECONDARY, 0.5));
   ctx.fillStyle = fGrad;
   ctx.fill();
   ctx.restore();
   ctx.font = `12px ${FONT}`;
-  ctx.fillStyle = '#c4baff';
+  ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'center';
   ctx.fillText('♫', PAD + 10, footerContentY + 15);
   ctx.textAlign = 'left';
 
   ctx.font = `600 10px ${FONT}`;
-  ctx.fillStyle = 'rgba(165,138,252,0.7)';
+  ctx.fillStyle = hexToRgba(ACCENT, 0.7);
   ctx.fillText('Echoes Between Notes', PAD + 26, footerContentY + 14);
 
   ctx.font = `10px ${FONT}`;
