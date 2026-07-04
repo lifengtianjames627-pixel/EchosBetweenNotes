@@ -228,7 +228,12 @@ async function fetchTracklist(title, artist, year, genre, skipAcgResolve) {
     fetchFromMusicBrainz(searchTitle, searchArtist, year),
     fetchFromItunes(searchTitle, searchArtist),
   ])).filter(r => r?.tracks?.length);
-  if (!results.length) return await fetchFromLastfm(searchTitle, searchArtist);
+  if (!results.length) {
+    const lastfm = await fetchFromLastfm(searchTitle, searchArtist);
+    if (lastfm) return lastfm;
+    // Final fallback for any genre — NetEase covers a lot that Western databases miss.
+    return await fetchFromNetease(searchTitle, searchArtist);
+  }
 
   const best = results.find(r => r.source === 'MusicBrainz') || results[0];
 
