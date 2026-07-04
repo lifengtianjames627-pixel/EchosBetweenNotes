@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ReviewCard from '@/components/ReviewCard';
 import { Link, useNavigate } from 'react-router-dom';
-import { Users, Star, UserPlus, Check, X, Music, Shield, MessageSquare } from 'lucide-react';
+import { Users, Star, UserPlus, Check, X, Music, Shield, MessageSquare, Search } from 'lucide-react';
 import UserBadges from '@/components/UserBadges';
 import BadgeIcon from '@/components/BadgeIcon';
 import { awardBadge } from '@/lib/badgeUtils';
@@ -15,6 +15,10 @@ export default function Profile() {
   const [friendEmail, setFriendEmail] = useState('');
   const [friendMsg, setFriendMsg] = useState('');
   const [showAddFriend, setShowAddFriend] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState(null);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
 
@@ -55,6 +59,17 @@ export default function Profile() {
     enabled: !!user,
   });
 
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) { setSearchResults([]); return; }
+    setSearching(true);
+    const timeout = setTimeout(() => {
+      base44.functions.invoke('searchUsers', { query: searchQuery.trim() })
+        .then(res => setSearchResults(res.data?.results || []))
+        .finally(() => setSearching(false));
+    }, 350);
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
+
   const sendFriendRequest = useMutation({
     mutationFn: () => base44.entities.FriendRequest.create({
       from_email: user.email, from_name: user.full_name,
@@ -63,6 +78,7 @@ export default function Profile() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sent-requests'] });
       setShowAddFriend(false); setFriendEmail(''); setFriendMsg('');
+      setSearchQuery(''); setSearchResults([]); setSelectedFriend(null);
     },
   });
 
@@ -259,7 +275,7 @@ export default function Profile() {
 
       {/* Add Friend Modal */}
       {showAddFriend && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setShowAddFriend(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => { setShowAddFriend(false); setSearchQuery(''); setSearchResults([]); setSelectedFriend(null); }}>
           <div
             className="rounded-2xl p-6 w-full max-w-sm space-y-4"
             style={{ background: 'rgba(10,12,30,0.98)', border: '1px solid rgba(124,111,255,0.25)' }}
@@ -267,9 +283,39 @@ export default function Profile() {
           >
             <p className="font-semibold text-base" style={{ color: 'rgba(220,225,255,0.9)' }}>Send Friend Request</p>
             <div className="space-y-3">
-              <input type="email" className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
-                value={friendEmail} onChange={e => setFriendEmail(e.target.value)} placeholder="friend@email.com" />
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(140,155,210,0.5)' }} />
+                <input className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm outline-none"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
+                  value={searchQuery}
+                  onChange={e => { setSearchQuery(e.target.value); setSelectedFriend(null); setFriendEmail(''); }}
+                  placeholder="Search by name or email…" />
+                {(searching || searchResults.length > 0) && searchQuery.trim().length >= 2 && !selectedFriend && (
+                  <div className="absolute left-0 right-0 mt-1.5 rounded-xl overflow-hidden max-h-48 overflow-y-auto z-10"
+                    style={{ background: 'rgba(15,17,38,0.98)', border: '1px solid rgba(124,111,255,0.25)' }}>
+                    {searching ? (
+                      <p className="text-xs px-4 py-3" style={{ color: 'rgba(140,155,210,0.5)' }}>Searching…</p>
+                    ) : searchResults.length > 0 ? (
+                      searchResults.map(u => (
+                        <button key={u.email} type="button"
+                          onClick={() => { setSelectedFriend(u); setFriendEmail(u.email); setSearchQuery(u.full_name || u.email); }}
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-white/5">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
+                            style={{ background: 'rgba(124,111,255,0.2)', color: '#a5b4fc' }}>
+                            {(u.full_name || u.email)[0].toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm truncate" style={{ color: 'rgba(220,225,255,0.9)' }}>{u.full_name || 'Listener'}</p>
+                            <p className="text-xs truncate" style={{ color: 'rgba(140,155,210,0.45)' }}>{u.email}</p>
+                          </div>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="text-xs px-4 py-3" style={{ color: 'rgba(140,155,210,0.5)' }}>No users found.</p>
+                    )}
+                  </div>
+                )}
+              </div>
               <input className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
                 value={friendMsg} onChange={e => setFriendMsg(e.target.value)} placeholder="Add a message (optional)" />
@@ -281,7 +327,7 @@ export default function Profile() {
                 style={{ background: 'rgba(124,111,255,0.2)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.3)', opacity: !friendEmail ? 0.4 : 1 }}>
                 {sendFriendRequest.isPending ? 'Sending…' : 'Send'}
               </button>
-              <button onClick={() => setShowAddFriend(false)} className="px-5 py-2.5 rounded-xl text-sm" style={{ color: 'rgba(140,155,210,0.5)' }}>Cancel</button>
+              <button onClick={() => { setShowAddFriend(false); setSearchQuery(''); setSearchResults([]); setSelectedFriend(null); }} className="px-5 py-2.5 rounded-xl text-sm" style={{ color: 'rgba(140,155,210,0.5)' }}>Cancel</button>
             </div>
           </div>
         </div>
