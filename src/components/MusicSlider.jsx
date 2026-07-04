@@ -137,7 +137,7 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, label }
                 }}
               >
                 {item.cover_url ? (
-                  <img src={item.cover_url} alt={item.title} className="w-full h-full object-cover" />
+                  <img src={item.cover_url} alt={item.title} loading="lazy" decoding="async" width={176} height={176} className="w-full h-full object-cover" />
                 ) : (
                   <VinylPlaceholder accent={v.accent} />
                 )}
