@@ -84,11 +84,11 @@ function CardCanvas({ review, album, cardRef }) {
           {(review.reviewer_name || 'A')[0].toUpperCase()}
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#e0d8ff' }}>
+          <div style={{ fontSize: 13, lineHeight: '16px', fontWeight: 700, color: '#e0d8ff' }}>
             @{(review.reviewer_name || 'Anonymous').replace(/\s+/g, '_').toLowerCase()}
           </div>
           {review.title && (
-            <div style={{ fontSize: 11, color: 'rgba(167,139,250,0.75)', fontStyle: 'italic' }}>
+            <div style={{ fontSize: 11, lineHeight: '14px', color: 'rgba(167,139,250,0.75)', fontStyle: 'italic', marginTop: 2 }}>
               "{review.title}"
             </div>
           )}
@@ -113,9 +113,9 @@ function CardCanvas({ review, album, cardRef }) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
           {album.tags.slice(0, 4).map(tag => (
             <span key={tag} style={{
-              fontSize: 10, color: accent, padding: '2px 8px', borderRadius: 999,
+              fontSize: 10, lineHeight: '14px', color: accent, padding: '2px 8px', borderRadius: 999,
               background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.25)',
-              letterSpacing: '0.05em',
+              letterSpacing: '0.05em', display: 'inline-block',
             }}>
               #{tag}
             </span>
@@ -158,6 +158,7 @@ export default function ReviewShareCard({ review, album, onClose }) {
   const capture = async () => {
     if (!cardRef.current) return null;
     setLoading(true);
+    if (document.fonts?.ready) await document.fonts.ready;
     const canvas = await html2canvas(cardRef.current, {
       scale: 2,
       useCORS: true,
