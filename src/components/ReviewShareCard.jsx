@@ -27,26 +27,15 @@ function CardCanvas({ review, album, cardRef }) {
       ref={cardRef}
       style={{
         width: 420,
-        background: 'linear-gradient(145deg, #0d0820 0%, #150d30 40%, #0a1020 100%)',
+        backgroundColor: '#0d0820',
+        backgroundImage: 'radial-gradient(circle at 85% 5%, rgba(167,139,250,0.18) 0%, transparent 40%), radial-gradient(circle at 5% 95%, rgba(96,165,250,0.12) 0%, transparent 35%), linear-gradient(145deg, #0d0820 0%, #150d30 40%, #0a1020 100%)',
         borderRadius: 20,
         padding: '28px 28px 22px 28px',
         fontFamily: "'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif",
         position: 'relative',
-        overflow: 'hidden',
         boxSizing: 'border-box',
       }}
     >
-      {/* Background glow blobs */}
-      <div style={{
-        position: 'absolute', top: -60, right: -60, width: 200, height: 200,
-        background: 'radial-gradient(circle, rgba(167,139,250,0.18) 0%, transparent 70%)',
-        borderRadius: '50%',
-      }} />
-      <div style={{
-        position: 'absolute', bottom: -40, left: -40, width: 160, height: 160,
-        background: 'radial-gradient(circle, rgba(96,165,250,0.12) 0%, transparent 70%)',
-        borderRadius: '50%',
-      }} />
 
       {/* Top: Album cover + info */}
       <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', marginBottom: 18 }}>
@@ -173,7 +162,7 @@ export default function ReviewShareCard({ review, album, onClose }) {
       scale: 2,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: null,
+      backgroundColor: '#0d0820',
     });
     setLoading(false);
     return canvas;
