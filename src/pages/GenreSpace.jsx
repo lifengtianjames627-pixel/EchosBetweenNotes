@@ -234,7 +234,7 @@ export default function GenreSpace() {
 
           <div className="relative">
             {/* Small label above */}
-            <p className="text-[10px] uppercase tracking-[0.28em] mb-4" style={{ color: `${v.muted}60` }}>
+            <p className="text-xs uppercase tracking-[0.28em] mb-4 font-semibold" style={{ color: v.text }}>
               {v.tagline}
             </p>
 
@@ -256,13 +256,13 @@ export default function GenreSpace() {
 
             {/* Description — right-offset, constrained */}
             <div className="max-w-sm ml-auto">
-              <p className="text-sm leading-relaxed font-light" style={{ color: `${v.muted}90` }}>{genre.desc}</p>
+              <p className="text-base leading-relaxed" style={{ color: v.text }}>{genre.desc}</p>
             </div>
 
             {/* Thin accent rule */}
             <div className="mt-10 flex items-center gap-5">
               <div className="h-px flex-1" style={{ background: `${v.accent}20` }} />
-              <span className="text-[9px] uppercase tracking-[0.3em]" style={{ color: `${v.muted}40` }}>{genre.label}</span>
+              <span className="text-xs uppercase tracking-[0.3em] font-semibold" style={{ color: v.muted }}>{genre.label}</span>
               <div className="h-px w-8" style={{ background: `${v.accent}20` }} />
             </div>
           </div>
