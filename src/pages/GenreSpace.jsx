@@ -167,8 +167,18 @@ export default function GenreSpace() {
 
   const [duplicateError, setDuplicateError] = useState(null);
 
+  // Singles have no automatic tracklist/cover fetch (that only runs for albums when opened),
+  // so fetch a cover from iTunes right at creation time when the user didn't upload one.
+  const fetchSingleCover = async (title, artist) => {
+    try {
+      const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(`${artist} ${title}`)}&entity=song&limit=1`);
+      const data = await res.json();
+      return data.results?.[0]?.artworkUrl100?.replace('100x100', '600x600') || null;
+    } catch { return null; }
+  };
+
   const addItem = useMutation({
-    mutationFn: (data) => {
+    mutationFn: async (data) => {
       // Check for duplicate (same title + artist, case-insensitive)
       const exists = allItems.some(
         item =>
@@ -176,7 +186,13 @@ export default function GenreSpace() {
           item.artist?.toLowerCase() === data.artist?.toLowerCase()
       );
       if (exists) throw new Error(`"${data.title}" by ${data.artist} is already in this genre.`);
-      return base44.entities.Album.create({ ...data, genre: entityGenre || 'other', avg_rating: 0, review_count: 0 });
+
+      let cover_url = data.cover_url;
+      if (data.type === 'single' && !cover_url) {
+        cover_url = await fetchSingleCover(data.title, data.artist) || '';
+      }
+
+      return base44.entities.Album.create({ ...data, cover_url, genre: entityGenre || 'other', avg_rating: 0, review_count: 0 });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['genre-albums', genreId] });
