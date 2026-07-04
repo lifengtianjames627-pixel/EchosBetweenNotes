@@ -102,7 +102,7 @@ export default function VirtualItemModal({ v, initialTitle = '', initialArtist =
     }
 
     const modStatus = modResult.suggestedAction === 'review' ? 'pending_review' : 'approved';
-    await base44.entities.Review.create({
+    const newReview = await base44.entities.Review.create({
       album_id: album.id,
       album_title: title,
       album_artist: artist,
@@ -124,10 +124,11 @@ export default function VirtualItemModal({ v, initialTitle = '', initialArtist =
       const newCount = (album.review_count || 0) + 1;
       const newAvg = Math.round((((album.avg_rating || 0) * (album.review_count || 0)) + rating) / newCount * 10) / 10;
       await base44.entities.Album.update(album.id, { review_count: newCount, avg_rating: newAvg });
+      setMatched({ ...album, review_count: newCount, avg_rating: newAvg });
+      // Add the new review straight to local state — refetching immediately after
+      // create can race the write and momentarily return the list without it.
+      setReviews(prev => [newReview, ...prev]);
     }
-
-    const rs = await base44.entities.Review.filter({ album_id: album.id }, '-created_date', 100);
-    setReviews(rs.filter(r => !r.moderation_status || r.moderation_status === 'approved'));
     setRating(0);
     setContent('');
     setShowForm(false);
