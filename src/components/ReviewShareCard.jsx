@@ -64,7 +64,7 @@ function CardCanvas({ review, album, cardRef }) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 10, color: accent, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4, opacity: 0.8 }}>
-            Music Critics Review
+            Echoes Between Notes
           </div>
           <div style={{ fontSize: 18, fontWeight: 800, color: '#f0eaff', lineHeight: 1.2, marginBottom: 4, letterSpacing: '-0.02em' }}>
             {album?.title || review.album_title}
@@ -150,11 +150,11 @@ function CardCanvas({ review, album, cardRef }) {
             </svg>
           </div>
           <span style={{ fontSize: 10, color: 'rgba(165,138,252,0.7)', fontWeight: 600, letterSpacing: '0.08em' }}>
-            Music Critics
+            Echoes Between Notes
           </span>
         </div>
         <div style={{ fontSize: 10, color: 'rgba(140,130,180,0.5)', letterSpacing: '0.05em' }}>
-          musiccritics.app
+          echoesbetweennotes.app
         </div>
       </div>
     </div>
