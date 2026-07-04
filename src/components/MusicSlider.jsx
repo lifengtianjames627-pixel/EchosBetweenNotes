@@ -171,7 +171,7 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, label }
 
               {/* Text — humanist, unboxed */}
               <p className="font-playfair text-sm font-semibold leading-snug truncate" style={{ color: v.text }}>{item.title}</p>
-              <p className="text-[11px] mt-0.5 truncate uppercase tracking-wider" style={{ color: `${v.muted}90` }}>{item.artist}</p>
+              <p className="text-[11px] mt-0.5 truncate uppercase tracking-wider font-medium" style={{ color: v.text, opacity: 0.85 }}>{item.artist}</p>
 
               {/* Rating — numeric, minimal */}
               {item.avg_rating > 0 && (
