@@ -151,6 +151,11 @@ export default function VirtualItemModal({ v, initialTitle = '', initialArtist =
         onClick={e => e.stopPropagation()}
       >
         <div className="flex gap-3 p-5 pb-3 items-start">
+          {(matched?.cover_url || coverUrl) && (
+            <div className="w-14 h-14 rounded-lg shrink-0 overflow-hidden" style={{ background: `${v.accent}15` }}>
+              <img src={matched?.cover_url || coverUrl} alt={title} className="w-full h-full object-cover" />
+            </div>
+          )}
           <div className="flex-1 min-w-0">
             <span className="text-xs uppercase tracking-widest" style={{ color: v.accent }}>{type}</span>
             {allowSearch && !searched ? (
