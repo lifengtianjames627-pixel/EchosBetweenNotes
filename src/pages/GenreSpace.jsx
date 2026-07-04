@@ -10,6 +10,7 @@ import AddMusicModal from '@/components/AddMusicModal';
 import MusicItemDetail from '@/components/MusicItemDetail';
 import GenreRankings from '@/components/GenreRankings';
 import GenreHeroMark from '@/components/genre-dashboard/GenreHeroMark';
+import { storeCoverImage } from '@/lib/storeCoverImage';
 
 // Per-genre visual configs
 const GENRE_VISUALS = {
@@ -173,7 +174,8 @@ export default function GenreSpace() {
     try {
       const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(`${artist} ${title}`)}&entity=song&limit=1`);
       const data = await res.json();
-      return data.results?.[0]?.artworkUrl100?.replace('100x100', '600x600') || null;
+      const artworkUrl = data.results?.[0]?.artworkUrl100?.replace('100x100', '600x600') || null;
+      return artworkUrl ? await storeCoverImage(artworkUrl) : null;
     } catch { return null; }
   };
 

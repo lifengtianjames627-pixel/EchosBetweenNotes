@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Music, Loader2, ListMusic, ChevronDown } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import AlbumMatchPreview from '@/components/AlbumMatchPreview';
+import { storeCoverImage } from '@/lib/storeCoverImage';
 
 const MB_HEADERS = { 'User-Agent': 'MusicCritics/1.0 (musiccritics@app.com)' };
 
@@ -252,20 +253,23 @@ export default function TrackList({ item, v, onDataFetched, onTrackClick }) {
   const runFetch = (title, artist, isRetry) => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
-    fetchTracklist(title, artist, item.release_year, item.genre, isRetry).then(result => {
+    fetchTracklist(title, artist, item.release_year, item.genre, isRetry).then(async result => {
       if (requestId !== requestIdRef.current) return; // a newer search superseded this one
-      setLoading(false);
       setFetched(true);
       setSource(result?.source || null);
       if (result?.tracks?.length) {
         setTracks(result.tracks);
         const update = { tracklist: result.tracks };
-        if ((isRetry || !item.cover_url) && result.coverUrl) update.cover_url = result.coverUrl;
+        if ((isRetry || !item.cover_url) && result.coverUrl) {
+          update.cover_url = await storeCoverImage(result.coverUrl);
+        }
+        if (requestId !== requestIdRef.current) return;
         base44.entities.Album.update(item.id, update);
         onDataFetched?.(update);
       } else if (isRetry) {
         setTracks([]);
       }
+      setLoading(false);
     });
   };
 
