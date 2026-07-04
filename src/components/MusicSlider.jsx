@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Disc3 } from 'lucide-react';
+import { Plus, Disc3, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // SVG grain filter for film/vinyl texture
 function GrainFilter({ id }) {
@@ -39,6 +39,11 @@ function VinylPlaceholder({ accent }) {
 export default function MusicSlider({ items, v, onItemClick, onAddClick, label }) {
   const [hovered, setHovered] = useState(null);
   const filterId = `grain-${label}`;
+  const scrollRef = useRef(null);
+
+  const scrollBy = (dir) => {
+    scrollRef.current?.scrollBy({ left: dir * 400, behavior: 'smooth' });
+  };
 
   return (
     <div className="mb-14">
@@ -77,10 +82,30 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, label }
           </p>
         </motion.div>
       ) : (
-        <div
-          className="flex gap-7 overflow-x-auto pb-4"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
+        <div className="relative group/slider">
+          {items.length > 5 && (
+            <>
+              <button
+                onClick={() => scrollBy(-1)}
+                className="hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity"
+                style={{ background: 'rgba(0,0,0,0.6)', border: `1px solid ${v.accent}40`, color: v.accent }}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scrollBy(1)}
+                className="hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity"
+                style={{ background: 'rgba(0,0,0,0.6)', border: `1px solid ${v.accent}40`, color: v.accent }}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </>
+          )}
+          <div
+            ref={scrollRef}
+            className="flex gap-7 overflow-x-auto pb-4"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
           {items.map((item, i) => (
             <motion.div
               key={item.id}
@@ -176,6 +201,7 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, label }
               )}
             </motion.div>
           ))}
+          </div>
         </div>
       )}
     </div>

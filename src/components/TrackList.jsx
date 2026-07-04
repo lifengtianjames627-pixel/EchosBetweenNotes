@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Music, Loader2, ListMusic, ChevronDown } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -245,10 +245,15 @@ export default function TrackList({ item, v, onDataFetched, onTrackClick }) {
   const [fetched, setFetched] = useState(item.tracklist?.length > 0);
   const [expanded, setExpanded] = useState(false);
   const [source, setSource] = useState(null);
+  // Guards against out-of-order responses: if the user retries again before an
+  // earlier search resolves, only the most recent request's result gets applied/saved.
+  const requestIdRef = useRef(0);
 
   const runFetch = (title, artist, isRetry) => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     fetchTracklist(title, artist, item.release_year, item.genre, isRetry).then(result => {
+      if (requestId !== requestIdRef.current) return; // a newer search superseded this one
       setLoading(false);
       setFetched(true);
       setSource(result?.source || null);
