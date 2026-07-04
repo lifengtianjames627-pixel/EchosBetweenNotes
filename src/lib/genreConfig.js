@@ -6,7 +6,7 @@ export const GENRES = [
   { id: 'jazz',       label: 'Jazz',       entityGenre: 'jazz',       icon: '🎷', tagline: 'Improvised · Intimate · Late Night',       desc: 'Where conversation becomes music. Every note a deliberate choice.' },
   { id: 'blues',      label: 'Blues',      entityGenre: 'blues',      icon: '🎺', tagline: 'Slow · Honest · Deep',                    desc: 'The roots of everything. Pain turned into beauty.' },
   { id: 'r_and_b',    label: 'R&B',        entityGenre: 'r_and_b',    icon: '🎙️', tagline: 'Smooth · Soulful · Night',                desc: 'Rhythm, soul, and the warmth of 2am.' },
-  { id: 'hardcore',   label: 'Hardcore',   entityGenre: 'punk',       icon: '💢', tagline: 'Fast · Loud · No Filler',                 desc: 'Zero pretense. Maximum energy. Pure.' },
+  { id: 'core',       label: 'Core',       entityGenre: 'punk',       icon: '💢', tagline: 'Fast · Loud · No Filler',                 desc: 'Punk and extreme core — zero pretense, maximum energy, pure.' },
   { id: 'country',    label: 'Country',    entityGenre: 'country',    icon: '🤠', tagline: 'Warm · Story-driven · Real',              desc: 'Life, roads, and the people you never forget.' },
   { id: 'hip_hop',    label: 'Hip-hop',    entityGenre: 'hip_hop',    icon: '🎧', tagline: 'Culture · Rhythm · Truth',                desc: 'A whole culture compressed into beats and bars.' },
   { id: 'indie',      label: 'Indie',      entityGenre: 'indie',      icon: '🌿', tagline: 'Curious · Unfiltered · Yours',            desc: 'Made on your own terms. Nothing to prove.' },
@@ -81,7 +81,7 @@ export const genreThemes = {
     accent: '#b47fff',
     hoverEffect: 'glow-purple',
   },
-  hardcore: {
+  core: {
     wrapper: { background: '#000', color: '#f0f0f0', padding: '20px', borderRadius: '0px', marginTop: '6px' },
     card: { background: '#0a0a0a', border: '1px solid #1e1e1e', borderRadius: '0px', color: '#f0f0f0' },
     text: { fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase' },

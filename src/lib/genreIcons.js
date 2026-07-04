@@ -9,7 +9,7 @@ export const GENRE_DECOR_ICONS = {
   jazz: Mic2,
   blues: Music4,
   r_and_b: Radio,
-  hardcore: Flame,
+  core: Flame,
   country: Compass,
   hip_hop: Disc3,
   indie: Leaf,

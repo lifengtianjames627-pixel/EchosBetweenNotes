@@ -69,13 +69,13 @@ const GENRE_VISUALS = {
     headerStyle: { fontWeight: 500, letterSpacing: '0.01em' },
     tagline: 'Smooth · Soulful · Night',
   },
-  hardcore: {
+  core: {
     bg: '#000000',
     accent: '#ffffff', accentGlow: 'rgba(255,255,255,0.25)',
     text: '#f0f0f0', muted: '#606060',
     cardBg: 'rgba(10,10,10,0.95)', cardBorder: 'rgba(255,255,255,0.12)',
     headerStyle: { fontWeight: 900, letterSpacing: '-0.06em', textTransform: 'uppercase' },
-    tagline: 'Fast · Loud · No Filler',
+    tagline: 'Punk · Extreme Core',
   },
   country: {
     bg: 'radial-gradient(ellipse at 50% 0%, #100c04 0%, #0a0802 60%, #060500 100%)',

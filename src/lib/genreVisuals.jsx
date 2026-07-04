@@ -71,7 +71,7 @@ export const GENRE_ICONS = {
       <path d="M18 22 L22 22" stroke={color} strokeWidth="2" strokeLinecap="round"/>
     </svg>
   ),
-  hardcore: (color) => (
+  core: (color) => (
     <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M6 34 L20 6 L34 34 Z" stroke={color} strokeWidth="2.5" strokeLinejoin="round"/>
       <path d="M12 26 L28 26" stroke={color} strokeWidth="2.5" strokeLinecap="round"/>
