@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Music, Loader2, ListMusic, ChevronDown } from 'lucide-react';
+import { Music, Loader2, ListMusic, ChevronDown, Save } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import AlbumMatchPreview from '@/components/AlbumMatchPreview';
 import { storeCoverImage } from '@/lib/storeCoverImage';
@@ -246,6 +246,9 @@ export default function TrackList({ item, v, onDataFetched, onTrackClick }) {
   const [fetched, setFetched] = useState(item.tracklist?.length > 0);
   const [expanded, setExpanded] = useState(false);
   const [source, setSource] = useState(null);
+  // Holds a manually-retried match that's been previewed but not saved yet —
+  // the user confirms it with the Save button before it's written to the album.
+  const [pendingUpdate, setPendingUpdate] = useState(null);
   // Guards against out-of-order responses: if the user retries again before an
   // earlier search resolves, only the most recent request's result gets applied/saved.
   const requestIdRef = useRef(0);
@@ -253,6 +256,7 @@ export default function TrackList({ item, v, onDataFetched, onTrackClick }) {
   const runFetch = (title, artist, isRetry) => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
+    if (isRetry) setPendingUpdate(null);
     fetchTracklist(title, artist, item.release_year, item.genre, isRetry).then(async result => {
       if (requestId !== requestIdRef.current) return; // a newer search superseded this one
       setFetched(true);
@@ -264,13 +268,25 @@ export default function TrackList({ item, v, onDataFetched, onTrackClick }) {
           update.cover_url = await storeCoverImage(result.coverUrl);
         }
         if (requestId !== requestIdRef.current) return;
-        base44.entities.Album.update(item.id, update);
         onDataFetched?.(update);
+        if (isRetry) {
+          // Manual re-search — preview only, wait for explicit Save.
+          setPendingUpdate(update);
+        } else {
+          // Initial automatic match — save right away as before.
+          base44.entities.Album.update(item.id, update);
+        }
       } else if (isRetry) {
         setTracks([]);
       }
       setLoading(false);
     });
+  };
+
+  const handleSave = async () => {
+    if (!pendingUpdate) return;
+    await base44.entities.Album.update(item.id, pendingUpdate);
+    setPendingUpdate(null);
   };
 
   useEffect(() => {
@@ -351,6 +367,16 @@ export default function TrackList({ item, v, onDataFetched, onTrackClick }) {
           retrying={loading}
           onRetry={(title, artist) => runFetch(title, artist, true)}
         />
+      )}
+
+      {pendingUpdate && (
+        <button
+          onClick={handleSave}
+          className="flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg text-xs font-semibold"
+          style={{ background: v.accent, color: '#000' }}
+        >
+          <Save className="w-3.5 h-3.5" /> Save this match
+        </button>
       )}
     </div>
   );
