@@ -7,6 +7,7 @@ import CivilityNotice from '@/components/CivilityNotice';
 import BadgeIcon from '@/components/BadgeIcon';
 import { awardBadge } from '@/lib/badgeUtils';
 import TrackList from '@/components/TrackList';
+import SingleCoverMatch from '@/components/SingleCoverMatch';
 import ReviewActions from '@/components/ReviewActions';
 import ReviewShareCard from '@/components/ReviewShareCard';
 import GenreDecoration from '@/components/GenreDecoration';
@@ -411,6 +412,15 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
           onDataFetched={(update) => setLocalItem(prev => ({ ...prev, ...update }))}
           onTrackClick={(track) => setVirtualTrack(track)}
         />
+
+        {/* Cover art match (singles only, auto-fetched with manual retry) */}
+        {localItem.type === 'single' && (
+          <SingleCoverMatch
+            item={localItem}
+            v={v}
+            onDataFetched={(update) => setLocalItem(prev => ({ ...prev, ...update }))}
+          />
+        )}
 
         {/* MV link for singles only */}
         {localItem.type === 'single' && localItem.mv_url && (

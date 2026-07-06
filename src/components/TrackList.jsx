@@ -245,6 +245,30 @@ async function fetchTracklist(title, artist, year, genre, skipAcgResolve) {
   return best;
 }
 
+// Cascades through all 4 sources looking only for a cover image (used for singles,
+// which have no tracklist but still need the same "try every database" guarantee albums get).
+export async function fetchCoverCascade(title, artist, genre) {
+  if (genre === 'acg') {
+    const netease = await fetchFromNetease(title, artist);
+    if (netease?.coverUrl) return { coverUrl: netease.coverUrl, source: 'NetEase' };
+  }
+
+  const results = (await Promise.all([
+    fetchFromMusicBrainz(title, artist),
+    fetchFromItunes(title, artist),
+  ])).filter(Boolean);
+  const withCover = results.find(r => r.coverUrl);
+  if (withCover) return { coverUrl: withCover.coverUrl, source: withCover.source };
+
+  const lastfm = await fetchFromLastfm(title, artist);
+  if (lastfm?.coverUrl) return { coverUrl: lastfm.coverUrl, source: 'Last.fm' };
+
+  const netease = await fetchFromNetease(title, artist);
+  if (netease?.coverUrl) return { coverUrl: netease.coverUrl, source: 'NetEase' };
+
+  return null;
+}
+
 export default function TrackList({ item, v, onDataFetched, onTrackClick }) {
   const [tracks, setTracks] = useState(item.tracklist || []);
   const [loading, setLoading] = useState(false);

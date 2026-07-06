@@ -11,6 +11,7 @@ import MusicItemDetail from '@/components/MusicItemDetail';
 import GenreRankings from '@/components/GenreRankings';
 import GenreHeroMark from '@/components/genre-dashboard/GenreHeroMark';
 import { storeCoverImage } from '@/lib/storeCoverImage';
+import { fetchCoverCascade } from '@/components/TrackList';
 
 // Per-genre visual configs
 const GENRE_VISUALS = {
@@ -176,15 +177,12 @@ export default function GenreSpace() {
 
   const [duplicateError, setDuplicateError] = useState(null);
 
-  // Singles have no automatic tracklist/cover fetch (that only runs for albums when opened),
-  // so fetch a cover from iTunes right at creation time when the user didn't upload one.
-  const fetchSingleCover = async (title, artist) => {
-    try {
-      const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(`${artist} ${title}`)}&entity=song&limit=1`);
-      const data = await res.json();
-      const artworkUrl = data.results?.[0]?.artworkUrl100?.replace('100x100', '600x600') || null;
-      return artworkUrl ? await storeCoverImage(artworkUrl) : null;
-    } catch { return null; }
+  // Singles have no automatic tracklist (that only runs for albums when opened),
+  // so cascade through all 4 databases for a cover right at creation time when
+  // the user didn't upload one — same guarantee albums get for tracklists.
+  const fetchSingleCover = async (title, artist, genre) => {
+    const result = await fetchCoverCascade(title, artist, genre);
+    return result?.coverUrl ? await storeCoverImage(result.coverUrl) : null;
   };
 
   // Backfill covers for singles that were already created before covers were fetched automatically.
@@ -194,7 +192,7 @@ export default function GenreSpace() {
     if (!singlesMissingCover.length) return;
     singlesMissingCover.forEach(async (item) => {
       backfilledRef.current.add(item.id);
-      const cover_url = await fetchSingleCover(item.title, item.artist);
+      const cover_url = await fetchSingleCover(item.title, item.artist, item.genre);
       if (cover_url) {
         await base44.entities.Album.update(item.id, { cover_url });
         queryClient.invalidateQueries({ queryKey: ['genre-albums', genreId] });
@@ -214,7 +212,7 @@ export default function GenreSpace() {
 
       let cover_url = data.cover_url;
       if (data.type === 'single' && !cover_url) {
-        cover_url = await fetchSingleCover(data.title, data.artist) || '';
+        cover_url = await fetchSingleCover(data.title, data.artist, entityGenre) || '';
       }
 
       return base44.entities.Album.create({ ...data, cover_url, genre: entityGenre || 'other', avg_rating: 0, review_count: 0 });
