@@ -17,6 +17,7 @@ export const BUBBLE_COLORS = [
   { bg: 'rgba(40,10,65,0.6)',  border: '#a78bfa', text: '#ddd6fe', glow: '0 0 28px 6px rgba(167,139,250,0.5), 0 0 70px 10px rgba(167,139,250,0.15)' },
   { bg: 'rgba(60,45,10,0.6)',  border: '#facc15', text: '#fef08a', glow: '0 0 28px 6px rgba(250,204,21,0.5), 0 0 70px 10px rgba(250,204,21,0.15)' },
   { bg: 'rgba(10,45,60,0.6)',  border: '#22d3ee', text: '#a5f3fc', glow: '0 0 28px 6px rgba(34,211,238,0.5), 0 0 70px 10px rgba(34,211,238,0.15)' },
+  { bg: 'rgba(40,30,10,0.6)',  border: '#d4a24c', text: '#f0dcb0', glow: '0 0 28px 6px rgba(212,162,76,0.5), 0 0 70px 10px rgba(212,162,76,0.15)' },
 ];
 
 // SVG icons per genre — clean, minimal, edgy
@@ -123,6 +124,13 @@ export const GENRE_ICONS = {
       <path d="M14 19 L14 25 M11 22 L17 22" stroke={color} strokeWidth="2" strokeLinecap="round"/>
       <circle cx="25" cy="20" r="1.8" fill={color}/>
       <circle cx="29" cy="24" r="1.8" fill={color}/>
+    </svg>
+  ),
+  cinematic: (color) => (
+    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 14 L34 14 L34 32 Q34 34 32 34 L8 34 Q6 34 6 32 Z" stroke={color} strokeWidth="2.2" strokeLinejoin="round"/>
+      <path d="M6 14 L10 6 L16 6 L12 14 Z M18 14 L22 6 L28 6 L24 14 Z" stroke={color} strokeWidth="2" strokeLinejoin="round"/>
+      <path d="M14 20 L26 26 L14 32 Z" fill={color} opacity="0.7"/>
     </svg>
   ),
 };

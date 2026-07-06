@@ -14,6 +14,7 @@ export const GENRES = [
   { id: 'electronic', label: 'Electronic', entityGenre: 'electronic', icon: '⚡', tagline: 'Synthetic · Future · Dance',              desc: 'Sound as architecture. The machine with a soul.' },
   { id: 'funk',       label: 'Funk',       entityGenre: 'funk',       icon: '🕺', tagline: 'Groovy · Loose · Alive',                  desc: 'The bassline runs the show. Rhythm you can feel in your chest.' },
   { id: 'acg',        label: 'ACG',        entityGenre: 'acg',        icon: '🎮', tagline: 'Nostalgic · Epic · Playful',              desc: 'Anime, comics, and games — the soundtrack to other worlds.' },
+  { id: 'cinematic',  label: 'Cinematic',  entityGenre: 'cinematic',  icon: '🎬', tagline: 'Sweeping · Dramatic · Immersive',          desc: 'Film scores and soundtracks — music that tells a story.' },
 ];
 
 export const genreThemes = {

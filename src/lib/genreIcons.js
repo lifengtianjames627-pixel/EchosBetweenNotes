@@ -1,4 +1,4 @@
-import { Guitar, Skull, Star, Music2, Mic2, Music4, Radio, Flame, Disc3, Leaf, Volume2, Zap, PartyPopper, Gamepad2, Compass } from 'lucide-react';
+import { Guitar, Skull, Star, Music2, Mic2, Music4, Radio, Flame, Disc3, Leaf, Volume2, Zap, PartyPopper, Gamepad2, Compass, Clapperboard } from 'lucide-react';
 
 // Shared per-genre icon used for decorative accents across the app.
 export const GENRE_DECOR_ICONS = {
@@ -17,4 +17,5 @@ export const GENRE_DECOR_ICONS = {
   electronic: Zap,
   funk: PartyPopper,
   acg: Gamepad2,
+  cinematic: Clapperboard,
 };

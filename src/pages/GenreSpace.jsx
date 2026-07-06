@@ -134,6 +134,14 @@ const GENRE_VISUALS = {
     headerStyle: { fontWeight: 600, letterSpacing: '0.01em' },
     tagline: 'Nostalgic · Epic · Playful',
   },
+  cinematic: {
+    bg: 'radial-gradient(ellipse at 50% 0%, #1a1408 0%, #100d05 60%, #080602 100%)',
+    accent: '#d4a24c', accentGlow: 'rgba(212,162,76,0.4)',
+    text: '#f0dcb0', muted: '#8a7550',
+    cardBg: 'rgba(35,28,12,0.85)', cardBorder: 'rgba(212,162,76,0.2)',
+    headerStyle: { fontFamily: 'Georgia, serif', fontWeight: 500, letterSpacing: '0.01em' },
+    tagline: 'Sweeping · Dramatic · Immersive',
+  },
 };
 
 export default function GenreSpace() {
