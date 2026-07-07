@@ -165,6 +165,42 @@ async function fetchFromItunes(title, artist) {
   } catch { return null; }
 }
 
+// Singles are individual tracks, not releases — searching iTunes/MusicBrainz as an
+// "album" (like we do for full albums) often finds nothing because the single was
+// never released as its own standalone release. Search the song/track endpoint
+// directly instead, which matches on the track itself.
+
+async function itunesSearchSongs(title, artist, country) {
+  try {
+    const q = encodeURIComponent(`${artist} ${title}`);
+    const res = await fetch(
+      `https://itunes.apple.com/search?term=${q}&entity=song&limit=5&country=${country}`
+    );
+    const data = await res.json();
+    return (data.results || []).map(r => ({ ...r, _country: country }));
+  } catch { return []; }
+}
+
+async function fetchSingleFromItunes(title, artist) {
+  try {
+    const resultsByStore = await Promise.all(
+      ITUNES_STOREFRONTS.map(c => itunesSearchSongs(title, artist, c))
+    );
+    const allResults = resultsByStore.flat();
+    if (!allResults.length) return null;
+
+    let track = null, bestScore = -1;
+    for (const r of allResults) {
+      const score = matchScore(r.trackName, r.artistName, title, artist);
+      if (score > bestScore) { bestScore = score; track = r; }
+    }
+    if (!track || bestScore < MIN_MATCH_SCORE) return null;
+
+    const coverUrl = track.artworkUrl100?.replace('100x100', '600x600') || null;
+    return coverUrl ? { coverUrl, source: `iTunes Song (${track._country.toUpperCase()})` } : null;
+  } catch { return null; }
+}
+
 // ── Last.fm API ──────────────────────────────────────────────────────────────
 // Strong global database, good for obscure / non-Western artists
 
@@ -252,6 +288,11 @@ export async function fetchCoverCascade(title, artist, genre) {
     const netease = await fetchFromNetease(title, artist);
     if (netease?.coverUrl) return { coverUrl: netease.coverUrl, source: 'NetEase' };
   }
+
+  // Try the track/song search first — singles usually aren't indexed as their
+  // own release, so the release-based searches below often can't find them at all.
+  const songResult = await fetchSingleFromItunes(title, artist);
+  if (songResult) return songResult;
 
   const results = (await Promise.all([
     fetchFromMusicBrainz(title, artist),
