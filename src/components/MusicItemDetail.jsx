@@ -520,7 +520,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
                       )}
                     </div>
                   </div>
-                  <p className="text-sm leading-relaxed" style={{ color: v.muted }}>{review.content}</p>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: v.muted }}>{review.content}</p>
 
                   {(review.band_style || review.band_background || review.band_history || review.band_story) && (
                     <div className="mt-3 pt-3 space-y-2" style={{ borderTop: `1px solid ${v.accent}15` }}>

@@ -36,7 +36,7 @@ export default function ReviewCard({ review, showAlbum = true }) {
               </div>
             </div>
           </div>
-          <p className="text-sm mt-2 line-clamp-3" style={{ color: 'rgba(140,155,210,0.7)' }}>{review.content}</p>
+          <p className="text-sm mt-2 line-clamp-3 whitespace-pre-wrap" style={{ color: 'rgba(140,155,210,0.7)' }}>{review.content}</p>
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center gap-1.5 text-xs" style={{ color: 'rgba(140,155,210,0.55)' }}>
               <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(124,111,255,0.2)' }}>
