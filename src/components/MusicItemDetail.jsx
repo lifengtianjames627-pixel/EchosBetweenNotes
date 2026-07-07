@@ -318,6 +318,15 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
   // Only show approved reviews publicly
   const reviews = allReviewsRaw.filter(r => !r.moderation_status || r.moderation_status === 'approved');
 
+  // Reviews store a snapshot of equipped badges at post time — fetch each reviewer's
+  // CURRENT equipped badges live so unequipped badges disappear right away.
+  const reviewerEmails = reviews.map(r => r.reviewer_email).filter(Boolean);
+  const { data: liveBadges = {} } = useQuery({
+    queryKey: ['live-equipped-badges', reviewerEmails.slice().sort().join(',')],
+    queryFn: async () => (await base44.functions.invoke('getEquippedBadges', { emails: reviewerEmails })).data.badges,
+    enabled: reviewerEmails.length > 0,
+  });
+
   // Compute live avg from actual reviews (true mean)
   const avgRating = reviews.length
     ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
@@ -501,10 +510,10 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
                         {review.reviewer_name || 'Anonymous'}
                       </button>
                       {review.title && <span className="text-xs ml-2 italic" style={{ color: v.accent }}>"{review.title}"</span>}
-                      {/* Equipped badges */}
-                      {review.reviewer_equipped_badges?.length > 0 && (
+                      {/* Equipped badges — live, not the stale post-time snapshot */}
+                      {(liveBadges[review.reviewer_email]?.length > 0) && (
                         <div className="flex gap-1 mt-1">
-                          {review.reviewer_equipped_badges.map(id => (
+                          {liveBadges[review.reviewer_email].map(id => (
                             <BadgeIcon key={id} badgeId={id} size="xs" />
                           ))}
                         </div>
