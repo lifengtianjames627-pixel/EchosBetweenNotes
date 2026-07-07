@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
@@ -184,21 +184,6 @@ export default function GenreSpace() {
     const result = await fetchCoverCascade(title, artist, genre);
     return result?.coverUrl ? await storeCoverImage(result.coverUrl) : null;
   };
-
-  // Backfill covers for singles that were already created before covers were fetched automatically.
-  const backfilledRef = useRef(new Set());
-  useEffect(() => {
-    const singlesMissingCover = allItems.filter(i => i.type === 'single' && !i.cover_url && !backfilledRef.current.has(i.id));
-    if (!singlesMissingCover.length) return;
-    singlesMissingCover.forEach(async (item) => {
-      backfilledRef.current.add(item.id);
-      const cover_url = await fetchSingleCover(item.title, item.artist, item.genre);
-      if (cover_url) {
-        await base44.entities.Album.update(item.id, { cover_url });
-        queryClient.invalidateQueries({ queryKey: ['genre-albums', genreId] });
-      }
-    });
-  }, [allItems, genreId]);
 
   const addItem = useMutation({
     mutationFn: async (data) => {
