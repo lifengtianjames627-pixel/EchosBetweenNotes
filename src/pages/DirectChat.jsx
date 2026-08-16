@@ -7,6 +7,10 @@ import { Send, ArrowLeft, Search, MessageSquare, ShieldAlert, Clock } from 'luci
 import { useChat, makeChatId } from '@/lib/useChat';
 import { findContactInfo } from '@/lib/contactFilter';
 import ReportButton from '@/components/soulmate/ReportButton';
+import PinnedPeople from '@/components/chat/PinnedPeople';
+import RecentConversations from '@/components/chat/RecentConversations';
+import PeopleAround from '@/components/chat/PeopleAround';
+import { usePins } from '@/components/chat/usePins';
 
 const V = {
   bg: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)',
@@ -63,6 +67,17 @@ export default function DirectChat() {
     },
   });
 
+  const { pins, isPinned, toggle } = usePins(user);
+
+  const { data: directory, isLoading: directoryLoading } = useQuery({
+    queryKey: ['chat-directory'],
+    queryFn: async () => (await base44.functions.invoke('chatDirectory', {})).data,
+    enabled: !!user && !peerEmail,
+  });
+
+  const openChat = (email, name) =>
+    navigate(`/chat?with=${encodeURIComponent(email)}&name=${encodeURIComponent(name || email)}`);
+
   if (!user) return null;
 
   // No peer selected — show search landing
@@ -74,7 +89,7 @@ export default function DirectChat() {
           <p className="text-base font-bold" style={{ color: V.text }}>Messages</p>
           <p className="text-xs mt-0.5" style={{ color: V.muted }}>Search for someone to start a conversation</p>
         </div>
-        <div className="px-5 pt-6 max-w-lg w-full mx-auto">
+        <div className="px-5 pt-6 pb-16 max-w-lg w-full mx-auto">
           {/* Search bar */}
           <div className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: V.muted }} />
@@ -96,7 +111,7 @@ export default function DirectChat() {
                 searchResults.map(u => (
                   <button
                     key={u.id}
-                    onClick={() => navigate(`/chat?with=${encodeURIComponent(u.email)}&name=${encodeURIComponent(u.full_name || u.email)}`)}
+                    onClick={() => openChat(u.email, u.full_name || u.email)}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.01]"
                     style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${V.border}` }}
                   >
@@ -113,6 +128,36 @@ export default function DirectChat() {
                 ))
               )}
             </div>
+          )}
+
+          {search.length === 0 && (
+            <>
+              <PinnedPeople
+                V={V}
+                pins={pins}
+                isPinned={isPinned}
+                onTogglePin={(p) => toggle.mutate(p)}
+                onOpen={openChat}
+              />
+              <RecentConversations
+                V={V}
+                conversations={directory?.conversations || []}
+                loading={directoryLoading}
+                isPinned={isPinned}
+                onTogglePin={(p) => toggle.mutate(p)}
+                onOpen={openChat}
+              />
+              <PeopleAround
+                V={V}
+                nearby={directory?.nearby || []}
+                loading={directoryLoading}
+                city={directory?.my_city}
+                matchedCity={directory?.matched_city}
+                isPinned={isPinned}
+                onTogglePin={(p) => toggle.mutate(p)}
+                onOpen={openChat}
+              />
+            </>
           )}
         </div>
       </div>

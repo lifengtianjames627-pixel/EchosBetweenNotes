@@ -1,0 +1,31 @@
+import React from 'react';
+import { Pin } from 'lucide-react';
+import ChatSection from './ChatSection';
+import PeerRow from './PeerRow';
+
+export default function PinnedPeople({ V, pins, isPinned, onTogglePin, onOpen }) {
+  return (
+    <ChatSection V={V} icon={Pin} label="Pinned people" count={pins.length}>
+      {pins.length === 0 ? (
+        <p className="text-xs px-4 py-4 rounded-2xl" style={{ color: V.muted, background: 'rgba(255,255,255,0.03)', border: `1px dashed ${V.border}` }}>
+          Tap the pin on anyone below to keep them at the top.
+        </p>
+      ) : (
+        <div className="space-y-1.5">
+          {pins.map(p => (
+            <PeerRow
+              key={p.id}
+              V={V}
+              name={p.peer_name}
+              email={p.peer_email}
+              subtitle={p.peer_email}
+              pinned={isPinned(p.peer_email)}
+              onOpen={() => onOpen(p.peer_email, p.peer_name)}
+              onTogglePin={() => onTogglePin({ peer_email: p.peer_email, peer_name: p.peer_name })}
+            />
+          ))}
+        </div>
+      )}
+    </ChatSection>
+  );
+}

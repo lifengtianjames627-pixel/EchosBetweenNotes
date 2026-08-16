@@ -1,0 +1,22 @@
+{
+  "name": "PinnedPeer",
+  "type": "object",
+  "properties": {
+    "owner_email": {
+      "type": "string",
+      "description": "Who pinned this person"
+    },
+    "peer_email": {
+      "type": "string",
+      "description": "The pinned person's email"
+    },
+    "peer_name": {
+      "type": "string",
+      "description": "Display name of the pinned person"
+    }
+  },
+  "required": [
+    "owner_email",
+    "peer_email"
+  ]
+}
