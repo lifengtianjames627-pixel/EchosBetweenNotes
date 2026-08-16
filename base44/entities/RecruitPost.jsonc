@@ -1,0 +1,117 @@
+{
+  "name": "RecruitPost",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "band",
+        "musician"
+      ],
+      "default": "band",
+      "description": "band = a band looking for members, musician = a player looking for a band"
+    },
+    "title": {
+      "type": "string",
+      "description": "Headline of the post"
+    },
+    "band_name": {
+      "type": "string",
+      "description": "Band name (for kind=band)"
+    },
+    "poster_url": {
+      "type": "string",
+      "description": "Recruitment poster image URL"
+    },
+    "city": {
+      "type": "string",
+      "description": "City or area"
+    },
+    "school": {
+      "type": "string",
+      "description": "School name (optional)"
+    },
+    "looking_for": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Instruments/roles wanted"
+    },
+    "i_play": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Instruments the author plays"
+    },
+    "genre_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Genre/style tags"
+    },
+    "influences": {
+      "type": "string",
+      "description": "Bands/artists that influence them"
+    },
+    "commitment": {
+      "type": "string",
+      "enum": [
+        "casual",
+        "regular",
+        "serious"
+      ],
+      "default": "casual",
+      "description": "How serious the commitment is"
+    },
+    "description": {
+      "type": "string",
+      "description": "Free-form details"
+    },
+    "author_email": {
+      "type": "string"
+    },
+    "author_name": {
+      "type": "string"
+    },
+    "author_age_group": {
+      "type": "string",
+      "enum": [
+        "minor",
+        "adult"
+      ],
+      "description": "Age bracket of the author \u2014 posts are only visible within the same bracket"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "closed"
+      ],
+      "default": "active"
+    },
+    "moderation_status": {
+      "type": "string",
+      "enum": [
+        "approved",
+        "pending_review",
+        "blocked"
+      ],
+      "default": "approved"
+    },
+    "moderation_reason": {
+      "type": "string"
+    },
+    "report_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "kind",
+    "title",
+    "author_email"
+  ]
+}

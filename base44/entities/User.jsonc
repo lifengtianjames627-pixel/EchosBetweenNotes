@@ -17,6 +17,14 @@
       },
       "description": "Up to 4 equipped badge IDs shown on reviews and profile"
     },
+    "age_group": {
+      "type": "string",
+      "enum": [
+        "minor",
+        "adult"
+      ],
+      "description": "Self-declared age bracket. Band-forming posts are only visible within the same bracket so adults and minors never match with each other."
+    },
     "total_browsing_minutes": {
       "type": "number",
       "default": 0

@@ -16,6 +16,7 @@ import About from '@/pages/About';
 import ModerationQueue from '@/pages/ModerationQueue';
 import BandDashboard from '@/pages/BandDashboard';
 import DirectChat from '@/pages/DirectChat';
+import SoulmateBoard from '@/pages/SoulmateBoard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -50,6 +51,7 @@ const AuthenticatedApp = () => {
         <Route path="/moderation" element={<ModerationQueue />} />
         <Route path="/band-dashboard" element={<BandDashboard />} />
         <Route path="/chat" element={<DirectChat />} />
+        <Route path="/soulmate" element={<SoulmateBoard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { PenLine, Headphones } from 'lucide-react';
+import { PenLine, Headphones, Users } from 'lucide-react';
 
 const OPTIONS = [
   {
@@ -19,6 +19,14 @@ const OPTIONS = [
     desc: 'Conversations, reactions, and voices behind the sound.',
     accent: '#f472b6',
     glow: 'rgba(244,114,182,0.4)',
+  },
+  {
+    path: '/soulmate',
+    icon: Users,
+    label: 'Meet Your Soulmate',
+    desc: 'Posters from bands and players looking for each other.',
+    accent: '#c084fc',
+    glow: 'rgba(192,132,252,0.4)',
   },
 ];
 
@@ -102,7 +110,7 @@ export default function Home() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.7 }}
-        className="relative z-10 mt-14 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl"
+        className="relative z-10 mt-14 grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-4xl"
       >
         {OPTIONS.map(({ path, icon: Icon, label, desc, accent, glow }) => (
           <motion.button
