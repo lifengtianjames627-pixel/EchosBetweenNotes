@@ -154,6 +154,8 @@ export default function DirectChat() {
                 city={directory?.my_city}
                 matchedCity={directory?.matched_city}
                 located={directory?.located}
+                myLat={directory?.my_lat}
+                myLng={directory?.my_lng}
                 isPinned={isPinned}
                 onTogglePin={(p) => toggle.mutate(p)}
                 onOpen={openChat}

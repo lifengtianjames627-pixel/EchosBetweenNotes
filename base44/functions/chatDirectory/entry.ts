@@ -86,7 +86,14 @@ Deno.serve(async (req) => {
       seen.add(p.author_email);
       const theirs = coordsByEmail.get(p.author_email);
       const km = mine && theirs ? distanceKm(mine.lat, mine.lng, theirs.lat, theirs.lng) : null;
+      // Map pins use a ~1km-coarse position, and only when the viewer shares
+      // their own location too — never an exact address.
+      const coarse = mine && theirs
+        ? { lat: Math.round(theirs.lat * 100) / 100, lng: Math.round(theirs.lng * 100) / 100 }
+        : null;
       nearby.push({
+        lat: coarse?.lat ?? null,
+        lng: coarse?.lng ?? null,
         email: p.author_email,
         name: p.author_name || p.author_email,
         city: p.city || '',
@@ -112,6 +119,8 @@ Deno.serve(async (req) => {
       my_city: myCity,
       matched_city: sameCity.length > 0,
       located: !!mine,
+      my_lat: mine ? Math.round(mine.lat * 100) / 100 : null,
+      my_lng: mine ? Math.round(mine.lng * 100) / 100 : null,
       located_count: nearby.filter(n => n.distance_km !== null).length,
     });
   } catch (error) {
