@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Disc3, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLang } from '@/i18n/LanguageContext';
 
 // SVG grain filter for film/vinyl texture
 function GrainFilter({ id }) {
@@ -36,9 +37,13 @@ function VinylPlaceholder({ accent }) {
   );
 }
 
-export default function MusicSlider({ items, v, onItemClick, onAddClick, label }) {
+// `kind` is 'albums' | 'singles' — section headings are system copy, so the
+// visible labels come from the system language, not from a hardcoded string.
+export default function MusicSlider({ items, v, onItemClick, onAddClick, kind = 'albums' }) {
+  const { t } = useLang();
   const [hovered, setHovered] = useState(null);
-  const filterId = `grain-${label}`;
+  const filterId = `grain-${kind}`;
+  const isAlbums = kind === 'albums';
   const scrollRef = useRef(null);
 
   const scrollBy = (dir) => {
@@ -53,10 +58,10 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, label }
       <div className="flex items-baseline justify-between mb-7">
         <div>
           <span className="text-[10px] uppercase tracking-[0.22em] font-medium block mb-1" style={{ color: `${v.muted}80` }}>
-            {label === 'Albums' ? 'Long-form' : 'Singles & EPs'}
+            {isAlbums ? t('genre.longForm') : t('genre.singlesEps')}
           </span>
           <h2 className="font-playfair italic text-2xl leading-none" style={{ color: v.text, letterSpacing: '-0.01em' }}>
-            {label}
+            {isAlbums ? t('genre.albums') : t('genre.singles')}
           </h2>
         </div>
         <button
@@ -64,7 +69,7 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, label }
           className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full transition-all hover:opacity-80"
           style={{ color: v.muted, border: `1px solid ${v.accent}30` }}
         >
-          <Plus className="w-3 h-3" /> Add
+          <Plus className="w-3 h-3" /> {t('genre.add')}
         </button>
       </div>
 
@@ -78,7 +83,7 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, label }
         >
           <Disc3 className="w-7 h-7 mb-3" style={{ color: v.accent, opacity: 0.25 }} />
           <p className="text-xs font-playfair italic" style={{ color: `${v.muted}60` }}>
-            No {label.toLowerCase()} yet — be the first
+            {isAlbums ? t('genre.emptyAlbums') : t('genre.emptySingles')}
           </p>
         </motion.div>
       ) : (
@@ -164,7 +169,7 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, label }
                   style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 55%)' }}
                 >
                   <span className="text-[9px] uppercase tracking-[0.18em] font-semibold" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                    Read Reviews
+                    {t('genre.readReviews')}
                   </span>
                 </motion.div>
               </motion.div>
@@ -182,7 +187,7 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, label }
                   <span className="text-[10px]" style={{ color: `${v.muted}50` }}>/ 10</span>
                   {item.review_count > 0 && (
                     <span className="text-[10px] ml-1" style={{ color: `${v.muted}40` }}>
-                      {item.review_count} {item.review_count === 1 ? 'review' : 'reviews'}
+                      {item.review_count} {item.review_count === 1 ? t('genre.review') : t('genre.reviews')}
                     </span>
                   )}
                 </div>

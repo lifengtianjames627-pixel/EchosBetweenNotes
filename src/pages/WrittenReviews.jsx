@@ -5,19 +5,21 @@ import { ArrowLeft, ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react';
 import { GENRES } from '@/lib/genreConfig';
 import GenreGauge from '@/components/genre-dashboard/GenreGauge';
 import AllGenresModal from '@/components/genre-dashboard/AllGenresModal';
-import { useReviewsLanguage } from '@/i18n/useReviewsLanguage';
-import { LANGUAGES } from '@/i18n/translations';
+import { useLang } from '@/i18n/LanguageContext';
+import { useGenreText } from '@/i18n/useGenreText';
 
 export default function WrittenReviews() {
   const navigate = useNavigate();
-  // Reviews area language is its OWN setting — the system language never touches it.
-  const { rlang, setRlang, rt } = useReviewsLanguage();
+  // Everything here except actual review text, album titles and artist names is
+  // system copy — genre names and taglines included — so it follows the system language.
+  const { t } = useLang();
+  const { localizedGenres } = useGenreText();
   const [startIdx, setStartIdx] = useState(0);
   const [showAll, setShowAll] = useState(false);
 
   const visible = [0, 1, 2].map(i => {
-    const idx = (startIdx + i) % GENRES.length;
-    return { genre: GENRES[idx], colorIdx: idx };
+    const idx = (startIdx + i) % localizedGenres.length;
+    return { genre: localizedGenres[idx], colorIdx: idx };
   });
 
   const goPrev = () => setStartIdx(prev => (prev - 3 + GENRES.length) % GENRES.length);
@@ -96,19 +98,8 @@ export default function WrittenReviews() {
           className="flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
           style={{ color: 'rgba(160,175,215,0.6)' }}
         >
-          <ArrowLeft className="w-4 h-4" /> {rt('common.back')}
+          <ArrowLeft className="w-4 h-4" /> {t('common.back')}
         </button>
-        <label className="flex items-center gap-2 text-xs" style={{ color: 'rgba(140,155,210,0.5)' }} title={rt('reviews.langLabel')}>
-          {rt('reviews.langLabel')}
-          <select
-            value={rlang}
-            onChange={e => setRlang(e.target.value)}
-            className="px-2 py-1 rounded-lg text-xs outline-none"
-            style={{ background: 'rgba(15,18,40,0.9)', border: '1px solid rgba(124,111,255,0.25)', color: '#a5b4fc' }}
-          >
-            {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
-          </select>
-        </label>
       </div>
 
       <div className="relative z-10 flex flex-col items-center justify-center pt-6 pb-2 px-4 text-center">
@@ -136,7 +127,7 @@ export default function WrittenReviews() {
           className="text-sm mt-2"
           style={{ color: 'rgba(160,175,220,0.55)' }}
         >
-          {rt('reviews.subtitle')}
+          {t('reviews.subtitle')}
         </motion.p>
       </div>
 
@@ -157,7 +148,7 @@ export default function WrittenReviews() {
             <ChevronLeft className="w-4 h-4" />
           </button>
           <span className="text-xs" style={{ color: 'rgba(140,155,210,0.4)' }}>
-            {startIdx + 1}–{Math.min(startIdx + 3, GENRES.length)} {rt('common.of')} {GENRES.length}
+            {startIdx + 1}–{Math.min(startIdx + 3, GENRES.length)} {t('common.of')} {GENRES.length}
           </span>
           <button
             onClick={goNext}
@@ -173,14 +164,14 @@ export default function WrittenReviews() {
           className="flex items-center gap-1.5 text-xs font-semibold px-3.5 py-1.5 rounded-full transition-all hover:scale-105 mt-4"
           style={{ background: 'rgba(124,111,255,0.1)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.2)' }}
         >
-          <LayoutGrid className="w-3.5 h-3.5" /> {rt('common.allGenres')}
+          <LayoutGrid className="w-3.5 h-3.5" /> {t('common.allGenres')}
         </button>
       </motion.div>
 
       <AnimatePresence>
         {showAll && (
           <AllGenresModal
-            genres={GENRES}
+            genres={localizedGenres}
             onClose={() => setShowAll(false)}
             onSelect={(id) => { setShowAll(false); goToGenre(id); }}
           />

@@ -2,8 +2,10 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight } from 'lucide-react';
 import { BUBBLE_COLORS, GENRE_ICONS } from '@/lib/genreVisuals';
+import { useLang } from '@/i18n/LanguageContext';
 
 export default function AllGenresModal({ genres, onClose, onSelect }) {
+  const { t } = useLang();
   return (
     <AnimatePresence>
       <motion.div
@@ -20,7 +22,7 @@ export default function AllGenresModal({ genres, onClose, onSelect }) {
           onClick={e => e.stopPropagation()}
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold" style={{ color: 'rgba(220,225,255,0.95)' }}>All Genres</h3>
+            <h3 className="text-base font-bold" style={{ color: 'rgba(220,225,255,0.95)' }}>{t('common.allGenres')}</h3>
             <button onClick={onClose} style={{ color: 'rgba(160,175,220,0.5)' }}>
               <X className="w-4.5 h-4.5" />
             </button>

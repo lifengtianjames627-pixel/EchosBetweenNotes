@@ -77,6 +77,23 @@ export function useMyLocation() {
     );
   }, []);
 
+  // Manual correction: the user placed the pin themselves on the map, so the
+  // position is exact by definition — no browser estimate involved.
+  const setManual = useCallback(async ([lat, lng]) => {
+    stopWatching();
+    await base44.auth.updateMe({
+      location_lat: Math.round(lat * 1000) / 1000,
+      location_lng: Math.round(lng * 1000) / 1000,
+      location_accuracy_m: 0,
+      location_source: 'manual',
+      location_consent: 'always',
+      location_updated: new Date().toISOString(),
+    });
+    queryClient.invalidateQueries({ queryKey: ['me'] });
+    queryClient.invalidateQueries({ queryKey: ['chat-directory'] });
+    setStatus('done');
+  }, [queryClient]);
+
   // User picked "Don't allow" in the agreement window — remember it.
   const deny = useCallback(async () => {
     await base44.auth.updateMe({ location_consent: 'denied', location_lat: null, location_lng: null, location_accuracy_m: null });
@@ -87,11 +104,11 @@ export function useMyLocation() {
 
   const clear = useCallback(async () => {
     stopWatching();
-    await base44.auth.updateMe({ location_lat: null, location_lng: null, location_accuracy_m: null, location_consent: null, location_updated: null });
+    await base44.auth.updateMe({ location_lat: null, location_lng: null, location_accuracy_m: null, location_consent: null, location_updated: null, location_source: null });
     queryClient.invalidateQueries({ queryKey: ['me'] });
     queryClient.invalidateQueries({ queryKey: ['chat-directory'] });
     setStatus('idle');
   }, [queryClient]);
 
-  return { status, accuracy, share, deny, clear };
+  return { status, accuracy, share, deny, clear, setManual };
 }

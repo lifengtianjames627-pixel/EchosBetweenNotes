@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star, TrendingUp, Trophy, Eye } from 'lucide-react';
+import { useLang } from '@/i18n/LanguageContext';
 
 export default function GenreRankings({ items, v }) {
+  const { t } = useLang();
   const [tab, setTab] = useState('rating');
 
   const albums = items.filter(i => !i.type || i.type === 'album');
@@ -34,14 +36,14 @@ export default function GenreRankings({ items, v }) {
     <div className="mb-10">
       <div className="flex items-center gap-3 mb-5">
         <Trophy className="w-3.5 h-3.5" style={{ color: v.accent, opacity: 0.7 }} />
-        <h2 className="text-xs uppercase tracking-widest font-bold" style={{ color: v.muted }}>Rankings</h2>
+        <h2 className="text-xs uppercase tracking-widest font-bold" style={{ color: v.muted }}>{t('genre.rankings')}</h2>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-2 mb-4">
         {[
-          { key: 'rating', icon: Star, label: 'Highest Rated' },
-          { key: 'popular', icon: TrendingUp, label: 'Most Viewed' },
+          { key: 'rating', icon: Star, label: t('genre.highestRated') },
+          { key: 'popular', icon: TrendingUp, label: t('genre.mostViewed') },
         ].map(({ key, icon: Icon, label }) => (
           <button
             key={key}
@@ -60,7 +62,7 @@ export default function GenreRankings({ items, v }) {
 
       {ranked.length === 0 ? (
         <p className="text-xs py-4 text-center" style={{ color: `${v.muted}70` }}>
-          {tab === 'rating' ? 'No rated albums yet.' : 'No view data yet — click some albums!'}
+          {tab === 'rating' ? t('genre.noRated') : t('genre.noViews')}
         </p>
       ) : (
         <div className="space-y-2">

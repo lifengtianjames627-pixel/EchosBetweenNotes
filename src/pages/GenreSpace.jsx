@@ -12,6 +12,8 @@ import GenreRankings from '@/components/GenreRankings';
 import GenreHeroMark from '@/components/genre-dashboard/GenreHeroMark';
 import { storeCoverImage } from '@/lib/storeCoverImage';
 import { fetchCoverCascade } from '@/components/TrackList';
+import { useLang } from '@/i18n/LanguageContext';
+import { useGenreText } from '@/i18n/useGenreText';
 
 // Per-genre visual configs
 const GENRE_VISUALS = {
@@ -149,6 +151,10 @@ export default function GenreSpace() {
   const { genreId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useLang();
+  // Genre name / tagline / description are system copy — they follow the system
+  // language. Album titles, artist names and review text never do.
+  const { gLabel, gTagline, gDesc } = useGenreText();
 
   const [addModal, setAddModal] = useState(null); // 'album' | 'single' | null
   const [selectedItem, setSelectedItem] = useState(null);
@@ -213,8 +219,8 @@ export default function GenreSpace() {
   if (!genre) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen" style={{ background: '#050709', color: '#aaa' }}>
-        <p>Genre not found.</p>
-        <button onClick={() => navigate('/')} className="mt-4 underline">Go home</button>
+        <p>{t('genre.notFound')}</p>
+        <button onClick={() => navigate('/')} className="mt-4 underline">{t('genre.goHome')}</button>
       </div>
     );
   }
@@ -229,10 +235,10 @@ export default function GenreSpace() {
             className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest transition-opacity hover:opacity-60"
             style={{ color: v.muted }}
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Home
+            <ArrowLeft className="w-3.5 h-3.5" /> {t('nav.home')}
           </button>
           <span className="text-[10px] uppercase tracking-[0.22em]" style={{ color: `${v.muted}60` }}>
-            {genre.label} Space
+            {gLabel(genreId, genre.label)} {t('genre.space')}
           </span>
           <div className="w-16" />
         </div>
@@ -253,13 +259,13 @@ export default function GenreSpace() {
             className="absolute -top-8 -left-4 select-none pointer-events-none font-playfair"
             style={{ fontSize: 'clamp(8rem, 22vw, 18rem)', color: `${v.accent}06`, letterSpacing: '-0.06em', lineHeight: 1 }}
           >
-            {genre.label.slice(0, 2)}
+            {gLabel(genreId, genre.label).slice(0, 2)}
           </div>
 
           <div className="relative">
             {/* Small label above */}
             <p className="text-xs uppercase tracking-[0.28em] mb-4 font-semibold" style={{ color: v.text }}>
-              {v.tagline}
+              {gTagline(genreId, v.tagline)}
             </p>
 
             {/* Main title — large serif, left-aligned */}
@@ -275,18 +281,18 @@ export default function GenreSpace() {
                 letterSpacing: '-0.03em',
               }}
             >
-              {genre.label}
+              {gLabel(genreId, genre.label)}
             </h1>
 
             {/* Description — right-offset, constrained */}
             <div className="max-w-sm ml-auto">
-              <p className="text-base leading-relaxed" style={{ color: v.text }}>{genre.desc}</p>
+              <p className="text-base leading-relaxed" style={{ color: v.text }}>{gDesc(genreId, genre.desc)}</p>
             </div>
 
             {/* Thin accent rule */}
             <div className="mt-10 flex items-center gap-5">
               <div className="h-px flex-1" style={{ background: `${v.accent}20` }} />
-              <span className="text-xs uppercase tracking-[0.3em] font-semibold" style={{ color: v.muted }}>{genre.label}</span>
+              <span className="text-xs uppercase tracking-[0.3em] font-semibold" style={{ color: v.muted }}>{gLabel(genreId, genre.label)}</span>
               <div className="h-px w-8" style={{ background: `${v.accent}20` }} />
             </div>
           </div>
@@ -314,7 +320,7 @@ export default function GenreSpace() {
             <MusicSlider
               items={albums}
               v={v}
-              label="Albums"
+              kind="albums"
               onItemClick={handleItemClick}
               onAddClick={() => setAddModal('album')}
             />
@@ -325,7 +331,7 @@ export default function GenreSpace() {
             <MusicSlider
               items={singles}
               v={v}
-              label="Singles"
+              kind="singles"
               onItemClick={handleItemClick}
               onAddClick={() => setAddModal('single')}
             />
