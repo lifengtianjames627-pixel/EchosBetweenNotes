@@ -2,29 +2,30 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { PenLine, Headphones, Users } from 'lucide-react';
+import { useLang } from '@/i18n/LanguageContext';
 
 const OPTIONS = [
   {
     path: '/reviews',
     icon: PenLine,
-    label: 'Written Reviews',
-    desc: 'Essays, ratings, and honest words on every genre.',
+    labelKey: 'home.reviews',
+    descKey: 'home.reviewsDesc',
     accent: '#7c6fff',
     glow: 'rgba(124,111,255,0.4)',
   },
   {
     path: '/podcasts',
     icon: Headphones,
-    label: 'Music Podcasts',
-    desc: 'Conversations, reactions, and voices behind the sound.',
+    labelKey: 'home.podcasts',
+    descKey: 'home.podcastsDesc',
     accent: '#f472b6',
     glow: 'rgba(244,114,182,0.4)',
   },
   {
     path: '/soulmate',
     icon: Users,
-    label: 'Meet Your Soulmate',
-    desc: 'Posters from bands and players looking for each other.',
+    labelKey: 'home.soulmate',
+    descKey: 'home.soulmateDesc',
     accent: '#c084fc',
     glow: 'rgba(192,132,252,0.4)',
   },
@@ -32,6 +33,7 @@ const OPTIONS = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const { t } = useLang();
 
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center px-4" style={{ background: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)' }}>
@@ -101,7 +103,7 @@ export default function Home() {
           className="mt-5 text-base md:text-lg max-w-xl mx-auto"
           style={{ color: 'rgba(160,175,215,0.7)', letterSpacing: '0.01em' }}
         >
-          Where every song leaves a trace — read it, or listen to it.
+          {t('home.tagline')}
         </motion.p>
       </motion.div>
 
@@ -112,7 +114,7 @@ export default function Home() {
         transition={{ delay: 0.5, duration: 0.7 }}
         className="relative z-10 mt-14 grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-4xl"
       >
-        {OPTIONS.map(({ path, icon: Icon, label, desc, accent, glow }) => (
+        {OPTIONS.map(({ path, icon: Icon, labelKey, descKey, accent, glow }) => (
           <motion.button
             key={path}
             onClick={() => navigate(path)}
@@ -133,8 +135,8 @@ export default function Home() {
             >
               <Icon className="w-6 h-6" style={{ color: accent, filter: `drop-shadow(0 0 8px ${glow})` }} />
             </div>
-            <p className="font-playfair italic text-xl mb-2" style={{ color: '#e8e9ff' }}>{label}</p>
-            <p className="text-xs leading-relaxed max-w-[220px]" style={{ color: 'rgba(160,175,215,0.6)' }}>{desc}</p>
+            <p className="font-playfair italic text-xl mb-2" style={{ color: '#e8e9ff' }}>{t(labelKey)}</p>
+            <p className="text-xs leading-relaxed max-w-[220px]" style={{ color: 'rgba(160,175,215,0.6)' }}>{t(descKey)}</p>
           </motion.button>
         ))}
       </motion.div>

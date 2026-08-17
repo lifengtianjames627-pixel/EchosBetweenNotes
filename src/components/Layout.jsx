@@ -5,17 +5,20 @@ import MiniChat from '@/components/MiniChat';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLang } from '@/i18n/LanguageContext';
+import LanguageButton from '@/components/LanguageButton';
 
 const NAV_ITEMS = [
-  { path: '/', icon: Home, label: 'Home' },
-  { path: '/chat', icon: MessageSquare, label: 'Messages' },
+  { path: '/', icon: Home, labelKey: 'nav.home' },
+  { path: '/chat', icon: MessageSquare, labelKey: 'nav.messages' },
 ];
 
 const ADMIN_ITEMS = [
-  { path: '/moderation', icon: Shield, label: 'Moderation' },
+  { path: '/moderation', icon: Shield, labelKey: 'nav.moderation' },
 ];
 
 export default function Layout() {
+  const { t } = useLang();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [miniChat, setMiniChat] = useState(null); // { email, name }
@@ -95,8 +98,9 @@ export default function Layout() {
   const isActive = (path) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
-  const NavLink = ({ path, icon: Icon, label }) => {
+  const NavLink = ({ path, icon: Icon, labelKey }) => {
     const active = isActive(path);
+    const label = t(labelKey);
     return (
       <Link
         to={path}
@@ -194,7 +198,7 @@ export default function Layout() {
                       className="text-[10px] uppercase tracking-widest font-bold"
                       style={{ color: 'rgba(124,111,255,0.45)' }}
                     >
-                      Admin
+                      {t('nav.admin')}
                     </motion.p>
                   ) : (
                     <div className="h-px w-full" style={{ background: 'rgba(124,111,255,0.15)' }} />
@@ -241,7 +245,7 @@ export default function Layout() {
 
               <button
                 onClick={() => base44.auth.logout()}
-                title={collapsed ? 'Log out' : undefined}
+                title={collapsed ? t('nav.logout') : undefined}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative"
                 style={{ color: 'rgba(248,113,113,0.6)' }}
               >
@@ -254,7 +258,7 @@ export default function Layout() {
                       exit={{ opacity: 0, width: 0 }}
                       className="overflow-hidden whitespace-nowrap"
                     >
-                      Log out
+                      {t('nav.logout')}
                     </motion.span>
                   )}
                 </AnimatePresence>
@@ -263,7 +267,7 @@ export default function Layout() {
                     className="absolute left-full ml-3 px-2.5 py-1.5 rounded-lg text-xs font-medium pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap"
                     style={{ background: 'rgba(15,18,40,0.95)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}
                   >
-                    Log out
+                    {t('nav.logout')}
                   </div>
                 )}
               </button>
@@ -271,7 +275,7 @@ export default function Layout() {
           ) : (
             <button
               onClick={() => base44.auth.redirectToLogin()}
-              title={collapsed ? 'Log in' : undefined}
+              title={collapsed ? t('nav.login') : undefined}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
               style={{ background: 'rgba(124,111,255,0.15)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.25)' }}
             >
@@ -284,7 +288,7 @@ export default function Layout() {
                     exit={{ opacity: 0, width: 0 }}
                     className="overflow-hidden whitespace-nowrap"
                   >
-                    Log in
+                    {t('nav.login')}
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -311,12 +315,13 @@ export default function Layout() {
         {/* Top bar */}
         <div className="sticky top-0 z-40 flex items-center justify-end px-5 h-12"
           style={{ background: 'rgba(5,7,20,0.85)', borderBottom: '1px solid rgba(124,111,255,0.1)', backdropFilter: 'blur(16px)' }}>
+          <div className="mr-2"><LanguageButton /></div>
           <Link
             to="/about"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-105 mr-2"
             style={{ color: 'rgba(160,175,220,0.6)', border: '1px solid rgba(124,111,255,0.15)' }}
           >
-            <Info className="w-3.5 h-3.5" /> About
+            <Info className="w-3.5 h-3.5" /> {t('nav.about')}
           </Link>
           {currentUser ? (
             <Link
@@ -329,7 +334,7 @@ export default function Layout() {
                 {(currentUser.full_name || currentUser.email || 'U')[0].toUpperCase()}
               </div>
               <span className="text-xs font-semibold" style={{ color: '#a5b4fc' }}>
-                {currentUser.full_name || 'My Account'}
+                {currentUser.full_name || t('nav.myAccount')}
               </span>
               <User className="w-3.5 h-3.5" style={{ color: '#a5b4fc' }} />
             </Link>
@@ -339,7 +344,7 @@ export default function Layout() {
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold"
               style={{ background: 'rgba(124,111,255,0.15)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.25)' }}
             >
-              <LogIn className="w-3.5 h-3.5" /> Log in
+              <LogIn className="w-3.5 h-3.5" /> {t('nav.login')}
             </button>
           )}
         </div>
