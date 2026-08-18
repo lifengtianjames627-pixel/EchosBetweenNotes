@@ -4,23 +4,25 @@ import ChatSection from './ChatSection';
 import PeerRow from './PeerRow';
 import LocationShareBar from './LocationShareBar';
 import NearbyMap from './NearbyMap';
+import { useLang } from '@/i18n/LanguageContext';
 
 // People currently active on the band board — closest first when the viewer has
 // shared their location, otherwise same city, and always inside their age bracket.
 export default function PeopleAround({ V, nearby, loading, city, matchedCity, located, myLat, myLng, isPinned, onTogglePin, onOpen }) {
   const [view, setView] = useState('list');
-  const hint = located ? 'closest first' : matchedCity && city ? `in ${city}` : 'on the board';
+  const { t } = useLang();
+  const hint = located ? t('chat.closestFirst') : matchedCity && city ? t('chat.inCity', { c: city }) : t('chat.onBoard');
   const canMap = located && typeof myLat === 'number' && typeof myLng === 'number';
 
   return (
-    <ChatSection V={V} icon={MapPin} label="People around you" hint={hint} count={nearby.length}>
+    <ChatSection V={V} icon={MapPin} label={t('chat.around')} hint={hint} count={nearby.length}>
       <LocationShareBar V={V} located={located} />
 
       {canMap && (
         <div className="flex gap-1.5 mb-2">
           {[
-            { id: 'list', label: 'List', icon: List },
-            { id: 'map', label: 'Map', icon: MapIcon },
+            { id: 'list', label: t('chat.list'), icon: List },
+            { id: 'map', label: t('chat.map'), icon: MapIcon },
           ].map(t => (
             <button
               key={t.id}
@@ -44,7 +46,7 @@ export default function PeopleAround({ V, nearby, loading, city, matchedCity, lo
         <NearbyMap V={V} center={[myLat, myLng]} people={nearby} onOpen={onOpen} />
       ) : nearby.length === 0 ? (
         <p className="text-xs px-4 py-4 rounded-2xl" style={{ color: V.muted, background: 'rgba(255,255,255,0.03)', border: `1px dashed ${V.border}` }}>
-          Nobody nearby on the board yet. Put up a poster and people will find you.
+          {t('chat.nearbyEmpty')}
         </p>
       ) : (
         <div className="space-y-1.5">
@@ -56,11 +58,11 @@ export default function PeopleAround({ V, nearby, loading, city, matchedCity, lo
               email={p.email}
               subtitle={[
                 p.distance_km !== null && p.distance_km !== undefined
-                  ? p.distance_km < 1 ? 'under 1 km away' : `${p.distance_km} km away`
+                  ? p.distance_km < 1 ? t('chat.underKm') : t('chat.kmAway', { km: p.distance_km })
                   : null,
                 p.city,
                 p.school,
-                p.kind === 'band' ? 'band recruiting' : 'player available',
+                p.kind === 'band' ? t('sm.bandRecruiting') : t('sm.playerAvailable'),
               ].filter(Boolean).join(' · ')}
               pinned={isPinned(p.email)}
               onOpen={() => onOpen(p.email, p.name)}

@@ -2,16 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, GraduationCap, Guitar, MessageSquare, Users } from 'lucide-react';
 import ReportButton from '@/components/soulmate/ReportButton';
-
-const COMMITMENT_LABEL = {
-  casual: 'Just for fun',
-  regular: 'Rehearsing regularly',
-  serious: 'Serious about gigging',
-};
+import { useLang } from '@/i18n/LanguageContext';
 
 // A single recruitment poster. Tapping the author's avatar opens in-app chat —
 // the only contact path there is.
 export default function PosterCard({ post, currentUser, index = 0 }) {
+  const { t } = useLang();
   const isMine = post.author_email === currentUser?.email;
   const initial = (post.author_name || post.author_email || '?')[0].toUpperCase();
 
@@ -44,7 +40,7 @@ export default function PosterCard({ post, currentUser, index = 0 }) {
             className="absolute top-3 left-3 text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full"
             style={{ background: 'rgba(8,10,28,0.75)', color: '#c4baff', border: '1px solid rgba(124,111,255,0.35)' }}
           >
-            {post.kind === 'band' ? 'Band recruiting' : 'Player available'}
+            {post.kind === 'band' ? t('sm.bandRecruiting') : t('sm.playerAvailable')}
           </span>
         </div>
       ) : (
@@ -53,7 +49,7 @@ export default function PosterCard({ post, currentUser, index = 0 }) {
             className="text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full"
             style={{ background: 'rgba(124,111,255,0.15)', color: '#c4baff', border: '1px solid rgba(124,111,255,0.3)' }}
           >
-            {post.kind === 'band' ? 'Band recruiting' : 'Player available'}
+            {post.kind === 'band' ? t('sm.bandRecruiting') : t('sm.playerAvailable')}
           </span>
         </div>
       )}
@@ -68,14 +64,14 @@ export default function PosterCard({ post, currentUser, index = 0 }) {
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px]" style={{ color: 'rgba(140,155,210,0.6)' }}>
           {post.city && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{post.city}</span>}
           {post.school && <span className="flex items-center gap-1"><GraduationCap className="w-3 h-3" />{post.school}</span>}
-          {post.commitment && <span>{COMMITMENT_LABEL[post.commitment]}</span>}
+          {post.commitment && <span>{t(`sm.commit.${post.commitment}`)}</span>}
         </div>
 
         {/* Looking for */}
         {post.looking_for?.length > 0 && (
           <div className="mt-3">
             <p className="text-[10px] uppercase tracking-widest font-bold mb-1.5" style={{ color: 'rgba(124,111,255,0.7)' }}>
-              Looking for
+              {t('sm.lookingFor')}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {post.looking_for.map(role => (
@@ -92,13 +88,13 @@ export default function PosterCard({ post, currentUser, index = 0 }) {
         {post.i_play?.length > 0 && (
           <div className="flex items-center gap-1.5 mt-2.5 text-[11px]" style={{ color: 'rgba(150,165,215,0.7)' }}>
             <Guitar className="w-3 h-3 shrink-0" style={{ color: 'rgba(244,114,182,0.7)' }} />
-            <span>Plays {post.i_play.join(' · ')}</span>
+            <span>{t('sm.plays')} {post.i_play.join(' · ')}</span>
           </div>
         )}
 
         {post.influences && (
           <p className="text-[11px] mt-2 italic" style={{ color: 'rgba(140,155,210,0.6)' }}>
-            Sounds like {post.influences}
+            {t('sm.soundsLike')} {post.influences}
           </p>
         )}
 
@@ -134,10 +130,10 @@ export default function PosterCard({ post, currentUser, index = 0 }) {
           </button>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold truncate" style={{ color: 'rgba(210,220,250,0.85)' }}>
-              {post.author_name || 'Anonymous'}
+              {post.author_name || t('sm.anonymous')}
             </p>
             <p className="text-[10px]" style={{ color: 'rgba(140,155,210,0.45)' }}>
-              {isMine ? 'Your post' : 'Tap the avatar to message'}
+              {isMine ? t('sm.yourPost') : t('sm.tapAvatar')}
             </p>
           </div>
 
@@ -147,14 +143,14 @@ export default function PosterCard({ post, currentUser, index = 0 }) {
               className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full font-semibold shrink-0 transition-all hover:scale-105"
               style={{ background: 'rgba(124,111,255,0.2)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.4)' }}
             >
-              <MessageSquare className="w-3 h-3" /> Message
+              <MessageSquare className="w-3 h-3" /> {t('sm.message')}
             </button>
           )}
         </div>
 
         <div className="flex items-center justify-between mt-1">
           <span className="flex items-center gap-1 text-[10px]" style={{ color: 'rgba(140,155,210,0.4)' }}>
-            <Users className="w-3 h-3" /> In-app chat only
+            <Users className="w-3 h-3" /> {t('sm.inAppOnly')}
           </span>
           <ReportButton
             targetType="recruit_post"

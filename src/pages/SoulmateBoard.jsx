@@ -7,14 +7,16 @@ import PosterCard from '@/components/soulmate/PosterCard';
 import CreatePostModal, { INSTRUMENTS } from '@/components/soulmate/CreatePostModal';
 import AgeGateModal from '@/components/soulmate/AgeGateModal';
 import SafetyNotice from '@/components/soulmate/SafetyNotice';
+import { useLang } from '@/i18n/LanguageContext';
 
 const KINDS = [
-  { id: 'all', label: 'Everything' },
-  { id: 'band', label: 'Bands recruiting' },
-  { id: 'musician', label: 'Players available' },
+  { id: 'all', labelKey: 'sm.kind.all' },
+  { id: 'band', labelKey: 'sm.kind.band' },
+  { id: 'musician', labelKey: 'sm.kind.musician' },
 ];
 
 export default function SoulmateBoard() {
+  const { t } = useLang();
   const [kind, setKind] = useState('all');
   const [role, setRole] = useState(null);
   const [search, setSearch] = useState('');
@@ -70,12 +72,12 @@ export default function SoulmateBoard() {
               filter: 'drop-shadow(0 0 26px rgba(165,138,252,0.35))',
             }}
           >
-            Meet Your Soulmate
+            {t('home.soulmate')}
           </h1>
           <div className="h-px mt-4 mx-auto max-w-md"
             style={{ background: 'linear-gradient(90deg, transparent, #7c6fff, #f472b6, transparent)' }} />
           <p className="mt-4 text-sm max-w-xl mx-auto" style={{ color: 'rgba(160,175,215,0.7)' }}>
-            Posters from bands looking for members, and players looking for a band. Read one, tap the avatar, talk here.
+            {t('sm.subtitle')}
           </p>
         </motion.div>
 
@@ -87,7 +89,7 @@ export default function SoulmateBoard() {
             className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold whitespace-nowrap transition-all hover:scale-[1.02]"
             style={{ background: 'rgba(124,111,255,0.2)', border: '1px solid rgba(124,111,255,0.45)', color: '#c4baff' }}
           >
-            <Plus className="w-4 h-4" /> Put up a poster
+            <Plus className="w-4 h-4" /> {t('sm.post')}
           </button>
         </div>
 
@@ -104,7 +106,7 @@ export default function SoulmateBoard() {
                   : { background: 'rgba(255,255,255,0.04)', color: 'rgba(160,175,215,0.6)', border: '1px solid rgba(124,111,255,0.14)' }
                 }
               >
-                {k.label}
+                {t(k.labelKey)}
               </button>
             ))}
           </div>
@@ -130,7 +132,7 @@ export default function SoulmateBoard() {
             <input
               className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm outline-none"
               style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(124,111,255,0.18)', color: 'rgba(220,225,255,0.9)' }}
-              placeholder="Search city, school, style…"
+              placeholder={t('sm.search')}
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
@@ -141,13 +143,13 @@ export default function SoulmateBoard() {
         {isLoading ? (
           <div className="flex items-center justify-center gap-2 py-24" style={{ color: 'rgba(140,155,210,0.55)' }}>
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-sm">Loading the board…</span>
+            <span className="text-sm">{t('sm.loading')}</span>
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-24">
             <Users className="w-8 h-8 mx-auto mb-3" style={{ color: 'rgba(124,111,255,0.35)' }} />
-            <p className="text-sm" style={{ color: 'rgba(150,165,215,0.65)' }}>Nothing on the board yet.</p>
-            <p className="text-xs mt-1" style={{ color: 'rgba(140,155,210,0.45)' }}>Put up the first poster and start something.</p>
+            <p className="text-sm" style={{ color: 'rgba(150,165,215,0.65)' }}>{t('sm.empty')}</p>
+            <p className="text-xs mt-1" style={{ color: 'rgba(140,155,210,0.45)' }}>{t('sm.emptyHint')}</p>
           </div>
         ) : (
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

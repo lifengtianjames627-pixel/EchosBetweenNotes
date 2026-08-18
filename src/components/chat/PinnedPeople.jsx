@@ -2,13 +2,15 @@ import React from 'react';
 import { Pin } from 'lucide-react';
 import ChatSection from './ChatSection';
 import PeerRow from './PeerRow';
+import { useLang } from '@/i18n/LanguageContext';
 
 export default function PinnedPeople({ V, pins, isPinned, onTogglePin, onOpen }) {
+  const { t } = useLang();
   return (
-    <ChatSection V={V} icon={Pin} label="Pinned people" count={pins.length}>
+    <ChatSection V={V} icon={Pin} label={t('chat.pinned')} count={pins.length}>
       {pins.length === 0 ? (
         <p className="text-xs px-4 py-4 rounded-2xl" style={{ color: V.muted, background: 'rgba(255,255,255,0.03)', border: `1px dashed ${V.border}` }}>
-          Tap the pin on anyone below to keep them at the top.
+          {t('chat.pinnedEmpty')}
         </p>
       ) : (
         <div className="space-y-1.5">

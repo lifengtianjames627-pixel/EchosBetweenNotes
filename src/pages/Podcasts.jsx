@@ -7,9 +7,11 @@ import { ArrowLeft, Headphones } from 'lucide-react';
 import { PODCAST_CATEGORIES } from '@/lib/podcastConfig';
 import PodcastCategorySection from '@/components/PodcastCategorySection';
 import AddPodcastModal from '@/components/AddPodcastModal';
+import { useLang } from '@/i18n/LanguageContext';
 
 export default function Podcasts() {
   const navigate = useNavigate();
+  const { t } = useLang();
   const queryClient = useQueryClient();
   const [addCategory, setAddCategory] = useState(null);
 
@@ -35,7 +37,7 @@ export default function Podcasts() {
             className="flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
             style={{ color: 'rgba(160,175,215,0.6)' }}
           >
-            <ArrowLeft className="w-4 h-4" /> Home
+            <ArrowLeft className="w-4 h-4" /> {t('nav.home')}
           </button>
         </div>
       </div>
@@ -62,7 +64,7 @@ export default function Podcasts() {
             Music Podcasts
           </h1>
           <p className="text-sm max-w-lg mx-auto" style={{ color: 'rgba(160,175,215,0.6)' }}>
-            Voices instead of words — conversations, reactions, and stories about the music we love.
+            {t('pod.subtitle')}
           </p>
         </motion.div>
 

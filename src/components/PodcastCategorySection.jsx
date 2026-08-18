@@ -1,26 +1,28 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Mic2, Plus, Clock } from 'lucide-react';
+import { useLang } from '@/i18n/LanguageContext';
 
 export default function PodcastCategorySection({ category, episodes, onAddClick }) {
+  const { t } = useLang();
   return (
     <div className="mb-14">
       <div className="flex items-start justify-between mb-5 gap-4">
         <div>
           <span className="text-[10px] uppercase tracking-[0.22em] font-medium block mb-1" style={{ color: `${category.accent}90` }}>
-            {category.tagline}
+            {t(`pod.cat.${category.id}.tagline`)}
           </span>
           <h2 className="font-playfair italic text-2xl leading-none" style={{ color: 'rgba(230,232,255,0.95)' }}>
-            {category.label}
+            {t(`pod.cat.${category.id}.label`)}
           </h2>
-          <p className="text-xs mt-2 max-w-md" style={{ color: 'rgba(140,155,210,0.55)' }}>{category.desc}</p>
+          <p className="text-xs mt-2 max-w-md" style={{ color: 'rgba(140,155,210,0.55)' }}>{t(`pod.cat.${category.id}.desc`)}</p>
         </div>
         <button
           onClick={onAddClick}
           className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full shrink-0 transition-all hover:opacity-80"
           style={{ color: category.accent, border: `1px solid ${category.accent}40` }}
         >
-          <Plus className="w-3 h-3" /> Add
+          <Plus className="w-3 h-3" /> {t('genre.add')}
         </button>
       </div>
 
@@ -31,7 +33,7 @@ export default function PodcastCategorySection({ category, episodes, onAddClick 
           onClick={onAddClick}
         >
           <Mic2 className="w-6 h-6 mb-2" style={{ color: category.accent, opacity: 0.3 }} />
-          <p className="text-xs font-playfair italic" style={{ color: 'rgba(140,155,210,0.45)' }}>No episodes yet — submit the first</p>
+          <p className="text-xs font-playfair italic" style={{ color: 'rgba(140,155,210,0.45)' }}>{t('pod.empty')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -58,7 +60,7 @@ export default function PodcastCategorySection({ category, episodes, onAddClick 
                 {ep.description && <p className="text-xs mt-1.5 line-clamp-2" style={{ color: 'rgba(140,155,210,0.55)' }}>{ep.description}</p>}
                 {ep.duration_minutes > 0 && (
                   <div className="flex items-center gap-1 mt-1.5 text-[10px]" style={{ color: 'rgba(140,155,210,0.4)' }}>
-                    <Clock className="w-3 h-3" /> {ep.duration_minutes} min
+                    <Clock className="w-3 h-3" /> {ep.duration_minutes} {t('pod.min')}
                   </div>
                 )}
                 {ep.audio_url && (

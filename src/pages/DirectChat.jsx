@@ -11,6 +11,7 @@ import PinnedPeople from '@/components/chat/PinnedPeople';
 import RecentConversations from '@/components/chat/RecentConversations';
 import PeopleAround from '@/components/chat/PeopleAround';
 import { usePins } from '@/components/chat/usePins';
+import { useLang } from '@/i18n/LanguageContext';
 
 const V = {
   bg: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)',
@@ -23,6 +24,7 @@ const V = {
 
 export default function DirectChat() {
   const navigate = useNavigate();
+  const { t } = useLang();
   const params = new URLSearchParams(window.location.search);
   const peerEmail = params.get('with');
   const peerName = params.get('name') || peerEmail;
@@ -46,7 +48,7 @@ export default function DirectChat() {
     if (!content || !chatId) return;
     const contact = findContactInfo(content);
     if (contact.length > 0) {
-      setWarning(`Keep it in Chordmates — please remove your ${contact.join(', ')}. In-app chat keeps a record so reports can be acted on.`);
+      setWarning(t('chat.keepWarning', { items: contact.join(', ') }));
       return;
     }
     setWarning(null);
@@ -86,8 +88,8 @@ export default function DirectChat() {
       <div className="min-h-screen flex flex-col" style={{ background: V.bg }}>
         <div className="px-5 py-4 sticky top-0 z-10"
           style={{ background: 'rgba(5,7,20,0.9)', borderBottom: `1px solid ${V.border}`, backdropFilter: 'blur(12px)' }}>
-          <p className="text-base font-bold" style={{ color: V.text }}>Messages</p>
-          <p className="text-xs mt-0.5" style={{ color: V.muted }}>Search for someone to start a conversation</p>
+          <p className="text-base font-bold" style={{ color: V.text }}>{t('chat.title')}</p>
+          <p className="text-xs mt-0.5" style={{ color: V.muted }}>{t('chat.subtitle')}</p>
         </div>
         <div className="px-5 pt-6 pb-16 max-w-lg w-full mx-auto">
           {/* Search bar */}
@@ -97,7 +99,7 @@ export default function DirectChat() {
               autoFocus
               className="w-full pl-10 pr-4 py-3 rounded-2xl text-sm outline-none"
               style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${V.border}`, color: V.text }}
-              placeholder="Search by name or email…"
+              placeholder={t('chat.searchPlaceholder')}
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
@@ -106,7 +108,7 @@ export default function DirectChat() {
           {search.length >= 1 && (
             <div className="mt-3 space-y-1">
               {searchResults.length === 0 ? (
-                <p className="text-sm text-center py-6" style={{ color: V.muted }}>No users found</p>
+                <p className="text-sm text-center py-6" style={{ color: V.muted }}>{t('chat.noUsers')}</p>
               ) : (
                 searchResults.map(u => (
                   <button
@@ -196,9 +198,9 @@ export default function DirectChat() {
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
         {messages.length === 0 && (
           <div className="text-center py-10">
-            <p className="text-sm" style={{ color: V.muted }}>No messages yet. Say hi! 👋</p>
+            <p className="text-sm" style={{ color: V.muted }}>{t('chat.noMessages')}</p>
             <p className="text-xs mt-2" style={{ color: 'rgba(140,155,210,0.4)' }}>
-              Keep it here — phone numbers, WeChat and QQ IDs aren't allowed.
+              {t('chat.noContactHint')}
             </p>
           </div>
         )}
@@ -247,7 +249,7 @@ export default function DirectChat() {
         <input
           className="flex-1 px-4 py-2.5 rounded-full text-sm outline-none"
           style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${V.border}`, color: V.text }}
-          placeholder="Type a message…"
+          placeholder={t('chat.typeMessage')}
           value={text}
           onChange={e => { setText(e.target.value); if (warning) setWarning(null); }}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
