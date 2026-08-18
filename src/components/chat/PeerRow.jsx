@@ -2,13 +2,15 @@ import React from 'react';
 import { Pin, PinOff } from 'lucide-react';
 
 // One person row, shared by the pinned / conversations / nearby lists.
-export default function PeerRow({ V, name, email, subtitle, meta, pinned, onOpen, onTogglePin }) {
+export default function PeerRow({ V, name, email, subtitle, meta, color, pinned, onOpen, onTogglePin }) {
   return (
     <div className="flex items-center gap-3 px-4 py-3 rounded-2xl"
       style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${V.border}` }}>
       <button onClick={onOpen} className="flex items-center gap-3 flex-1 min-w-0 text-left">
         <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-          style={{ background: 'rgba(124,111,255,0.2)', color: V.accent }}>
+          style={color
+            ? { background: `${color}26`, color, border: `1.5px solid ${color}` }
+            : { background: 'rgba(124,111,255,0.2)', color: V.accent }}>
           {(name || email || '?')[0].toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
