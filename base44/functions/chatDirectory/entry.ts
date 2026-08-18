@@ -114,11 +114,12 @@ export default async function(req) {
       if (mine && theirs) km = distanceKm(mine.lat, mine.lng, theirs.lat, theirs.lng);
       if (net && km === null) km = 0; // same Wi-Fi ≈ same place
 
-      // Map pins use a ~1km-coarse position. Same-network people without their
-      // own coordinates are placed at the viewer's coarse spot (same Wi-Fi).
+      // Other people's pins are coarsened to ~100 m — precise enough to find the
+      // neighbourhood, never an exact address. Same-network people without their
+      // own coordinates are placed at the viewer's spot (same Wi-Fi).
       const src = theirs || (net ? mine : null);
       const coarse = src && (mine || net)
-        ? { lat: Math.round(src.lat * 100) / 100, lng: Math.round(src.lng * 100) / 100 }
+        ? { lat: Math.round(src.lat * 1000) / 1000, lng: Math.round(src.lng * 1000) / 1000 }
         : null;
 
       nearby.push({
@@ -131,7 +132,7 @@ export default async function(req) {
         kind: post?.kind || null,
         title: post?.title || '',
         same_network: net,
-        distance_km: km === null ? null : Math.round(km * 10) / 10,
+        distance_km: km === null ? null : km < 1 ? Math.round(km * 100) / 100 : Math.round(km * 10) / 10,
       });
     }
 
@@ -154,8 +155,10 @@ export default async function(req) {
       matched_city: sameCity,
       located: !!mine,
       network_active: !!myNet,
-      my_lat: mine ? Math.round(mine.lat * 100) / 100 : null,
-      my_lng: mine ? Math.round(mine.lng * 100) / 100 : null,
+      // Your own position comes back at full precision — it's your data,
+      // and it centres the map exactly where you are.
+      my_lat: mine ? mine.lat : null,
+      my_lng: mine ? mine.lng : null,
       located_count: nearby.filter(n => n.distance_km !== null).length,
     });
   } catch (error) {

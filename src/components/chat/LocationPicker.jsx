@@ -43,8 +43,10 @@ export default function LocationPicker({ V, initialCenter, onConfirm, onClose })
         <p className="text-[11px] leading-relaxed mb-3" style={{ color: V.muted }}>{t('picker.help')}</p>
 
         <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${V.border}`, height: 300 }}>
-          <MapContainer center={center} zoom={13} style={{ height: '100%', width: '100%', background: '#0b0e20' }}>
-            <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
+          <MapContainer center={center} zoom={initialCenter ? 16 : 13} maxZoom={19} style={{ height: '100%', width: '100%', background: '#0b0e20' }}>
+            {/* Live OSM tiles, zoomable to level 19 — building footprints render
+                from ~level 15, so the pin can be dropped on an exact building. */}
+            <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maxZoom={19} attribution="&copy; OpenStreetMap contributors" />
             <ClickCatcher onPick={setPin} />
             {pin && (
               <CircleMarker center={pin} radius={9}

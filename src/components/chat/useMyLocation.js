@@ -6,7 +6,9 @@ import { base44 } from '@/api/base44Client';
 // device fix for up to 20s with enableHighAccuracy and keep the BEST sample.
 // A fix is only accepted and saved when its reported error is ≤ 500 m —
 // anything worse is rejected as "imprecise" rather than silently stored wrong.
-// Coordinates are rounded to ~100 m before saving; only km distances are shown.
+// GPS is satellite-based, so a VPN cannot distort it — only the network address
+// changes, never the device fix. Coordinates are saved at full precision (~1 m);
+// other people only ever see a ~100 m-coarse pin and rounded distances.
 
 const MAX_ERROR_M = 500;      // reject fixes worse than this
 const GOOD_ENOUGH_M = 60;     // stop sampling early once we're this precise
@@ -26,8 +28,8 @@ export function useMyLocation() {
 
   const save = async (best, consent) => {
     await base44.auth.updateMe({
-      location_lat: Math.round(best.lat * 1000) / 1000,
-      location_lng: Math.round(best.lng * 1000) / 1000,
+      location_lat: Math.round(best.lat * 100000) / 100000,
+      location_lng: Math.round(best.lng * 100000) / 100000,
       location_accuracy_m: Math.round(best.acc),
       location_consent: consent,
       location_updated: new Date().toISOString(),
@@ -82,8 +84,8 @@ export function useMyLocation() {
   const setManual = useCallback(async ([lat, lng]) => {
     stopWatching();
     await base44.auth.updateMe({
-      location_lat: Math.round(lat * 1000) / 1000,
-      location_lng: Math.round(lng * 1000) / 1000,
+      location_lat: Math.round(lat * 100000) / 100000,
+      location_lng: Math.round(lng * 100000) / 100000,
       location_accuracy_m: 0,
       location_source: 'manual',
       location_consent: 'always',

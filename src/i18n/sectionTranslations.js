@@ -81,7 +81,7 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': 'Same Wi-Fi network',
     'chat.mapYou': 'You (approximate)',
     'chat.tapToChat': 'tap to chat',
-    'chat.wifiNote': 'Anyone who opens this page on the same Wi-Fi network is matched with you automatically — no GPS needed.',
+    'chat.wifiNote': 'Anyone who opens this page on the same Wi-Fi network is matched with you automatically — no GPS needed. Using a VPN? GPS and the map pin are satellite/hand-placed, so they stay precise even with a VPN on.',
   },
   zh: {
     'pod.subtitle': '用声音代替文字——关于我们所爱音乐的对话、反应与故事。',
@@ -162,7 +162,7 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': '同一 Wi-Fi 网络',
     'chat.mapYou': '你（大致位置）',
     'chat.tapToChat': '点按开始聊天',
-    'chat.wifiNote': '连着同一个 Wi-Fi 打开本页的人会自动互相看见——无需 GPS。',
+    'chat.wifiNote': '连着同一个 Wi-Fi 打开本页的人会自动互相看见——无需 GPS。开了 VPN？GPS 定位和手动图钉不走网络，开着 VPN 也一样精准。',
   },
   ja: {
     'pod.subtitle': '言葉の代わりに声で——愛する音楽についての会話、リアクション、物語。',
@@ -243,7 +243,7 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': '同じ Wi-Fi ネットワーク',
     'chat.mapYou': 'あなた（おおよそ）',
     'chat.tapToChat': 'タップしてチャット',
-    'chat.wifiNote': '同じ Wi-Fi でこのページを開いた人とは自動的にマッチします——GPS 不要。',
+    'chat.wifiNote': '同じ Wi-Fi でこのページを開いた人とは自動的にマッチします——GPS 不要。VPN 使用中でも、GPS と手動ピンは衛星・手動なので正確なままです。',
   },
   ko: {
     'pod.subtitle': '글 대신 목소리로 — 우리가 사랑하는 음악에 대한 대화, 반응, 이야기.',
@@ -324,7 +324,7 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': '같은 Wi-Fi 네트워크',
     'chat.mapYou': '나 (대략적 위치)',
     'chat.tapToChat': '눌러서 채팅',
-    'chat.wifiNote': '같은 Wi-Fi에서 이 페이지를 연 사람과는 자동으로 연결됩니다 — GPS가 필요 없어요.',
+    'chat.wifiNote': '같은 Wi-Fi에서 이 페이지를 연 사람과는 자동으로 연결됩니다 — GPS가 필요 없어요. VPN을 켜도 GPS와 수동 핀은 위성·직접 지정 방식이라 정확합니다.',
   },
   fr: {
     'pod.subtitle': 'Des voix plutôt que des mots — conversations, réactions et histoires sur la musique que nous aimons.',
@@ -405,7 +405,7 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': 'Même réseau Wi-Fi',
     'chat.mapYou': 'Vous (approximatif)',
     'chat.tapToChat': 'touchez pour discuter',
-    'chat.wifiNote': 'Toute personne qui ouvre cette page sur le même réseau Wi-Fi vous est associée automatiquement — sans GPS.',
+    'chat.wifiNote': 'Toute personne qui ouvre cette page sur le même réseau Wi-Fi vous est associée automatiquement — sans GPS. Avec un VPN ? Le GPS et l\'épingle manuelle restent précis, ils ne passent pas par le réseau.',
   },
   ru: {
     'pod.subtitle': 'Голоса вместо слов — разговоры, реакции и истории о музыке, которую мы любим.',
@@ -486,6 +486,6 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': 'Одна сеть Wi-Fi',
     'chat.mapYou': 'Вы (примерно)',
     'chat.tapToChat': 'нажмите, чтобы написать',
-    'chat.wifiNote': 'Все, кто откроет эту страницу в той же сети Wi-Fi, автоматически увидят вас — GPS не нужен.',
+    'chat.wifiNote': 'Все, кто откроет эту страницу в той же сети Wi-Fi, автоматически увидят вас — GPS не нужен. VPN включён? GPS и ручная метка не зависят от сети и остаются точными.',
   },
 };

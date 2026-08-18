@@ -3,10 +3,12 @@ import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useLang } from '@/i18n/LanguageContext';
 
-// Free OpenStreetMap tiles — no API key, no billing. Positions are the coarse
-// (~1km) ones the server returns, so nobody's exact spot is ever plotted.
-// People sharing the same coarse spot (e.g. same Wi-Fi) are fanned out in a
-// small ring so every marker stays visible, each in its own rainbow color.
+// Live OpenStreetMap tiles — the map is re-rendered from the OSM database, which
+// is community-updated continuously (new buildings usually appear within minutes
+// of being mapped), no API key needed. Zoom in to street level (up to 19) to see
+// individual building footprints. Other people's pins are ~100 m-coarse; people
+// sharing the same spot (e.g. same Wi-Fi) fan out in a small ring, each marker
+// in its own rainbow color matching the list.
 export default function NearbyMap({ V, center, people, onOpen }) {
   const { t } = useLang();
   const pinned = people.filter(p => typeof p.lat === 'number' && typeof p.lng === 'number');
@@ -19,15 +21,16 @@ export default function NearbyMap({ V, center, people, onOpen }) {
     seen.set(key, n + 1);
     if (n === 0) return { ...p, plat: p.lat, plng: p.lng };
     const angle = (n - 1) * (Math.PI / 3);
-    const r = 0.004; // ~400 m fan-out ring
+    const r = 0.0009; // ~100 m fan-out ring
     return { ...p, plat: p.lat + Math.sin(angle) * r, plng: p.lng + Math.cos(angle) * r };
   });
 
   return (
-    <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${V.border}`, height: 260 }}>
-      <MapContainer center={center} zoom={13} style={{ height: '100%', width: '100%', background: '#0b0e20' }} scrollWheelZoom={false}>
+    <div className="rounded-2xl overflow-hidden relative z-0" style={{ border: `1px solid ${V.border}`, height: 260, isolation: 'isolate' }}>
+      <MapContainer center={center} zoom={15} maxZoom={19} style={{ height: '100%', width: '100%', background: '#0b0e20' }} scrollWheelZoom={true}>
         <TileLayer
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
           attribution='&copy; OpenStreetMap contributors'
         />
         <CircleMarker center={center} radius={7} pathOptions={{ color: '#a5b4fc', fillColor: '#a5b4fc', fillOpacity: 0.9 }}>
