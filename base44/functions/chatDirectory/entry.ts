@@ -9,6 +9,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 //    ~1km-coarse pins and rounded km distances.
 
 const NETWORK_WINDOW_MS = 24 * 60 * 60 * 1000; // "on the same Wi-Fi" = seen within 24h
+const ONLINE_WINDOW_MS = 5 * 60 * 1000;        // "online" = active in the last 5 minutes
 
 function distanceKm(aLat, aLng, bLat, bLng) {
   const R = 6371;
@@ -42,9 +43,12 @@ export default async function(req) {
       || req.headers.get('cf-connecting-ip') || '';
     const myNet = ip ? await networkHash(ip) : null;
     const now = Date.now();
-    if (myNet) {
-      await svc.entities.User.update(user.id, { network_id: myNet, network_seen: new Date(now).toISOString() });
-    }
+    // Heartbeat: every visit refreshes last_active, which is what makes someone
+    // "online" for everyone else (and what their last-known position is dated by).
+    await svc.entities.User.update(user.id, {
+      last_active: new Date(now).toISOString(),
+      ...(myNet ? { network_id: myNet, network_seen: new Date(now).toISOString() } : {}),
+    });
 
     const [messages, posts, users] = await Promise.all([
       svc.entities.ChatMessage.list('-created_date', 500),
@@ -122,9 +126,17 @@ export default async function(req) {
         ? { lat: Math.round(src.lat * 1000) / 1000, lng: Math.round(src.lng * 1000) / 1000 }
         : null;
 
+      // Online = heartbeat within the last 5 minutes. When offline we still show
+      // the position they had when last seen, marked as such.
+      const lastActive = u.last_active || u.network_seen || null;
+      const online = !!lastActive && (now - new Date(lastActive).getTime()) < ONLINE_WINDOW_MS;
+
       nearby.push({
         lat: coarse?.lat ?? null,
         lng: coarse?.lng ?? null,
+        online,
+        last_active: lastActive,
+        location_updated: u.location_updated || null,
         email: u.email,
         name: u.full_name || post?.author_name || u.email,
         city: post?.city || '',
@@ -137,6 +149,7 @@ export default async function(req) {
     }
 
     nearby.sort((a, b) => {
+      if (a.online !== b.online) return a.online ? -1 : 1;
       if (a.same_network !== b.same_network) return a.same_network ? -1 : 1;
       if (a.distance_km === null) return b.distance_km === null ? 0 : 1;
       if (b.distance_km === null) return -1;

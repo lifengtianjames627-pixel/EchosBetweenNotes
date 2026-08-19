@@ -75,6 +75,7 @@ export default function DirectChat() {
     queryKey: ['chat-directory'],
     queryFn: async () => (await base44.functions.invoke('chatDirectory', {})).data,
     enabled: !!user && !peerEmail,
+    refetchInterval: 60000, // keeps online/offline dots fresh
   });
 
   const openChat = (email, name) =>

@@ -55,11 +55,18 @@ export default function NearbyMap({ V, center, people, onOpen }) {
               key={p.email}
               center={[p.plat, p.plng]}
               radius={9}
-              pathOptions={{ color: p.color, fillColor: p.color, fillOpacity: 0.85, weight: 3 }}
+              pathOptions={{
+                color: p.color,
+                fillColor: p.online === false ? '#0b0e20' : p.color,
+                fillOpacity: p.online === false ? 0.55 : 0.85,
+                weight: 3,
+                dashArray: p.online === false ? '3 3' : undefined,
+              }}
               eventHandlers={{ click: () => onOpen(p.email, p.name) }}
             >
               <Tooltip>
                 {p.name}
+                {' · '}{p.online ? t('chat.online') : t('chat.offlineSpot')}
                 {p.same_network ? ` · ${t('chat.sameWifi')}` : p.distance_km !== null ? ` · ${p.distance_km} km` : ''}
                 {' — '}{t('chat.tapToChat')}
               </Tooltip>

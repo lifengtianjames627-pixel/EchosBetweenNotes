@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { formatDistanceToNow } from 'date-fns';
 import { MapPin, List, Map as MapIcon, Wifi } from 'lucide-react';
 import { peerColor } from './peerColors';
 import ChatSection from './ChatSection';
@@ -64,10 +65,12 @@ export default function PeopleAround({ V, nearby, loading, city, matchedCity, lo
               name={p.name}
               email={p.email}
               color={p.color}
+              online={p.online}
               subtitle={[
+                p.online ? t('chat.online') : p.last_active ? t('chat.lastSeen', { ago: formatDistanceToNow(new Date(p.last_active), { addSuffix: true }) }) : t('chat.offline'),
                 p.same_network ? t('chat.sameWifi') : null,
-                !p.same_network && p.distance_km !== null && p.distance_km !== undefined
-                  ? p.distance_km < 1 ? t('chat.underKm') : t('chat.kmAway', { km: p.distance_km })
+                p.distance_km !== null && p.distance_km !== undefined
+                  ? (p.distance_km < 1 ? t('chat.underKm') : t('chat.kmAway', { km: p.distance_km })) + (p.online ? '' : ` (${t('chat.lastSpot')})`)
                   : null,
                 p.city,
                 p.school,
