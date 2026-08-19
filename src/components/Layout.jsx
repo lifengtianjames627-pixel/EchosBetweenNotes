@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, User, Info, Shield, LogOut, LogIn, ChevronLeft, ChevronRight, Music2, MessageSquare } from 'lucide-react';
+import { Home, User, Info, Shield, LogOut, LogIn, ChevronLeft, ChevronRight, Music2, MessageSquare, Menu, X } from 'lucide-react';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import MiniChat from '@/components/MiniChat';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -22,6 +23,11 @@ export default function Layout() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [miniChat, setMiniChat] = useState(null); // { email, name }
+  // On phones the sidebar becomes a slide-over drawer, so pages get the whole width.
+  const isMobile = useIsMobile();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => { setDrawerOpen(false); }, [location.pathname]);
 
   useEffect(() => {
     const handler = (e) => setMiniChat(e.detail);
@@ -140,9 +146,23 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex" style={{ background: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)' }}>
 
-      {/* ── Sidebar ── */}
+      {/* Drawer backdrop (phones only) */}
+      <AnimatePresence>
+        {isMobile && drawerOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setDrawerOpen(false)}
+            className="fixed inset-0 z-40"
+            style={{ background: 'rgba(0,0,0,0.6)' }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* ── Sidebar (fixed rail on desktop, slide-over drawer on phones) ── */}
       <motion.aside
-        animate={{ width: collapsed ? 64 : 220 }}
+        animate={isMobile
+          ? { width: 240, x: drawerOpen ? 0 : -260 }
+          : { width: collapsed ? 64 : 220, x: 0 }}
         transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
         className="fixed top-0 left-0 h-full z-50 flex flex-col overflow-hidden"
         style={{
@@ -296,7 +316,8 @@ export default function Layout() {
           )}
         </div>
 
-        {/* Collapse toggle */}
+        {/* Collapse toggle — desktop only; phones close the drawer from the top bar */}
+        {!isMobile && (
         <button
           onClick={() => setCollapsed(c => !c)}
           className="absolute -right-3 top-[72px] w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
@@ -304,24 +325,35 @@ export default function Layout() {
         >
           {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
         </button>
+        )}
       </motion.aside>
 
       {/* ── Main content ── */}
       <motion.div
-        animate={{ marginLeft: collapsed ? 64 : 220 }}
+        animate={{ marginLeft: isMobile ? 0 : collapsed ? 64 : 220 }}
         transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-        className="flex-1 min-h-screen"
+        className="flex-1 min-w-0 min-h-screen"
       >
         {/* Top bar */}
-        <div className="sticky top-0 z-40 flex items-center justify-end px-5 h-12"
+        <div className="sticky top-0 z-30 flex items-center justify-end gap-2 px-3 sm:px-5 h-12"
           style={{ background: 'rgba(5,7,20,0.85)', borderBottom: '1px solid rgba(124,111,255,0.1)', backdropFilter: 'blur(16px)' }}>
-          <div className="mr-2"><LanguageButton /></div>
+          {isMobile && (
+            <button
+              onClick={() => setDrawerOpen(o => !o)}
+              aria-label="Menu"
+              className="mr-auto w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: 'rgba(124,111,255,0.12)', border: '1px solid rgba(124,111,255,0.25)', color: '#a5b4fc' }}
+            >
+              {drawerOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+          )}
+          <LanguageButton />
           <Link
             to="/about"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-105 mr-2"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-105"
             style={{ color: 'rgba(160,175,220,0.6)', border: '1px solid rgba(124,111,255,0.15)' }}
           >
-            <Info className="w-3.5 h-3.5" /> {t('nav.about')}
+            <Info className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('nav.about')}</span>
           </Link>
           {currentUser ? (
             <Link
@@ -333,7 +365,7 @@ export default function Layout() {
                 style={{ background: 'linear-gradient(135deg, rgba(124,111,255,0.4), rgba(192,132,252,0.4))', color: '#c4baff' }}>
                 {(currentUser.full_name || currentUser.email || 'U')[0].toUpperCase()}
               </div>
-              <span className="text-xs font-semibold" style={{ color: '#a5b4fc' }}>
+              <span className="text-xs font-semibold hidden sm:inline max-w-[140px] truncate" style={{ color: '#a5b4fc' }}>
                 {currentUser.full_name || t('nav.myAccount')}
               </span>
               <User className="w-3.5 h-3.5" style={{ color: '#a5b4fc' }} />

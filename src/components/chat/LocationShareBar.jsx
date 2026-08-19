@@ -20,6 +20,10 @@ export default function LocationShareBar({ V, located }) {
   const autoTried = useRef(false);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  // Touch device ⇒ almost certainly a phone/tablet with a GPS chip.
+  const hasGps = typeof window !== 'undefined'
+    && window.matchMedia?.('(pointer: coarse)').matches
+    && !!navigator.geolocation;
   const manual = user?.location_source === 'manual';
   const pickerCenter = typeof user?.location_lat === 'number'
     ? [user.location_lat, user.location_lng]
@@ -70,13 +74,30 @@ export default function LocationShareBar({ V, located }) {
               {t('loc.turnOff')}
             </button>
           </div>
-          <button
-            onClick={() => setShowPicker(true)}
-            className="flex items-center gap-1.5 text-[11px] font-semibold mt-2 underline"
-            style={{ color: V.accent }}
-          >
-            <Crosshair className="w-3 h-3" /> {t('loc.adjust')}
-          </button>
+          <div className="flex flex-wrap items-center gap-4 mt-2">
+            <button
+              onClick={() => setShowPicker(true)}
+              className="flex items-center gap-1.5 text-[11px] font-semibold underline"
+              style={{ color: V.accent }}
+            >
+              <Crosshair className="w-3 h-3" /> {t('loc.adjust')}
+            </button>
+            {/* Phones have a real GPS chip, so re-running the fix there genuinely
+                improves accuracy — offered only on touch devices. */}
+            {hasGps && (
+              <button
+                onClick={() => share(user?.location_consent === 'always' ? 'always' : 'session')}
+                disabled={status === 'asking'}
+                className="flex items-center gap-1.5 text-[11px] font-semibold underline"
+                style={{ color: V.accent, opacity: status === 'asking' ? 0.6 : 1 }}
+              >
+                <Navigation className={`w-3 h-3 ${status === 'asking' ? 'animate-pulse' : ''}`} />
+                {status === 'asking'
+                  ? (accuracy !== null ? t('loc.locating', { m: accuracy }) : t('loc.locatingStart'))
+                  : t('chat.gpsRefresh')}
+              </button>
+            )}
+          </div>
         </div>
         {pickerNode}
       </>

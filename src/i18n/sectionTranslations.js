@@ -81,6 +81,8 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': 'Same Wi-Fi network',
     'chat.mapYou': 'You (approximate)',
     'chat.tapToChat': 'tap to chat',
+    'chat.mapMissing': '{n} more people are listed but have not shared a position yet — see the List view.',
+    'chat.gpsRefresh': 'Refresh with GPS',
     'chat.wifiNote': 'Anyone who opens this page on the same Wi-Fi network is matched with you automatically — no GPS needed. Using a VPN? GPS and the map pin are satellite/hand-placed, so they stay precise even with a VPN on.',
   },
   zh: {
@@ -162,6 +164,8 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': '同一 Wi-Fi 网络',
     'chat.mapYou': '你（大致位置）',
     'chat.tapToChat': '点按开始聊天',
+    'chat.mapMissing': '还有 {n} 人在列表里，但尚未分享位置——请切换到「列表」查看。',
+    'chat.gpsRefresh': '用 GPS 重新定位',
     'chat.wifiNote': '连着同一个 Wi-Fi 打开本页的人会自动互相看见——无需 GPS。开了 VPN？GPS 定位和手动图钉不走网络，开着 VPN 也一样精准。',
   },
   ja: {
@@ -243,6 +247,8 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': '同じ Wi-Fi ネットワーク',
     'chat.mapYou': 'あなた（おおよそ）',
     'chat.tapToChat': 'タップしてチャット',
+    'chat.mapMissing': 'あと {n} 人はリストにいますが、位置を共有していません——「リスト」表示をご覧ください。',
+    'chat.gpsRefresh': 'GPS で再取得',
     'chat.wifiNote': '同じ Wi-Fi でこのページを開いた人とは自動的にマッチします——GPS 不要。VPN 使用中でも、GPS と手動ピンは衛星・手動なので正確なままです。',
   },
   ko: {
@@ -324,6 +330,8 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': '같은 Wi-Fi 네트워크',
     'chat.mapYou': '나 (대략적 위치)',
     'chat.tapToChat': '눌러서 채팅',
+    'chat.mapMissing': '{n}명이 목록에 더 있지만 위치를 공유하지 않았어요 — 「목록」에서 확인하세요.',
+    'chat.gpsRefresh': 'GPS로 다시 찾기',
     'chat.wifiNote': '같은 Wi-Fi에서 이 페이지를 연 사람과는 자동으로 연결됩니다 — GPS가 필요 없어요. VPN을 켜도 GPS와 수동 핀은 위성·직접 지정 방식이라 정확합니다.',
   },
   fr: {
@@ -405,6 +413,8 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': 'Même réseau Wi-Fi',
     'chat.mapYou': 'Vous (approximatif)',
     'chat.tapToChat': 'touchez pour discuter',
+    'chat.mapMissing': '{n} autres personnes sont listées mais n’ont pas partagé de position — voir la vue Liste.',
+    'chat.gpsRefresh': 'Actualiser avec le GPS',
     'chat.wifiNote': 'Toute personne qui ouvre cette page sur le même réseau Wi-Fi vous est associée automatiquement — sans GPS. Avec un VPN ? Le GPS et l\'épingle manuelle restent précis, ils ne passent pas par le réseau.',
   },
   ru: {
@@ -486,6 +496,8 @@ export const SECTION_TRANSLATIONS = {
     'chat.sameWifi': 'Одна сеть Wi-Fi',
     'chat.mapYou': 'Вы (примерно)',
     'chat.tapToChat': 'нажмите, чтобы написать',
+    'chat.mapMissing': 'Ещё {n} человек в списке, но они не поделились местоположением — откройте вид «Список».',
+    'chat.gpsRefresh': 'Обновить по GPS',
     'chat.wifiNote': 'Все, кто откроет эту страницу в той же сети Wi-Fi, автоматически увидят вас — GPS не нужен. VPN включён? GPS и ручная метка не зависят от сети и остаются точными.',
   },
 };

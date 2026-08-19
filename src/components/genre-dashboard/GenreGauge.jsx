@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BUBBLE_COLORS, GENRE_ICONS } from '@/lib/genreVisuals';
 
@@ -23,8 +23,24 @@ export default function GenreGauge({ items, onSelect }) {
   const [hovered, setHovered] = useState(1); // default: center genre
   const needlePoint = polar(ANGLES[hovered], NEEDLE_LEN);
 
+  // The gauge is drawn in a fixed 800×420 space, so on narrow screens we scale
+  // the whole stage down instead of letting the pixel-positioned bubbles spill
+  // off the right edge.
+  const wrapRef = useRef(null);
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const measure = () => setScale(Math.min(1, el.clientWidth / 800));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   return (
-    <div className="relative mx-auto" style={{ width: 800, maxWidth: '100%', height: 420 }}>
+    <div ref={wrapRef} className="w-full" style={{ height: 420 * scale }}>
+    <div className="relative mx-auto" style={{ width: 800, height: 420, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
       <svg viewBox="0 0 800 420" className="absolute inset-0 w-full h-full pointer-events-none">
         <path d={describeArc(300, -68, 68)} fill="none" stroke="rgba(124,111,255,0.18)" strokeWidth="2" />
         {Array.from({ length: 13 }).map((_, i) => {
@@ -86,6 +102,7 @@ export default function GenreGauge({ items, onSelect }) {
           </motion.div>
         );
       })}
+    </div>
     </div>
   );
 }
