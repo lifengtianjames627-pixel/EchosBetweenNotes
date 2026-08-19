@@ -60,21 +60,19 @@ export default function LocationShareBar({ V, located }) {
   if (located) {
     return (
       <>
-        <div className="px-4 py-2.5 rounded-2xl mb-1.5"
+        {/* Compact one-line status: the position is on, and the two things you can
+            do about it. Details live in the accuracy tooltip, not on screen. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2 rounded-2xl mb-1.5"
           style={{ background: 'rgba(124,111,255,0.08)', border: `1px solid ${V.border}` }}>
-          <div className="flex items-center gap-2">
+          <span
+            className="flex items-center gap-1.5 text-[11px]"
+            style={{ color: V.muted }}
+            title={manual ? t('loc.manualSet') : (user?.location_accuracy_m ? t('loc.accuracy', { m: user.location_accuracy_m }) : '')}
+          >
             <LocateFixed className="w-3.5 h-3.5 shrink-0" style={{ color: V.accent }} />
-            <p className="text-[11px] flex-1" style={{ color: V.muted }}>
-              {t('loc.sorted')}{' '}
-              {manual
-                ? t('loc.manualSet')
-                : (user?.location_accuracy_m ? t('loc.accuracy', { m: user.location_accuracy_m }) : '')}
-            </p>
-            <button onClick={clear} className="text-[11px] shrink-0 underline" style={{ color: V.muted }}>
-              {t('loc.turnOff')}
-            </button>
-          </div>
-          <div className="flex flex-wrap items-center gap-4 mt-2">
+            {t('loc.sortedShort')}
+          </span>
+          <div className="flex items-center gap-3 ml-auto">
             <button
               onClick={() => setShowPicker(true)}
               className="flex items-center gap-1.5 text-[11px] font-semibold underline"
@@ -97,6 +95,9 @@ export default function LocationShareBar({ V, located }) {
                   : t('chat.gpsRefresh')}
               </button>
             )}
+            <button onClick={clear} className="text-[11px] shrink-0 underline" style={{ color: V.muted }}>
+              {t('loc.turnOff')}
+            </button>
           </div>
         </div>
         {pickerNode}

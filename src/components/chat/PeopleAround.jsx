@@ -12,6 +12,7 @@ import { useLang } from '@/i18n/LanguageContext';
 // shared their location, otherwise same city, and always inside their age bracket.
 export default function PeopleAround({ V, nearby, loading, city, matchedCity, located, myLat, myLng, isPinned, onTogglePin, onOpen }) {
   const [view, setView] = useState('list');
+  const [wifiOpen, setWifiOpen] = useState(false);
   const { t } = useLang();
   const hint = located ? t('chat.closestFirst') : matchedCity && city ? t('chat.inCity', { c: city }) : t('chat.onBoard');
   const canMap = located && typeof myLat === 'number' && typeof myLng === 'number';
@@ -21,10 +22,15 @@ export default function PeopleAround({ V, nearby, loading, city, matchedCity, lo
     <ChatSection V={V} icon={MapPin} label={t('chat.around')} hint={hint} count={nearby.length}>
       <LocationShareBar V={V} located={located} />
 
-      <p className="flex items-start gap-1.5 text-[10px] leading-relaxed mb-2 px-1" style={{ color: V.muted }}>
+      {/* One short line by default — the full explanation is one tap away. */}
+      <button
+        onClick={() => setWifiOpen(o => !o)}
+        className="flex items-start gap-1.5 text-[10px] leading-relaxed mb-2 px-1 text-left w-full"
+        style={{ color: V.muted }}
+      >
         <Wifi className="w-3 h-3 shrink-0 mt-0.5" style={{ color: V.accent }} />
-        {t('chat.wifiNote')}
-      </p>
+        <span>{wifiOpen ? t('chat.wifiNote') : t('chat.wifiShort')}</span>
+      </button>
 
       {canMap && (
         <div className="flex gap-1.5 mb-2">
