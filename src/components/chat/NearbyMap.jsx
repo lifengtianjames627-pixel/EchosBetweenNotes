@@ -18,6 +18,9 @@ function avatarIcon(person) {
   const fill = offline ? 'rgba(30,34,55,0.95)' : `${person.color}33`;
   const ink = offline ? 'rgba(190,200,230,0.7)' : '#ffffff';
   const dot = offline ? 'rgba(140,155,210,0.6)' : '#34d399';
+  const inner = person.picture_url
+    ? `<img src="${person.picture_url}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />`
+    : initial;
   return L.divIcon({
     className: '',
     iconSize: [38, 38],
@@ -25,9 +28,9 @@ function avatarIcon(person) {
     html: `
       <div style="position:relative;width:38px;height:38px;${offline ? 'filter:grayscale(0.85);' : ''}">
         <div style="width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-                    font:700 14px/1 Inter,sans-serif;color:${ink};background:${fill};
+                    font:700 14px/1 Inter,sans-serif;color:${ink};background:${fill};overflow:hidden;
                     border:2.5px solid ${ring};box-shadow:0 2px 8px rgba(0,0,0,0.5);backdrop-filter:blur(2px);">
-          ${initial}
+          ${inner}
         </div>
         <span style="position:absolute;bottom:-1px;right:-1px;width:11px;height:11px;border-radius:50%;
                      background:${dot};border:2px solid #0b0e20;"></span>

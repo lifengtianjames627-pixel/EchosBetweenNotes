@@ -69,6 +69,7 @@ export default function UserProfile() {
               badges={profile?.equipped_badges || []}
               online={profile?.online}
               statusText={status}
+              pictureUrl={profile?.profile_picture_url}
             >
               {me && !profile?.is_me && (
                 <ProfileActions me={me} targetEmail={email} targetName={profile?.full_name || email} />

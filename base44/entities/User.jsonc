@@ -17,6 +17,10 @@
       },
       "description": "Up to 4 equipped badge IDs shown on reviews and profile"
     },
+    "profile_picture_url": {
+      "type": "string",
+      "description": "Uploaded profile picture URL (stored file)"
+    },
     "age_group": {
       "type": "string",
       "enum": [

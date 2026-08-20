@@ -23,6 +23,7 @@ export default async function(req) {
       found: true,
       email: target.email,
       full_name: target.full_name || '',
+      profile_picture_url: target.profile_picture_url || '',
       equipped_badges: target.equipped_badges || [],
       last_active: lastActive,
       online: !!lastActive && (Date.now() - new Date(lastActive).getTime()) < ONLINE_WINDOW_MS,

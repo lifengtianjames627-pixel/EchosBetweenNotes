@@ -115,6 +115,8 @@ export default function Profile() {
           initial={initial}
           badges={user?.equipped_badges || []}
           statusText={user.email}
+          pictureUrl={user?.profile_picture_url}
+          editable
         >
           <button
             onClick={() => setShowAddFriend(true)}

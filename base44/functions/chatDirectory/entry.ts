@@ -138,6 +138,7 @@ export default async function(req) {
         last_active: lastActive,
         location_updated: u.location_updated || null,
         email: u.email,
+        picture_url: u.profile_picture_url || '',
         name: u.full_name || post?.author_name || u.email,
         city: post?.city || '',
         school: post?.school || '',

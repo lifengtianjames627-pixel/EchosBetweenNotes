@@ -1,13 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import BadgeIcon from '@/components/BadgeIcon';
+import ProfileAvatar from './ProfileAvatar';
 
 // Artistic header shared by your own profile and other members' profiles:
 // a slow aurora wash, a rotating vinyl ring around the avatar and a live
 // equaliser baseline — movement that feels musical without stealing focus.
 const BARS = [10, 22, 14, 30, 18, 26, 12, 34, 16, 24, 11, 28, 20, 15, 32, 13, 25, 19, 29, 17];
 
-export default function ProfileHero({ name, email, initial, badges = [], online, statusText, children }) {
+export default function ProfileHero({ name, email, initial, badges = [], online, statusText, pictureUrl, editable, onPictureUploaded, children }) {
   return (
     <div className="relative overflow-hidden rounded-3xl mb-6"
       style={{ background: 'rgba(10,13,32,0.85)', border: '1px solid rgba(124,111,255,0.18)' }}>
@@ -39,15 +40,13 @@ export default function ProfileHero({ name, email, initial, badges = [], online,
               animate={{ rotate: 360 }}
               transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
             />
-            <div className="relative w-[74px] h-[74px] rounded-full flex items-center justify-center text-3xl font-black"
-              style={{
-                background: 'linear-gradient(150deg, rgba(28,24,66,0.98), rgba(12,15,35,0.98))',
-                color: '#c4baff',
-                border: '1px solid rgba(124,111,255,0.35)',
-                fontFamily: 'Playfair Display, Georgia, serif',
-              }}>
-              {initial}
-            </div>
+            <ProfileAvatar
+              pictureUrl={pictureUrl}
+              initial={initial}
+              size={74}
+              editable={editable}
+              onUploaded={onPictureUploaded}
+            />
             {online !== undefined && online !== null && (
               <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full"
                 style={{
