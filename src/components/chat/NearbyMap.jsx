@@ -1,5 +1,6 @@
 import React from 'react';
-import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Marker, Tooltip } from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useLang } from '@/i18n/LanguageContext';
 import FitToPeople from './FitToPeople';
@@ -7,8 +8,33 @@ import FitToPeople from './FitToPeople';
 // Live OpenStreetMap tiles — community-updated continuously, no API key, zoomable
 // to street level (19) so building footprints show. The view auto-fits every
 // marker, so people far away are always visible instead of being cropped out.
-// Other people's pins are ~100 m-coarse; people sharing the same spot (e.g. the
-// same Wi-Fi) fan out in a small ring, each in its own rainbow color.
+// Each person is drawn as their own avatar (greyed out when offline); tapping one
+// opens their profile. Pins are ~100 m-coarse and people sharing the same spot
+// fan out in a small ring so every avatar stays tappable.
+function avatarIcon(person) {
+  const offline = person.online === false;
+  const initial = (person.name || person.email || '?')[0].toUpperCase();
+  const ring = offline ? 'rgba(140,155,210,0.55)' : person.color;
+  const fill = offline ? 'rgba(30,34,55,0.95)' : `${person.color}33`;
+  const ink = offline ? 'rgba(190,200,230,0.7)' : '#ffffff';
+  const dot = offline ? 'rgba(140,155,210,0.6)' : '#34d399';
+  return L.divIcon({
+    className: '',
+    iconSize: [38, 38],
+    iconAnchor: [19, 19],
+    html: `
+      <div style="position:relative;width:38px;height:38px;${offline ? 'filter:grayscale(0.85);' : ''}">
+        <div style="width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+                    font:700 14px/1 Inter,sans-serif;color:${ink};background:${fill};
+                    border:2.5px solid ${ring};box-shadow:0 2px 8px rgba(0,0,0,0.5);backdrop-filter:blur(2px);">
+          ${initial}
+        </div>
+        <span style="position:absolute;bottom:-1px;right:-1px;width:11px;height:11px;border-radius:50%;
+                     background:${dot};border:2px solid #0b0e20;"></span>
+      </div>`,
+  });
+}
+
 export default function NearbyMap({ V, center, people, onOpen }) {
   const { t } = useLang();
   const pinned = people.filter(p => typeof p.lat === 'number' && typeof p.lng === 'number');
@@ -51,26 +77,19 @@ export default function NearbyMap({ V, center, people, onOpen }) {
             <Tooltip>{t('chat.mapYou')}</Tooltip>
           </CircleMarker>
           {placed.map(p => (
-            <CircleMarker
+            <Marker
               key={p.email}
-              center={[p.plat, p.plng]}
-              radius={9}
-              pathOptions={{
-                color: p.color,
-                fillColor: p.online === false ? '#0b0e20' : p.color,
-                fillOpacity: p.online === false ? 0.55 : 0.85,
-                weight: 3,
-                dashArray: p.online === false ? '3 3' : undefined,
-              }}
+              position={[p.plat, p.plng]}
+              icon={avatarIcon(p)}
               eventHandlers={{ click: () => onOpen(p.email, p.name) }}
             >
               <Tooltip>
                 {p.name}
                 {' · '}{p.online ? t('chat.online') : t('chat.offlineSpot')}
                 {p.same_network ? ` · ${t('chat.sameWifi')}` : p.distance_km !== null ? ` · ${p.distance_km} km` : ''}
-                {' — '}{t('chat.tapToChat')}
+                {' — '}{t('chat.tapProfile')}
               </Tooltip>
-            </CircleMarker>
+            </Marker>
           ))}
         </MapContainer>
       </div>

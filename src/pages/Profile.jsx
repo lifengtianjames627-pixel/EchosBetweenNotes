@@ -5,7 +5,8 @@ import ReviewCard from '@/components/ReviewCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { Users, Star, UserPlus, Check, X, Music, Shield, MessageSquare, Search } from 'lucide-react';
 import UserBadges from '@/components/UserBadges';
-import BadgeIcon from '@/components/BadgeIcon';
+import ProfileHero from '@/components/profile/ProfileHero';
+import StatStrip from '@/components/profile/StatStrip';
 import { awardBadge } from '@/lib/badgeUtils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -108,45 +109,29 @@ export default function Profile() {
       <div className="max-w-2xl mx-auto px-5 pt-8 pb-16">
 
         {/* Profile header */}
-        <div className="flex items-center gap-4 mb-8 p-5 rounded-2xl"
-          style={{ background: 'rgba(12,15,35,0.8)', border: '1px solid rgba(124,111,255,0.15)' }}>
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0"
-            style={{ background: 'linear-gradient(135deg, rgba(124,111,255,0.3), rgba(192,132,252,0.3))', color: '#c4baff', border: '1px solid rgba(124,111,255,0.25)' }}>
-            {initial}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold truncate" style={{ color: 'rgba(220,225,255,0.95)' }}>{user.full_name || 'Listener'}</h1>
-            <p className="text-sm truncate" style={{ color: 'rgba(140,155,210,0.5)' }}>{user.email}</p>
-            {user?.equipped_badges?.length > 0 && (
-              <div className="flex gap-1.5 mt-2">
-                {user.equipped_badges.map(id => <BadgeIcon key={id} badgeId={id} size="xs" />)}
-              </div>
-            )}
-          </div>
+        <ProfileHero
+          name={user.full_name || 'Listener'}
+          email={user.email}
+          initial={initial}
+          badges={user?.equipped_badges || []}
+          statusText={user.email}
+        >
           <button
             onClick={() => setShowAddFriend(true)}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold shrink-0"
-            style={{ background: 'rgba(124,111,255,0.12)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.25)' }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold"
+            style={{ background: 'rgba(124,111,255,0.14)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.3)' }}
           >
             <UserPlus className="w-3.5 h-3.5" /> Add Friend
           </button>
-        </div>
+        </ProfileHero>
 
         {/* Stats row */}
-        <div className="grid grid-cols-4 gap-3 mb-8">
-          {[
-            { label: 'Reviews', val: myReviews.length },
-            { label: 'Friends', val: friendsList.length },
-            { label: 'Badges', val: earnedBadgeIds.length },
-            { label: 'Bands', val: myBands.length },
-          ].map(({ label, val }) => (
-            <div key={label} className="text-center p-3 rounded-xl"
-              style={{ background: 'rgba(12,15,35,0.8)', border: '1px solid rgba(124,111,255,0.1)' }}>
-              <p className="text-xl font-bold" style={{ color: '#a5b4fc' }}>{val}</p>
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(140,155,210,0.45)' }}>{label}</p>
-            </div>
-          ))}
-        </div>
+        <StatStrip stats={[
+          { label: 'Reviews', val: myReviews.length },
+          { label: 'Friends', val: friendsList.length },
+          { label: 'Badges', val: earnedBadgeIds.length },
+          { label: 'Bands', val: myBands.length },
+        ]} />
 
         {/* Tabs */}
         <Tabs defaultValue="reviews">

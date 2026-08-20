@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { MapPin, List, Map as MapIcon, Wifi } from 'lucide-react';
 import { peerColor } from './peerColors';
@@ -13,6 +14,7 @@ import { useLang } from '@/i18n/LanguageContext';
 export default function PeopleAround({ V, nearby, loading, city, matchedCity, located, myLat, myLng, isPinned, onTogglePin, onOpen }) {
   const [view, setView] = useState('list');
   const [wifiOpen, setWifiOpen] = useState(false);
+  const navigate = useNavigate();
   const { t } = useLang();
   const hint = located ? t('chat.closestFirst') : matchedCity && city ? t('chat.inCity', { c: city }) : t('chat.onBoard');
   const canMap = located && typeof myLat === 'number' && typeof myLng === 'number';
@@ -57,7 +59,12 @@ export default function PeopleAround({ V, nearby, loading, city, matchedCity, lo
           {[0, 1].map(i => <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'rgba(124,111,255,0.08)' }} />)}
         </div>
       ) : canMap && view === 'map' ? (
-        <NearbyMap V={V} center={[myLat, myLng]} people={people} onOpen={onOpen} />
+        <NearbyMap
+          V={V}
+          center={[myLat, myLng]}
+          people={people}
+          onOpen={(email) => navigate(`/u/${encodeURIComponent(email)}`)}
+        />
       ) : nearby.length === 0 ? (
         <p className="text-xs px-4 py-4 rounded-2xl" style={{ color: V.muted, background: 'rgba(255,255,255,0.03)', border: `1px dashed ${V.border}` }}>
           {t('chat.nearbyEmpty')}

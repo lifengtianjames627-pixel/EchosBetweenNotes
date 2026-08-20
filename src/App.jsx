@@ -18,6 +18,7 @@ import ModerationQueue from '@/pages/ModerationQueue';
 import BandDashboard from '@/pages/BandDashboard';
 import DirectChat from '@/pages/DirectChat';
 import SoulmateBoard from '@/pages/SoulmateBoard';
+import UserProfile from '@/pages/UserProfile';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -48,6 +49,7 @@ const AuthenticatedApp = () => {
         <Route path="/genre/:genreId" element={<GenreSpace />} />
         <Route path="/album/:id" element={<AlbumDetail />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/u/:email" element={<UserProfile />} />
         <Route path="/about" element={<About />} />
         <Route path="/moderation" element={<ModerationQueue />} />
         <Route path="/band-dashboard" element={<BandDashboard />} />
