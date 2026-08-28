@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Disc3, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLang } from '@/i18n/LanguageContext';
+import { useAuthed } from '@/hooks/useAuthed';
 
 // SVG grain filter for film/vinyl texture
 function GrainFilter({ id }) {
@@ -41,6 +42,7 @@ function VinylPlaceholder({ accent }) {
 // visible labels come from the system language, not from a hardcoded string.
 export default function MusicSlider({ items, v, onItemClick, onAddClick, kind = 'albums' }) {
   const { t } = useLang();
+  const { authed, login } = useAuthed();
   const [hovered, setHovered] = useState(null);
   const filterId = `grain-${kind}`;
   const isAlbums = kind === 'albums';
@@ -65,11 +67,11 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, kind = 
           </h2>
         </div>
         <button
-          onClick={onAddClick}
+          onClick={authed ? onAddClick : login}
           className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full transition-all hover:opacity-80"
           style={{ color: v.muted, border: `1px solid ${v.accent}30` }}
         >
-          <Plus className="w-3 h-3" /> {t('genre.add')}
+          <Plus className="w-3 h-3" /> {authed ? t('genre.add') : t('nav.login')}
         </button>
       </div>
 
@@ -79,7 +81,7 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, kind = 
           animate={{ opacity: 1 }}
           className="flex flex-col items-center justify-center py-16 cursor-pointer"
           style={{ borderTop: `1px solid ${v.accent}15`, borderBottom: `1px solid ${v.accent}15` }}
-          onClick={onAddClick}
+          onClick={authed ? onAddClick : login}
         >
           <Disc3 className="w-7 h-7 mb-3" style={{ color: v.accent, opacity: 0.25 }} />
           <p className="text-xs font-playfair italic" style={{ color: `${v.muted}60` }}>

@@ -3,10 +3,12 @@ import { ThumbsUp, ThumbsDown, Bell, BellOff } from 'lucide-react';
 import { awardBadge } from '@/lib/badgeUtils';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuthed } from '@/hooks/useAuthed';
 
 export default function ReviewActions({ review, v, currentUser }) {
   const queryClient = useQueryClient();
   const [optimisticVote, setOptimisticVote] = useState(null); // 'like' | 'dislike' | null = no change
+  const { authed, login } = useAuthed();
 
   // Fetch current user's vote on this review
   const { data: myVotes = [] } = useQuery({
@@ -100,8 +102,8 @@ export default function ReviewActions({ review, v, currentUser }) {
       {/* Like */}
       <button
         className={btnBase}
-        disabled={!canVote || voteMutation.isPending}
-        onClick={() => voteMutation.mutate('like')}
+        disabled={voteMutation.isPending}
+        onClick={() => canVote ? voteMutation.mutate('like') : login()}
         title={canVote ? 'Like' : 'Login to vote'}
         style={{
           background: myVote === 'like' ? `${v.accent}30` : 'rgba(255,255,255,0.05)',
@@ -117,8 +119,8 @@ export default function ReviewActions({ review, v, currentUser }) {
       {/* Dislike */}
       <button
         className={btnBase}
-        disabled={!canVote || voteMutation.isPending}
-        onClick={() => voteMutation.mutate('dislike')}
+        disabled={voteMutation.isPending}
+        onClick={() => canVote ? voteMutation.mutate('dislike') : login()}
         title={canVote ? 'Dislike' : 'Login to vote'}
         style={{
           background: myVote === 'dislike' ? 'rgba(248,113,113,0.15)' : 'rgba(255,255,255,0.05)',

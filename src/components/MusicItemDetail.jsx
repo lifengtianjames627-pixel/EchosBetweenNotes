@@ -14,6 +14,7 @@ import GenreDecoration from '@/components/GenreDecoration';
 import VirtualItemModal from '@/components/VirtualItemModal';
 import { Search } from 'lucide-react';
 import { loadDraft, saveDraft, clearDraft } from '@/lib/reviewDraft';
+import { useAuthed } from '@/hooks/useAuthed';
 
 function StarPicker({ rating, onRate, accent, muted }) {
   return (
@@ -34,6 +35,7 @@ function StarPicker({ rating, onRate, accent, muted }) {
 function CommentSection({ reviewId, v, currentUser }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
+  const { authed, login } = useAuthed();
   const queryClient = useQueryClient();
 
   const { data: comments = [] } = useQuery({
@@ -105,6 +107,7 @@ function CommentSection({ reviewId, v, currentUser }) {
                 </div>
               ))}
             </div>
+            {authed ? (
             <div className="mt-3 flex gap-2">
               <input
                 className="flex-1 px-3 py-1.5 rounded-lg text-xs outline-none"
@@ -123,6 +126,9 @@ function CommentSection({ reviewId, v, currentUser }) {
                 <Send className="w-3.5 h-3.5" />
               </button>
             </div>
+            ) : (
+              <button onClick={login} className="mt-3 w-full text-left text-xs" style={{ color: v.muted }}>Log in to comment</button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -301,6 +307,8 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
     queryFn: () => base44.auth.me(),
   });
 
+  const { authed, login } = useAuthed();
+
   const canDelete = currentUser?.role === 'admin' && currentUser?.full_name?.trim().toLowerCase() === 'fengtian james li';
 
   const deleteAlbum = useMutation({
@@ -464,6 +472,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
             <p className="text-xs uppercase tracking-widest font-bold" style={{ color: v.muted }}>
               Reviews {reviews.length > 0 && <span style={{ color: v.accent }}>({reviews.length})</span>}
             </p>
+            {authed ? (
             <button
               onClick={() => setShowForm(f => !f)}
               className="text-xs px-3 py-1 rounded-full"
@@ -471,6 +480,11 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
             >
               {showForm ? 'Cancel' : '+ Review'}
             </button>
+            ) : (
+              <button onClick={login} className="text-xs px-3 py-1 rounded-full" style={{ border: `1px solid ${v.accent}40`, color: v.accent }}>
+                Log in to review
+              </button>
+            )}
           </div>
 
           <AnimatePresence>

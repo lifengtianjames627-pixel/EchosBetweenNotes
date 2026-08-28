@@ -204,7 +204,7 @@ export default function Layout() {
 
         {/* Nav items */}
         <nav className="flex-1 px-2 pt-4 space-y-1 overflow-y-auto overflow-x-hidden">
-          {NAV_ITEMS.map(item => <NavLink key={item.path} {...item} />)}
+          {NAV_ITEMS.filter(item => item.path !== '/chat' || currentUser).map(item => <NavLink key={item.path} {...item} />)}
 
           {isAdmin && (
             <>

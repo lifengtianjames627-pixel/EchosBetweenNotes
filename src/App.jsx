@@ -19,6 +19,7 @@ import BandDashboard from '@/pages/BandDashboard';
 import DirectChat from '@/pages/DirectChat';
 import SoulmateBoard from '@/pages/SoulmateBoard';
 import UserProfile from '@/pages/UserProfile';
+import RequireAuth from '@/components/RequireAuth';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -48,13 +49,13 @@ const AuthenticatedApp = () => {
         <Route path="/podcasts" element={<Podcasts />} />
         <Route path="/genre/:genreId" element={<GenreSpace />} />
         <Route path="/album/:id" element={<AlbumDetail />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/u/:email" element={<UserProfile />} />
         <Route path="/about" element={<About />} />
-        <Route path="/moderation" element={<ModerationQueue />} />
-        <Route path="/band-dashboard" element={<BandDashboard />} />
-        <Route path="/chat" element={<DirectChat />} />
-        <Route path="/soulmate" element={<SoulmateBoard />} />
+        <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+        <Route path="/u/:email" element={<RequireAuth><UserProfile /></RequireAuth>} />
+        <Route path="/moderation" element={<RequireAuth><ModerationQueue /></RequireAuth>} />
+        <Route path="/band-dashboard" element={<RequireAuth><BandDashboard /></RequireAuth>} />
+        <Route path="/chat" element={<RequireAuth><DirectChat /></RequireAuth>} />
+        <Route path="/soulmate" element={<RequireAuth><SoulmateBoard /></RequireAuth>} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

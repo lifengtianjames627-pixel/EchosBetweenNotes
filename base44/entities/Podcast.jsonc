@@ -13,12 +13,12 @@
     "category": {
       "type": "string",
       "enum": [
-        "amateur_review",
-        "artist_take",
-        "industry_insider",
-        "deep_dive",
-        "genre_roundtable",
-        "listening_session"
+        "youth_ears_lab",
+        "sonic_technical_breakdown",
+        "cross_cultural_sound",
+        "live_scene_chronicle",
+        "independent_creator",
+        "behind_the_lyrics"
       ],
       "description": "Type of podcast episode"
     },

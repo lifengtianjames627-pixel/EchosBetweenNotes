@@ -11,12 +11,14 @@ import GenreBadge from '@/components/GenreBadge';
 import ReviewCard from '@/components/ReviewCard';
 import { ArrowLeft, Star, MessageSquare, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuthed } from '@/hooks/useAuthed';
 
 export default function AlbumDetail() {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewData, setReviewData] = useState({ rating: 0, title: '', content: '' });
+  const { authed, login } = useAuthed();
 
   const { data: album, isLoading: loadingAlbum } = useQuery({
     queryKey: ['album', id],
@@ -120,12 +122,18 @@ export default function AlbumDetail() {
             <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{album.description}</p>
           )}
           
-          <Button
-            onClick={() => setShowReviewForm(!showReviewForm)}
-            className="mt-6 rounded-xl gap-2"
-          >
-            <Star className="w-4 h-4" /> Write a Review
-          </Button>
+          {authed ? (
+            <Button
+              onClick={() => setShowReviewForm(!showReviewForm)}
+              className="mt-6 rounded-xl gap-2"
+            >
+              <Star className="w-4 h-4" /> Write a Review
+            </Button>
+          ) : (
+            <Button onClick={login} variant="outline" className="mt-6 rounded-xl gap-2">
+              <Star className="w-4 h-4" /> Log in to review
+            </Button>
+          )}
         </div>
       </motion.div>
 
