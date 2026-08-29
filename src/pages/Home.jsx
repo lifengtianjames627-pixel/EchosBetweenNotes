@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { PenLine, Headphones, Users } from 'lucide-react';
 import { useLang } from '@/i18n/LanguageContext';
 
-// Three entry cards — each gets one low-sat warm accent used only for a top
-// hairline + hover icon tint. Ochre / olive / gray-indigo. No background fills.
+// Three entry cards — unified ochre accent (same as Written Reviews) for the
+// top hairline + hover icon tint, so every card lights up identically on hover.
 const OPTIONS = [
   { path: '/reviews',  icon: PenLine,   labelKey: 'home.reviews',   descKey: 'home.reviewsDesc',   accent: '#bf7a35' },
-  { path: '/podcasts', icon: Headphones, labelKey: 'home.podcasts',  descKey: 'home.podcastsDesc',  accent: '#6b7a3f' },
-  { path: '/soulmate', icon: Users,     labelKey: 'home.soulmate',  descKey: 'home.soulmateDesc',  accent: '#5a6a8a' },
+  { path: '/podcasts', icon: Headphones, labelKey: 'home.podcasts',  descKey: 'home.podcastsDesc',  accent: '#bf7a35' },
+  { path: '/soulmate', icon: Users,     labelKey: 'home.soulmate',  descKey: 'home.soulmateDesc',  accent: '#bf7a35' },
 ];
 
 // Faint hand-drawn stars — the only decoration, barely visible.
