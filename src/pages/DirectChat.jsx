@@ -94,79 +94,86 @@ export default function DirectChat() {
           <p className="font-playfair italic text-lg" style={{ color: V.text }}>{t('chat.title')}</p>
           <p className="text-xs mt-0.5" style={{ color: V.muted }}>{t('chat.subtitle')}</p>
         </div>
-        <div className="px-5 pt-6 pb-16 max-w-lg w-full mx-auto">
-          {/* Search bar */}
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: V.muted }} />
-            <input
-              autoFocus
-              className="w-full pl-10 pr-4 py-3 rounded-2xl text-sm outline-none"
-              style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
-              placeholder={t('chat.searchPlaceholder')}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
-          {/* Results */}
-          {search.length >= 1 && (
-            <div className="mt-3 space-y-1">
-              {searchResults.length === 0 ? (
-                <p className="text-sm text-center py-6" style={{ color: V.muted }}>{t('chat.noUsers')}</p>
-              ) : (
-                searchResults.map(u => (
-                  <button
-                    key={u.id}
-                    onClick={() => openChat(u.email, u.full_name || u.email)}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-colors"
-                    style={{ background: V.card, border: `1px solid ${V.border}` }}
-                  >
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-                      style={{ background: '#f1ebdd', color: '#8a5a20' }}>
-                      {(u.full_name || u.email || '?')[0].toUpperCase()}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-sm truncate" style={{ color: V.text }}>{u.full_name || u.email}</p>
-                      <p className="text-xs truncate" style={{ color: V.muted }}>{u.email}</p>
-                    </div>
-                    <MessageSquare className="w-4 h-4 ml-auto shrink-0" style={{ color: V.muted }} />
-                  </button>
-                ))
-              )}
+        {/* Two-column reading room — bordered side column for finding people,
+            wider centre column for the board around you. */}
+        <div className="flex-1 w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[320px_1fr]">
+          <aside className="px-5 pt-6 pb-10 md:pb-16 md:border-r" style={{ borderColor: V.border }}>
+            {/* Search bar */}
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: V.muted }} />
+              <input
+                autoFocus
+                className="w-full pl-10 pr-4 py-3 rounded-2xl text-sm outline-none"
+                style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
+                placeholder={t('chat.searchPlaceholder')}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
             </div>
-          )}
+            {/* Results */}
+            {search.length >= 1 && (
+              <div className="mt-3 space-y-1">
+                {searchResults.length === 0 ? (
+                  <p className="text-sm text-center py-6" style={{ color: V.muted }}>{t('chat.noUsers')}</p>
+                ) : (
+                  searchResults.map(u => (
+                    <button
+                      key={u.id}
+                      onClick={() => openChat(u.email, u.full_name || u.email)}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-colors"
+                      style={{ background: V.card, border: `1px solid ${V.border}` }}
+                    >
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                        style={{ background: '#f1ebdd', color: '#8a5a20' }}>
+                        {(u.full_name || u.email || '?')[0].toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm truncate" style={{ color: V.text }}>{u.full_name || u.email}</p>
+                        <p className="text-xs truncate" style={{ color: V.muted }}>{u.email}</p>
+                      </div>
+                      <MessageSquare className="w-4 h-4 ml-auto shrink-0" style={{ color: V.muted }} />
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
 
-          {search.length === 0 && (
-            <>
-              <PinnedPeople
-                V={V}
-                pins={pins}
-                isPinned={isPinned}
-                onTogglePin={(p) => toggle.mutate(p)}
-                onOpen={openChat}
-              />
-              <RecentConversations
-                V={V}
-                conversations={directory?.conversations || []}
-                loading={directoryLoading}
-                isPinned={isPinned}
-                onTogglePin={(p) => toggle.mutate(p)}
-                onOpen={openChat}
-              />
-              <PeopleAround
-                V={V}
-                nearby={directory?.nearby || []}
-                loading={directoryLoading}
-                city={directory?.my_city}
-                matchedCity={directory?.matched_city}
-                located={directory?.located}
-                myLat={directory?.my_lat}
-                myLng={directory?.my_lng}
-                isPinned={isPinned}
-                onTogglePin={(p) => toggle.mutate(p)}
-                onOpen={openChat}
-              />
-            </>
-          )}
+            {search.length === 0 && (
+              <>
+                <PinnedPeople
+                  V={V}
+                  pins={pins}
+                  isPinned={isPinned}
+                  onTogglePin={(p) => toggle.mutate(p)}
+                  onOpen={openChat}
+                />
+                <RecentConversations
+                  V={V}
+                  conversations={directory?.conversations || []}
+                  loading={directoryLoading}
+                  isPinned={isPinned}
+                  onTogglePin={(p) => toggle.mutate(p)}
+                  onOpen={openChat}
+                />
+              </>
+            )}
+          </aside>
+
+          <section className="px-5 pt-6 pb-16">
+            <PeopleAround
+              V={V}
+              nearby={directory?.nearby || []}
+              loading={directoryLoading}
+              city={directory?.my_city}
+              matchedCity={directory?.matched_city}
+              located={directory?.located}
+              myLat={directory?.my_lat}
+              myLng={directory?.my_lng}
+              isPinned={isPinned}
+              onTogglePin={(p) => toggle.mutate(p)}
+              onOpen={openChat}
+            />
+          </section>
         </div>
       </div>
     );
