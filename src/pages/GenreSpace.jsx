@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
@@ -217,6 +217,39 @@ export default function GenreSpace() {
     },
     onError: (err) => setDuplicateError(err.message),
   });
+
+  // Backfill real cover art for albums/singles that were added without one.
+  // Covers are otherwise only fetched when a user opens the detail modal, so the
+  // slider filled up with generic placeholder photography. This runs once per
+  // page visit, searches the same four music databases, and updates each cover
+  // in the cache as it resolves so real art appears progressively.
+  const backfillStartedRef = useRef(false);
+  useEffect(() => {
+    if (backfillStartedRef.current) return;
+    if (!allItems.length) return;
+    const missing = allItems.filter(it => !it.cover_url);
+    if (!missing.length) return;
+    backfillStartedRef.current = true;
+    let cancelled = false;
+    (async () => {
+      for (const item of missing) {
+        if (cancelled) return;
+        try {
+          const result = await fetchCoverCascade(item.title, item.artist, entityGenre);
+          if (result?.coverUrl) {
+            const stored = await storeCoverImage(result.coverUrl);
+            if (stored) {
+              await base44.entities.Album.update(item.id, { cover_url: stored });
+              queryClient.setQueryData(['genre-albums', genreId], (old) =>
+                old ? old.map(it => (it.id === item.id ? { ...it, cover_url: stored } : it)) : old
+              );
+            }
+          }
+        } catch {}
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [allItems, genreId, entityGenre, queryClient]);
 
   if (!genre) {
     return (
