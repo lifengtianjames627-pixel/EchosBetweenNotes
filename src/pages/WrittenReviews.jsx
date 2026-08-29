@@ -17,26 +17,38 @@ export default function WrittenReviews() {
   const { data: reviews = [] } = useQuery({ queryKey: ['public-reviews'], queryFn: () => base44.entities.Review.list('-created_date', 30) });
   const visible = reviews.filter(item => !item.moderation_status || item.moderation_status === 'approved');
   const open = id => navigate(`/album/${id}`);
+
   return (
-    <div className="min-h-screen px-4 pb-20 sm:px-6" style={{ background: 'radial-gradient(ellipse 120% 80% at 50% -10%, rgba(201,165,88,0.12) 0%, transparent 55%), linear-gradient(180deg, #f7f3ec 0%, #efe9dd 100%)' }}>
-      <div className="mx-auto max-w-6xl">
-        <button onClick={() => navigate('/')} className="flex items-center gap-2 pt-7 text-xs font-semibold" style={{ color: '#6b6358' }}>
+    <div className="min-h-screen" style={{ background: '#f3efe6' }}>
+      {/* Layer 1 — blurred ambient header */}
+      <div className="relative h-[230px] overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1800&q=80"
+          alt=""
+          aria-hidden
+          className="w-full h-full object-cover"
+          style={{ filter: 'blur(24px) saturate(0.55) brightness(1.05)', transform: 'scale(1.12)' }}
+        />
+        <div className="absolute inset-0" style={{ background: 'rgba(243,239,230,0.62)' }} />
+        <div className="absolute inset-0 flex items-end pb-7 px-6 sm:px-10">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.28em] font-bold" style={{ color: '#bf7a35' }}>Listening, closely</p>
+            <h1 className="mt-2 font-playfair text-5xl italic sm:text-6xl" style={{ color: '#1a1815' }}>Written Reviews</h1>
+          </div>
+        </div>
+      </div>
+
+      {/* Layer 2 — beige genre filter bar */}
+      <GenreRail genres={localizedGenres || GENRES} onSelect={id => navigate(`/genre/${id}`)} />
+
+      {/* Layer 3 — cream paper content sheet */}
+      <div className="mx-auto max-w-5xl my-10 px-8 sm:px-12 py-10" style={{ background: '#faf8f2', border: '1px solid #e6ddc9', boxShadow: '0 2px 20px rgba(120,100,80,0.06)' }}>
+        <button onClick={() => navigate('/')} className="flex items-center gap-2 text-xs font-semibold" style={{ color: '#6b6358' }}>
           <ArrowLeft className="h-4 w-4" /> {t('common.back')}
         </button>
-        <header className="mt-10 grid gap-5 lg:grid-cols-[1fr_260px] lg:items-end">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.28em] font-bold" style={{ color: '#b06547' }}>Listening, closely</p>
-            <h1 className="mt-2 font-playfair text-5xl italic sm:text-6xl" style={{ color: '#2b2620' }}>Written Reviews</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed" style={{ color: '#6b6358' }}>{t('reviews.subtitle')}</p>
-          </div>
-          <div className="overflow-hidden rounded-2xl flex items-center justify-center min-h-[128px]" style={{ border: '1px solid rgba(176,101,71,0.22)', background: 'radial-gradient(ellipse at 70% 30%, rgba(176,101,71,0.12) 0%, transparent 60%), linear-gradient(135deg, #fbf8f2 0%, #f1ece1 100%)' }}>
-            <span className="font-playfair italic text-5xl" style={{ color: 'rgba(176,101,71,0.32)' }}>♪</span>
-          </div>
-        </header>
-        <GenreRail genres={localizedGenres || GENRES} onSelect={id => navigate(`/genre/${id}`)} />
         <main className="mt-8">
           <ReviewLead review={visible[0]} onOpen={open} />
-          <ReviewFeed reviews={visible.slice(1, 10)} onOpen={open} accent="#5a6a8a" text="#2b2620" />
+          <ReviewFeed reviews={visible.slice(1, 10)} onOpen={open} />
         </main>
       </div>
     </div>

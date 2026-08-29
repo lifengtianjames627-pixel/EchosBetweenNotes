@@ -1,7 +1,34 @@
 import React from 'react';
-import { Star } from 'lucide-react';
 import CoverImage from '@/components/music/CoverImage';
 
-export default function ReviewFeed({ reviews, onOpen, accent = '#5a6a8a', text = '#2b2620' }) {
-  return <section className="mt-10"><div className="mb-4 flex items-end justify-between"><div><p className="text-[10px] uppercase tracking-[0.24em] font-bold" style={{ color: accent }}>From this scene</p><h2 className="mt-1 font-playfair text-3xl italic" style={{ color: text }}>Trending discussions</h2></div><span className="text-xs" style={{ color: `${text}99` }}>{reviews.length} recent voices</span></div><div className="grid gap-x-5 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">{reviews.map(review => <button key={review.id} onClick={() => onOpen(review.album_id)} className="group text-left"><div className="aspect-square overflow-hidden rounded-2xl" style={{ background: `${accent}20` }}><CoverImage src={review.album_cover_url} alt={review.album_title || 'Album artwork'} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /></div><div className="pt-3"><p className="text-[10px] uppercase tracking-[0.16em]" style={{ color: accent }}>{review.album_artist}</p><p className="mt-1 font-playfair text-xl italic leading-tight" style={{ color: text }}>{review.title || review.album_title}</p><p className="mt-1 line-clamp-2 text-xs leading-relaxed" style={{ color: `${text}99` }}>{review.content}</p><p className="mt-2 flex items-center gap-1 text-[11px]" style={{ color: accent }}><Star className="h-3 w-3" fill="currentColor" /> {review.rating || '—'} · {review.reviewer_name || 'Chordmates listener'}</p></div></button>)}</div>{reviews.length === 0 && <p className="rounded-2xl py-14 text-center text-sm" style={{ background: `${accent}12`, color: `${text}99` }}>New discussions about this scene will appear here.</p>}</section>;
+// Paper grid of review cards — square cover (no border / no radius / no zoom),
+// ochre artist tag, black serif title with hover underline, rating as a plain
+// number (no star component), one-line summary.
+export default function ReviewFeed({ reviews, onOpen }) {
+  return (
+    <section>
+      <div className="mb-6 flex items-baseline justify-between">
+        <h2 className="font-playfair text-2xl italic" style={{ color: '#1a1815' }}>Trending discussions</h2>
+        <span className="text-xs" style={{ color: '#8a7e6f' }}>{reviews.length} recent</span>
+      </div>
+      <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        {reviews.map(review => (
+          <button key={review.id} onClick={() => onOpen(review.album_id)} className="group text-left">
+            <CoverImage src={review.album_cover_url} alt={review.album_title || 'Album artwork'} className="w-full aspect-square object-cover" />
+            <p className="mt-3 text-[10px] uppercase tracking-[0.16em] font-semibold" style={{ color: '#bf7a35' }}>{review.album_artist}</p>
+            <h3 className="mt-1 font-playfair text-lg italic leading-tight border-b border-transparent transition-colors group-hover:border-[#1a1815] inline-block" style={{ color: '#1a1815' }}>
+              {review.title || review.album_title}
+            </h3>
+            <p className="mt-1 line-clamp-2 text-xs leading-relaxed" style={{ color: '#6b6358' }}>{review.content}</p>
+            <p className="mt-2 text-[11px] font-semibold" style={{ color: '#bf7a35' }}>
+              {review.rating ? `${(review.rating * 2).toFixed(1)}/10` : '—'} · {review.reviewer_name || 'Listener'}
+            </p>
+          </button>
+        ))}
+      </div>
+      {reviews.length === 0 && (
+        <p className="py-16 text-center text-sm" style={{ color: '#8a7e6f' }}>New discussions will appear here.</p>
+      )}
+    </section>
+  );
 }

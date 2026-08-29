@@ -172,16 +172,20 @@ export default function GenreSpace() {
   // and header typography stay genre-specific. Keeps the inclusive, friendly,
   // cross-cultural feel instead of 16 cold dark rooms.
   const baseV = GENRE_VISUALS[genreId] || GENRE_VISUALS.electronic;
+  // Paper editorialism — warm paper base shared across every genre; ochre is the
+  // single cross-cultural accent site-wide (genre identity now comes from the
+  // hero photo + header typography, not per-genre color).
   const v = {
     ...baseV,
     ...(GENRE_ATMOSPHERES[genreId] || GENRE_ATMOSPHERES.electronic),
-    bg: 'linear-gradient(180deg, #f7f3ec 0%, #efe9dd 100%)',
-    pageBg: 'linear-gradient(180deg, #f7f3ec 0%, #efe9dd 100%)',
-    text: '#2b2620',
+    bg: '#f3efe6',
+    pageBg: '#f3efe6',
+    text: '#1a1815',
     muted: '#6b6358',
-    cardBg: '#fbf8f2',
-    cardBorder: `${baseV.accent}33`,
-    accentGlow: `${baseV.accent}22`,
+    cardBg: '#faf8f2',
+    cardBorder: '#e6ddc9',
+    accent: '#bf7a35',
+    accentGlow: 'rgba(191,122,53,0.18)',
   };
   const entityGenre = genre?.entityGenre;
 
@@ -277,16 +281,16 @@ export default function GenreSpace() {
   return (
     <div className="min-h-screen" style={{ backgroundImage: v.pageBg || v.bg, backgroundAttachment: 'fixed' }}>
       {/* Top bar */}
-      <div className="sticky top-0 z-40 backdrop-blur-xl" style={{ background: 'rgba(247,243,236,0.78)', borderBottom: `1px solid ${v.accent}22` }}>
+      <div className="sticky top-0 z-40" style={{ background: 'rgba(230,221,201,0.88)', borderBottom: '1px solid rgba(26,24,21,0.1)' }}>
         <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest transition-opacity hover:opacity-60"
-            style={{ color: v.muted }}
+            className="flex items-center gap-2 text-xs font-semibold transition-colors hover:text-[#1a1815]"
+            style={{ color: '#6b6358' }}
           >
             <ArrowLeft className="w-3.5 h-3.5" /> {t('nav.home')}
           </button>
-          <span className="text-[10px] uppercase tracking-[0.22em]" style={{ color: `${v.muted}60` }}>
+          <span className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: '#8a7e6f' }}>
             {gLabel(genreId, genre.label)} {t('genre.space')}
           </span>
           <div className="w-16" />

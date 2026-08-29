@@ -9,81 +9,73 @@
   :root {
     --font-inter: 'Inter', sans-serif;
 
-    /* Warm paper journal — ivory/cream base (never pure white, never cold
-       black), warm ink-brown text, terracotta primary, and a rotating set of
-       earthy cross-cultural accents (ochre / indigo / sage / rose). Friendly,
-       academic-but-not-rigid, culturally inclusive. */
-    --background: 40 38% 94%;
-    --foreground: 32 15% 15%;
-    --card: 40 40% 97%;
-    --card-foreground: 32 15% 15%;
-    --popover: 40 40% 97%;
-    --popover-foreground: 32 15% 15%;
-    --primary: 17 42% 48%;
-    --primary-foreground: 40 44% 97%;
-    --secondary: 40 28% 90%;
-    --secondary-foreground: 32 15% 22%;
-    --muted: 40 30% 89%;
+    /* Paper editorialism — three-layer depth (blurred ambient → beige bar →
+       cream paper). Warm near-black ink, ochre as the single cross-cultural
+       accent. No neon, no glow, no gradient fills. */
+    --background: 42 35% 93%;
+    --foreground: 36 11% 9%;
+    --card: 42 40% 96%;
+    --card-foreground: 36 11% 9%;
+    --popover: 42 40% 96%;
+    --popover-foreground: 36 11% 9%;
+    --primary: 36 11% 9%;
+    --primary-foreground: 42 40% 96%;
+    --secondary: 41 37% 85%;
+    --secondary-foreground: 36 11% 12%;
+    --muted: 41 30% 88%;
     --muted-foreground: 35 10% 38%;
-    --accent: 41 51% 57%;
-    --accent-foreground: 32 15% 15%;
+    --accent: 30 57% 48%;
+    --accent-foreground: 42 40% 96%;
     --destructive: 0 55% 48%;
-    --destructive-foreground: 40 44% 97%;
+    --destructive-foreground: 42 40% 96%;
     --border: 40 26% 84%;
     --input: 40 26% 84%;
-    --ring: 17 42% 48%;
-    --chart-1: 17 42% 48%;
-    --chart-2: 41 51% 57%;
-    --chart-3: 95 14% 48%;
-    --chart-4: 224 22% 46%;
-    --chart-5: 5 25% 60%;
-    --radius: 0.75rem;
+    --ring: 30 57% 48%;
+    --chart-1: 30 57% 48%;
+    --chart-2: 95 14% 40%;
+    --chart-3: 224 22% 46%;
+    --chart-4: 41 37% 55%;
+    --chart-5: 36 11% 30%;
+    --radius: 0.5rem;
 
-    /* Cross-cultural soft accent set — rotates across sections/genres */
-    --accent-terracotta: 17 42% 48%;
-    --accent-ochre: 41 51% 57%;
-    --accent-indigo: 224 22% 46%;
-    --accent-sage: 95 14% 48%;
-    --accent-rose: 5 25% 60%;
-
-    --sidebar-background: 42 34% 90%;
-    --sidebar-foreground: 35 12% 30%;
-    --sidebar-primary: 17 42% 48%;
-    --sidebar-primary-foreground: 40 44% 97%;
-    --sidebar-accent: 40 28% 86%;
-    --sidebar-accent-foreground: 32 15% 18%;
+    --sidebar-background: 42 35% 93%;
+    --sidebar-foreground: 36 11% 12%;
+    --sidebar-primary: 30 57% 48%;
+    --sidebar-primary-foreground: 42 40% 96%;
+    --sidebar-accent: 41 37% 85%;
+    --sidebar-accent-foreground: 36 11% 12%;
     --sidebar-border: 40 26% 82%;
-    --sidebar-ring: 17 42% 48%;
+    --sidebar-ring: 30 57% 48%;
   }
 
   .dark {
-    --background: 40 38% 94%;
-    --foreground: 32 15% 15%;
-    --card: 40 40% 97%;
-    --card-foreground: 32 15% 15%;
-    --popover: 40 40% 97%;
-    --popover-foreground: 32 15% 15%;
-    --primary: 17 42% 48%;
-    --primary-foreground: 40 44% 97%;
-    --secondary: 40 28% 90%;
-    --secondary-foreground: 32 15% 22%;
-    --muted: 40 30% 89%;
+    --background: 42 35% 93%;
+    --foreground: 36 11% 9%;
+    --card: 42 40% 96%;
+    --card-foreground: 36 11% 9%;
+    --popover: 42 40% 96%;
+    --popover-foreground: 36 11% 9%;
+    --primary: 36 11% 9%;
+    --primary-foreground: 42 40% 96%;
+    --secondary: 41 37% 85%;
+    --secondary-foreground: 36 11% 12%;
+    --muted: 41 30% 88%;
     --muted-foreground: 35 10% 38%;
-    --accent: 41 51% 57%;
-    --accent-foreground: 32 15% 15%;
+    --accent: 30 57% 48%;
+    --accent-foreground: 42 40% 96%;
     --destructive: 0 55% 48%;
-    --destructive-foreground: 40 44% 97%;
+    --destructive-foreground: 42 40% 96%;
     --border: 40 26% 84%;
     --input: 40 26% 84%;
-    --ring: 17 42% 48%;
-    --sidebar-background: 42 34% 90%;
-    --sidebar-foreground: 35 12% 30%;
-    --sidebar-primary: 17 42% 48%;
-    --sidebar-primary-foreground: 40 44% 97%;
-    --sidebar-accent: 40 28% 86%;
-    --sidebar-accent-foreground: 32 15% 18%;
+    --ring: 30 57% 48%;
+    --sidebar-background: 42 35% 93%;
+    --sidebar-foreground: 36 11% 12%;
+    --sidebar-primary: 30 57% 48%;
+    --sidebar-primary-foreground: 42 40% 96%;
+    --sidebar-accent: 41 37% 85%;
+    --sidebar-accent-foreground: 36 11% 12%;
     --sidebar-border: 40 26% 82%;
-    --sidebar-ring: 17 42% 48%;
+    --sidebar-ring: 30 57% 48%;
   }
 }
 
