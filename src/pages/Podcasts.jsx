@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { ArrowLeft, Headphones, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { PODCAST_CATEGORIES } from '@/lib/podcastConfig';
+import PodcastEditorialStrip from '@/components/podcasts/PodcastEditorialStrip';
 import { useLang } from '@/i18n/LanguageContext';
 
 function fmtTotal(mins) {
@@ -148,6 +149,7 @@ export default function Podcasts() {
             </div>
           </div>
           </div>
+          <PodcastEditorialStrip />
         </div>
       </div>
 

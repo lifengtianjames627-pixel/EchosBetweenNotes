@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 const PHOTOS = {
   rock: ['https://images.unsplash.com/photo-1546708770-589dab7b22c7?auto=format&fit=crop&w=1800&q=85', 'Guns N’ Roses · AC/DC · Motörhead'],
   pop: ['https://images.unsplash.com/photo-1507838153414-b4b713384a76?auto=format&fit=crop&w=1800&q=85'], classical: ['https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=1800&q=85'],
-  metal: ['https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1800&q=85'], jazz: ['https://images.unsplash.com/photo-1630754157722-f18671962ff4?auto=format&fit=crop&w=1800&q=85'],
+  metal: ['https://media.base44.com/images/public/69bfbc84f5aa64ed245721b1/f19f3b28d_image.png', 'Wacken Open Air · 83,400 voices'],  jazz: ['https://images.unsplash.com/photo-1630754157722-f18671962ff4?auto=format&fit=crop&w=1800&q=85'],
   blues: ['https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=1800&q=85'], r_and_b: ['https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1800&q=85'],
   core: ['https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1800&q=85'], country: ['https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=1800&q=85'],
   hip_hop: ['https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1800&q=85'], indie: ['https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1800&q=85'],

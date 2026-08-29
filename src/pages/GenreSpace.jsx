@@ -10,6 +10,7 @@ import AddMusicModal from '@/components/AddMusicModal';
 import MusicItemDetail from '@/components/MusicItemDetail';
 import GenreRankings from '@/components/GenreRankings';
 import GenrePhotoHero from '@/components/genre-dashboard/GenrePhotoHero';
+import GenreCommunity from '@/components/genre-dashboard/GenreCommunity';
 import { storeCoverImage } from '@/lib/storeCoverImage';
 import { fetchCoverCascade } from '@/components/TrackList';
 import { useLang } from '@/i18n/LanguageContext';
@@ -290,6 +291,8 @@ export default function GenreSpace() {
               onItemClick={handleItemClick}
               onAddClick={() => setAddModal('single')}
             />
+
+            <GenreCommunity genreId={genreId} accent={v.accent} />
           </div>
         )}
       </div>
