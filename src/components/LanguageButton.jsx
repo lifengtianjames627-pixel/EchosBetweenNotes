@@ -22,20 +22,20 @@ export default function LanguageButton() {
       <button
         onClick={() => setOpen(o => !o)}
         title={t('common.language')}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-105"
-        style={{ color: 'rgba(160,175,220,0.6)', border: '1px solid rgba(124,111,255,0.15)' }}
+        className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
+        style={{ color: '#6b6358', border: '1px solid rgba(26,24,21,0.14)' }}
       >
-        <Globe className="w-3.5 h-3.5" /> {current.flag} {current.label}
+        <Globe className="w-3.5 h-3.5" /> {current.flag} <span className="hidden sm:inline">{current.label}</span>
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-2 py-1.5 rounded-2xl z-50 min-w-[160px]"
-          style={{ background: 'rgba(10,13,32,0.98)', border: '1px solid rgba(124,111,255,0.3)', boxShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
+        <div className="absolute right-0 top-full mt-2 py-1.5 z-50 min-w-[160px]"
+          style={{ background: '#faf8f2', border: '1px solid #e0d9c8', boxShadow: '0 8px 30px rgba(120,100,80,0.14)' }}>
           {LANGUAGES.map(l => (
             <button
               key={l.code}
               onClick={() => { setLang(l.code); setOpen(false); }}
-              className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-left transition-colors hover:bg-white/5"
-              style={{ color: l.code === lang ? '#a5b4fc' : 'rgba(180,195,235,0.75)' }}
+              className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-left transition-colors hover:bg-black/5"
+              style={{ color: l.code === lang ? '#bf7a35' : '#5a5a5a' }}
             >
               <span>{l.flag}</span>
               <span className="flex-1 font-medium">{l.label}</span>

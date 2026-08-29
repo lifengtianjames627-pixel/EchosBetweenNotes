@@ -9,13 +9,14 @@ import MusicSlider from '@/components/MusicSlider';
 import AddMusicModal from '@/components/AddMusicModal';
 import MusicItemDetail from '@/components/MusicItemDetail';
 import GenreRankings from '@/components/GenreRankings';
-import GenrePhotoHero from '@/components/genre-dashboard/GenrePhotoHero';
+import GenreHero from '@/components/genre-dashboard/GenreHero';
+import GenreEmptyState from '@/components/genre-dashboard/GenreEmptyState';
 import GenreCommunity from '@/components/genre-dashboard/GenreCommunity';
+import { buildGenreTheme, GENRE_SLUG_ALIASES, PAPER } from '@/lib/genreSkins';
 import { storeCoverImage } from '@/lib/storeCoverImage';
 import { fetchCoverCascade } from '@/components/TrackList';
 import { useLang } from '@/i18n/LanguageContext';
 import { useGenreText } from '@/i18n/useGenreText';
-import { GENRE_ATMOSPHERES } from '@/lib/genreAtmospheres';
 
 // Per-genre visual configs
 const GENRE_VISUALS = {
@@ -150,7 +151,9 @@ const GENRE_VISUALS = {
 };
 
 export default function GenreSpace() {
-  const { genreId } = useParams();
+  const { genreId: rawGenreId } = useParams();
+  // Accept /genre/rnb, /genre/r&b, /genre/hip-hop as aliases of the real ids.
+  const genreId = GENRE_SLUG_ALIASES[decodeURIComponent(rawGenreId || '').toLowerCase()] || rawGenreId;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t } = useLang();
@@ -168,25 +171,14 @@ export default function GenreSpace() {
   };
 
   const genre = GENRES.find(g => g.id === genreId);
-  // Warm paper journal base — shared across every genre; only the accent hue
-  // and header typography stay genre-specific. Keeps the inclusive, friendly,
-  // cross-cultural feel instead of 16 cold dark rooms.
-  const baseV = GENRE_VISUALS[genreId] || GENRE_VISUALS.electronic;
-  // Paper editorialism — warm paper base shared across every genre; ochre is the
-  // single cross-cultural accent site-wide (genre identity now comes from the
-  // hero photo + header typography, not per-genre color).
+  // Three-layer theme: fixed cream page base + fixed nav, with only the genre
+  // skin (accent, hero overlay, title typography, card radius) changing.
   const v = {
-    ...baseV,
-    ...(GENRE_ATMOSPHERES[genreId] || GENRE_ATMOSPHERES.electronic),
-    bg: '#f3efe6',
-    pageBg: '#f3efe6',
-    text: '#1a1815',
-    muted: '#6b6358',
-    cardBg: '#faf8f2',
-    cardBorder: '#e6ddc9',
-    accent: '#bf7a35',
-    accentGlow: 'rgba(191,122,53,0.18)',
+    ...(GENRE_VISUALS[genreId] || GENRE_VISUALS.electronic),
+    tagline: (GENRE_VISUALS[genreId] || GENRE_VISUALS.electronic).tagline,
+    ...buildGenreTheme(genreId),
   };
+  const skin = v.skin;
   const entityGenre = genre?.entityGenre;
 
   const { data: allItems = [], isLoading } = useQuery({
@@ -271,7 +263,7 @@ export default function GenreSpace() {
 
   if (!genre) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen" style={{ background: '#050709', color: '#aaa' }}>
+      <div className="flex flex-col items-center justify-center min-h-screen" style={{ background: PAPER.base, color: PAPER.muted }}>
         <p>{t('genre.notFound')}</p>
         <button onClick={() => navigate('/')} className="mt-4 underline">{t('genre.goHome')}</button>
       </div>
@@ -279,9 +271,9 @@ export default function GenreSpace() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundImage: v.pageBg || v.bg, backgroundAttachment: 'fixed' }}>
-      {/* Top bar */}
-      <div className="sticky top-0 z-40" style={{ background: 'rgba(230,221,201,0.88)', borderBottom: '1px solid rgba(26,24,21,0.1)' }}>
+    <div className="min-h-screen" data-genre={genreId} style={{ background: PAPER.base }}>
+      {/* Top bar — identical on every genre (fixed top layer) */}
+      <div className="sticky top-0 z-40" style={{ background: 'rgba(230,221,201,0.92)', borderBottom: '1px solid rgba(26,24,21,0.1)' }}>
         <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between">
           <button
             onClick={() => navigate('/')}
@@ -297,13 +289,13 @@ export default function GenreSpace() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 pt-14 pb-24">
-        <GenrePhotoHero
+      <div className={`mx-auto px-6 pt-14 pb-24 ${skin.narrow ? 'max-w-3xl' : 'max-w-5xl'}`}>
+        <GenreHero
           genreId={genreId}
           label={gLabel(genreId, genre.label)}
           tagline={gTagline(genreId, v.tagline)}
           description={gDesc(genreId, genre.desc)}
-          v={v}
+          skin={skin}
         />
 
         {isLoading ? (
@@ -317,6 +309,12 @@ export default function GenreSpace() {
               </div>
             ))}
           </div>
+        ) : allItems.length === 0 ? (
+          <GenreEmptyState
+            label={gLabel(genreId, genre.label)}
+            accent={v.accent}
+            onAdd={() => setAddModal('album')}
+          />
         ) : (
           <div className="mt-8 space-y-2">
             {/* Rankings */}

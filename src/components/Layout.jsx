@@ -104,14 +104,14 @@ export default function Layout() {
     <div className="min-h-screen flex flex-col" style={{ background: '#f3efe6' }}>
       {/* Top navigation — Bandcamp-style thin bar, no sidebar */}
       <header className="sticky top-0 z-30 flex items-center gap-3 px-5 h-14" style={{ background: 'rgba(243,239,230,0.92)', borderBottom: '1px solid rgba(26,24,21,0.1)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}>
-        <Link to="/" className="font-playfair italic text-lg whitespace-nowrap shrink-0" style={{ color: '#1a1815', letterSpacing: '-0.01em' }}>
+        <Link to="/" className="font-playfair italic text-sm sm:text-lg whitespace-nowrap shrink-0" style={{ color: '#1a1815', letterSpacing: '-0.01em' }}>
           Echo Between Notes
         </Link>
-        <nav className="flex items-center gap-0.5 ml-1">
+        <nav className="hidden sm:flex items-center gap-0.5 ml-1 min-w-0 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
           {NAV_ITEMS.filter(item => item.path !== '/chat' || currentUser).map(item => navLink(item.path, item.labelKey))}
           {isAdmin && ADMIN_ITEMS.map(item => navLink(item.path, item.labelKey))}
         </nav>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2 shrink-0">
           <LanguageButton />
           <Link to="/about" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors" style={{ color: '#6b6358', border: '1px solid rgba(26,24,21,0.14)' }}>
             <Info className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('nav.about')}</span>
@@ -137,6 +137,12 @@ export default function Layout() {
           )}
         </div>
       </header>
+
+      {/* Mobile nav strip — the links that don't fit in the thin top bar */}
+      <nav className="sm:hidden flex items-center gap-0.5 px-4 py-1.5 overflow-x-auto" style={{ background: '#e6ddc9', borderBottom: '1px solid rgba(26,24,21,0.08)', scrollbarWidth: 'none' }}>
+        {NAV_ITEMS.filter(item => item.path !== '/chat' || currentUser).map(item => navLink(item.path, item.labelKey))}
+        {isAdmin && ADMIN_ITEMS.map(item => navLink(item.path, item.labelKey))}
+      </nav>
 
       <main className="flex-1 min-w-0">
         <Outlet />
