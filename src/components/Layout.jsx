@@ -113,11 +113,11 @@ export default function Layout() {
         title={collapsed ? label : undefined}
         className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative"
         style={active
-          ? { background: 'rgba(124,111,255,0.18)', color: '#a5b4fc', boxShadow: '0 0 12px rgba(124,111,255,0.2)' }
-          : { color: 'rgba(160,175,220,0.55)' }
+          ? { background: 'rgba(176,101,71,0.14)', color: '#b06547' }
+          : { color: '#6b6358' }
         }
       >
-        <Icon className="w-4 h-4 shrink-0" style={active ? { filter: 'drop-shadow(0 0 6px rgba(165,138,252,0.7))' } : {}} />
+        <Icon className="w-4 h-4 shrink-0" />
         <AnimatePresence initial={false}>
           {!collapsed && (
             <motion.span
@@ -134,7 +134,7 @@ export default function Layout() {
         {collapsed && (
           <div
             className="absolute left-full ml-3 px-2.5 py-1.5 rounded-lg text-xs font-medium pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap"
-            style={{ background: 'rgba(15,18,40,0.95)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.25)', boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}
+            style={{ background: '#fbf8f2', color: '#2b2620', border: '1px solid rgba(176,101,71,0.2)', boxShadow: '0 4px 18px rgba(120,100,80,0.14)' }}
           >
             {label}
           </div>
@@ -144,7 +144,7 @@ export default function Layout() {
   };
 
   return (
-    <div className="min-h-screen flex" style={{ background: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)' }}>
+    <div className="min-h-screen flex" style={{ background: 'linear-gradient(180deg, #f7f3ec 0%, #efe9dd 100%)' }}>
 
       {/* Drawer backdrop (phones only) */}
       <AnimatePresence>
@@ -153,7 +153,7 @@ export default function Layout() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setDrawerOpen(false)}
             className="fixed inset-0 z-40"
-            style={{ background: 'rgba(0,0,0,0.6)' }}
+            style={{ background: 'rgba(80,68,56,0.28)' }}
           />
         )}
       </AnimatePresence>
@@ -166,19 +166,19 @@ export default function Layout() {
         transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
         className="fixed top-0 left-0 h-full z-50 flex flex-col overflow-hidden"
         style={{
-          background: 'rgba(5,7,20,0.92)',
-          borderRight: '1px solid rgba(124,111,255,0.12)',
+          background: 'rgba(247,243,236,0.94)',
+          borderRight: '1px solid rgba(176,101,71,0.16)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
         }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-3 h-16 shrink-0" style={{ borderBottom: '1px solid rgba(124,111,255,0.1)' }}>
+        <div className="flex items-center gap-3 px-3 h-16 shrink-0" style={{ borderBottom: '1px solid rgba(176,101,71,0.12)' }}>
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-            style={{ background: 'linear-gradient(135deg, rgba(124,111,255,0.3), rgba(192,132,252,0.3))', border: '1px solid rgba(124,111,255,0.35)' }}
+            style={{ background: 'rgba(176,101,71,0.14)', border: '1px solid rgba(176,101,71,0.3)' }}
           >
-            <Music2 className="w-4 h-4" style={{ color: '#a5b4fc' }} />
+            <Music2 className="w-4 h-4" style={{ color: '#b06547' }} />
           </div>
           <AnimatePresence initial={false}>
             {!collapsed && (
@@ -188,13 +188,7 @@ export default function Layout() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
                 className="font-playfair italic text-base whitespace-nowrap"
-                style={{
-                  background: 'linear-gradient(135deg, #a5b4fc, #c084fc)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  letterSpacing: '-0.01em',
-                }}
+                style={{ color: '#2b2620', letterSpacing: '-0.01em' }}
               >
                 Echo Between Notes
               </motion.span>
@@ -216,12 +210,12 @@ export default function Layout() {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       className="text-[10px] uppercase tracking-widest font-bold"
-                      style={{ color: 'rgba(124,111,255,0.45)' }}
+                      style={{ color: '#9a8e7e' }}
                     >
                       {t('nav.admin')}
                     </motion.p>
                   ) : (
-                    <div className="h-px w-full" style={{ background: 'rgba(124,111,255,0.15)' }} />
+                    <div className="h-px w-full" style={{ background: 'rgba(176,101,71,0.18)' }} />
                   )}
                 </AnimatePresence>
               </div>
@@ -231,16 +225,16 @@ export default function Layout() {
         </nav>
 
         {/* User + logout */}
-        <div className="px-2 pb-4 space-y-1 shrink-0" style={{ borderTop: '1px solid rgba(124,111,255,0.1)', paddingTop: 12 }}>
+        <div className="px-2 pb-4 space-y-1 shrink-0" style={{ borderTop: '1px solid rgba(176,101,71,0.12)', paddingTop: 12 }}>
           {currentUser ? (
             <>
               <div
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl overflow-hidden"
-                style={{ background: 'rgba(124,111,255,0.08)' }}
+                style={{ background: 'rgba(176,101,71,0.08)' }}
               >
                 <div
                   className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
-                  style={{ background: 'linear-gradient(135deg, rgba(124,111,255,0.4), rgba(192,132,252,0.4))', color: '#c4baff' }}
+                  style={{ background: 'rgba(176,101,71,0.22)', color: '#b06547' }}
                 >
                   {(currentUser.full_name || currentUser.email || 'U')[0].toUpperCase()}
                 </div>
@@ -252,10 +246,10 @@ export default function Layout() {
                       exit={{ opacity: 0, width: 0 }}
                       className="overflow-hidden min-w-0"
                     >
-                      <p className="text-xs font-semibold truncate whitespace-nowrap" style={{ color: '#c4baff' }}>
+                      <p className="text-xs font-semibold truncate whitespace-nowrap" style={{ color: '#2b2620' }}>
                         {currentUser.full_name || 'User'}
                       </p>
-                      <p className="text-[10px] truncate whitespace-nowrap" style={{ color: 'rgba(160,175,220,0.4)' }}>
+                      <p className="text-[10px] truncate whitespace-nowrap" style={{ color: '#8a7e6f' }}>
                         {currentUser.email}
                       </p>
                     </motion.div>
@@ -267,7 +261,7 @@ export default function Layout() {
                 onClick={() => base44.auth.logout()}
                 title={collapsed ? t('nav.logout') : undefined}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative"
-                style={{ color: 'rgba(248,113,113,0.6)' }}
+                style={{ color: '#a85a4a' }}
               >
                 <LogOut className="w-4 h-4 shrink-0" />
                 <AnimatePresence initial={false}>
@@ -285,7 +279,7 @@ export default function Layout() {
                 {collapsed && (
                   <div
                     className="absolute left-full ml-3 px-2.5 py-1.5 rounded-lg text-xs font-medium pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap"
-                    style={{ background: 'rgba(15,18,40,0.95)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}
+                    style={{ background: '#fbf8f2', color: '#a85a4a', border: '1px solid rgba(168,90,74,0.22)' }}
                   >
                     {t('nav.logout')}
                   </div>
@@ -297,7 +291,7 @@ export default function Layout() {
               onClick={() => base44.auth.redirectToLogin()}
               title={collapsed ? t('nav.login') : undefined}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
-              style={{ background: 'rgba(124,111,255,0.15)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.25)' }}
+              style={{ background: 'rgba(176,101,71,0.14)', color: '#b06547', border: '1px solid rgba(176,101,71,0.25)' }}
             >
               <LogIn className="w-4 h-4 shrink-0" />
               <AnimatePresence initial={false}>
@@ -321,7 +315,7 @@ export default function Layout() {
         <button
           onClick={() => setCollapsed(c => !c)}
           className="absolute -right-3 top-[72px] w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
-          style={{ background: 'rgba(15,18,40,0.98)', border: '1px solid rgba(124,111,255,0.3)', color: '#a5b4fc', boxShadow: '0 0 10px rgba(124,111,255,0.2)' }}
+          style={{ background: '#fbf8f2', border: '1px solid rgba(176,101,71,0.3)', color: '#b06547' }}
         >
           {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
         </button>
@@ -336,13 +330,13 @@ export default function Layout() {
       >
         {/* Top bar */}
         <div className="sticky top-0 z-30 flex items-center justify-end gap-2 px-3 sm:px-5 h-12"
-          style={{ background: 'rgba(5,7,20,0.85)', borderBottom: '1px solid rgba(124,111,255,0.1)', backdropFilter: 'blur(16px)' }}>
+          style={{ background: 'rgba(247,243,236,0.82)', borderBottom: '1px solid rgba(176,101,71,0.12)', backdropFilter: 'blur(16px)' }}>
           {isMobile && (
             <button
               onClick={() => setDrawerOpen(o => !o)}
               aria-label="Menu"
               className="mr-auto w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: 'rgba(124,111,255,0.12)', border: '1px solid rgba(124,111,255,0.25)', color: '#a5b4fc' }}
+              style={{ background: 'rgba(176,101,71,0.12)', border: '1px solid rgba(176,101,71,0.25)', color: '#b06547' }}
             >
               {drawerOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
@@ -351,7 +345,7 @@ export default function Layout() {
           <Link
             to="/about"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-105"
-            style={{ color: 'rgba(160,175,220,0.6)', border: '1px solid rgba(124,111,255,0.15)' }}
+            style={{ color: '#6b6358', border: '1px solid rgba(176,101,71,0.18)' }}
           >
             <Info className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('nav.about')}</span>
           </Link>
@@ -359,22 +353,22 @@ export default function Layout() {
             <Link
               to="/profile"
               className="flex items-center gap-2.5 px-3 py-1.5 rounded-full transition-all hover:scale-105"
-              style={{ background: 'rgba(124,111,255,0.1)', border: '1px solid rgba(124,111,255,0.25)' }}
+              style={{ background: 'rgba(176,101,71,0.1)', border: '1px solid rgba(176,101,71,0.22)' }}
             >
               <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                style={{ background: 'linear-gradient(135deg, rgba(124,111,255,0.4), rgba(192,132,252,0.4))', color: '#c4baff' }}>
+                style={{ background: 'rgba(176,101,71,0.22)', color: '#b06547' }}>
                 {(currentUser.full_name || currentUser.email || 'U')[0].toUpperCase()}
               </div>
-              <span className="text-xs font-semibold hidden sm:inline max-w-[140px] truncate" style={{ color: '#a5b4fc' }}>
+              <span className="text-xs font-semibold hidden sm:inline max-w-[140px] truncate" style={{ color: '#2b2620' }}>
                 {currentUser.full_name || t('nav.myAccount')}
               </span>
-              <User className="w-3.5 h-3.5" style={{ color: '#a5b4fc' }} />
+              <User className="w-3.5 h-3.5" style={{ color: '#b06547' }} />
             </Link>
           ) : (
             <button
               onClick={() => base44.auth.redirectToLogin()}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold"
-              style={{ background: 'rgba(124,111,255,0.15)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.25)' }}
+              style={{ background: 'rgba(176,101,71,0.14)', color: '#b06547', border: '1px solid rgba(176,101,71,0.25)' }}
             >
               <LogIn className="w-3.5 h-3.5" /> {t('nav.login')}
             </button>

@@ -9,6 +9,17 @@ export default function GenrePhotoHero({ genreId, label, tagline, description, v
   const [photo, note] = PHOTOS[genreId] || PHOTOS.electronic;
   const ordered = v.heroMode === 'ordered';
   const rounded = v.heroMode === 'glossy' || v.heroMode === 'soft';
-  const warm = v.heroMode === 'warm';
-  return <motion.section initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="relative mb-14 min-h-[420px] overflow-hidden" style={{ borderRadius: ordered ? 8 : rounded ? 32 : 16, border: `1px solid ${v.accent}45`, boxShadow: `0 28px 70px rgba(0,0,0,.32)` }}><img src={photo} alt={`${label} music scene`} className="absolute inset-0 h-full w-full object-cover" /><div className="absolute inset-0" style={{ background: warm ? 'linear-gradient(90deg, rgba(25,15,7,.84), rgba(25,15,7,.48) 54%, rgba(25,15,7,.12))' : `linear-gradient(90deg, rgba(18,20,29,.9), rgba(18,20,29,.54) 55%, rgba(18,20,29,.14))` }} />{ordered && <div className="absolute inset-0" style={{ backgroundImage: `repeating-linear-gradient(90deg, ${v.accent}18 0 1px, transparent 1px 96px)` }} />}<div className="relative flex min-h-[420px] max-w-2xl flex-col justify-end p-7 sm:p-10"><p className="text-[10px] uppercase tracking-[0.28em] font-bold" style={{ color: v.text }}>{tagline}</p><h1 className="mt-3 font-playfair text-5xl italic leading-none sm:text-7xl" style={{ ...v.headerStyle, color: v.accent, textShadow: '0 2px 30px rgba(0,0,0,0.5)' }}>{label}</h1><p className="mt-4 max-w-lg text-sm leading-relaxed sm:text-base" style={{ color: v.text }}>{description}</p>{note && <p className="mt-6 text-[10px] uppercase tracking-[0.2em]" style={{ color: `${v.text}aa` }}>{note}</p>}</div></motion.section>;
+  return (
+    <motion.section initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="relative mb-14 min-h-[420px] overflow-hidden" style={{ borderRadius: ordered ? 8 : rounded ? 32 : 16, border: `1px solid ${v.accent}30`, boxShadow: '0 18px 50px rgba(120,100,80,0.14)' }}>
+      <img src={photo} alt={`${label} music scene`} className="absolute inset-0 h-full w-full object-cover" />
+      {/* Warm paper scrim — photo fades into the page like a journal spread */}
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(247,243,236,0.97) 0%, rgba(247,243,236,0.82) 42%, rgba(247,243,236,0.28) 76%, rgba(247,243,236,0.05) 100%)' }} />
+      <div className="relative flex min-h-[420px] max-w-2xl flex-col justify-end p-7 sm:p-10">
+        <p className="text-[10px] uppercase tracking-[0.28em] font-bold" style={{ color: v.muted }}>{tagline}</p>
+        <h1 className="mt-3 font-playfair text-5xl italic leading-none sm:text-7xl" style={{ ...v.headerStyle, color: v.accent }}>{label}</h1>
+        <p className="mt-4 max-w-lg text-sm leading-relaxed sm:text-base" style={{ color: v.text }}>{description}</p>
+        {note && <p className="mt-6 text-[10px] uppercase tracking-[0.2em]" style={{ color: v.muted }}>{note}</p>}
+      </div>
+    </motion.section>
+  );
 }

@@ -168,7 +168,21 @@ export default function GenreSpace() {
   };
 
   const genre = GENRES.find(g => g.id === genreId);
-  const v = { ...(GENRE_VISUALS[genreId] || GENRE_VISUALS.electronic), ...(GENRE_ATMOSPHERES[genreId] || GENRE_ATMOSPHERES.electronic) };
+  // Warm paper journal base — shared across every genre; only the accent hue
+  // and header typography stay genre-specific. Keeps the inclusive, friendly,
+  // cross-cultural feel instead of 16 cold dark rooms.
+  const baseV = GENRE_VISUALS[genreId] || GENRE_VISUALS.electronic;
+  const v = {
+    ...baseV,
+    ...(GENRE_ATMOSPHERES[genreId] || GENRE_ATMOSPHERES.electronic),
+    bg: 'linear-gradient(180deg, #f7f3ec 0%, #efe9dd 100%)',
+    pageBg: 'linear-gradient(180deg, #f7f3ec 0%, #efe9dd 100%)',
+    text: '#2b2620',
+    muted: '#6b6358',
+    cardBg: '#fbf8f2',
+    cardBorder: `${baseV.accent}33`,
+    accentGlow: `${baseV.accent}22`,
+  };
   const entityGenre = genre?.entityGenre;
 
   const { data: allItems = [], isLoading } = useQuery({
@@ -263,7 +277,7 @@ export default function GenreSpace() {
   return (
     <div className="min-h-screen" style={{ backgroundImage: v.pageBg || v.bg, backgroundAttachment: 'fixed' }}>
       {/* Top bar */}
-      <div className="sticky top-0 z-40 backdrop-blur-xl" style={{ background: 'rgba(0,0,0,0.5)', borderBottom: `1px solid ${v.accent}12` }}>
+      <div className="sticky top-0 z-40 backdrop-blur-xl" style={{ background: 'rgba(247,243,236,0.78)', borderBottom: `1px solid ${v.accent}22` }}>
         <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between">
           <button
             onClick={() => navigate('/')}

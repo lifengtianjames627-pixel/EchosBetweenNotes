@@ -9,80 +9,81 @@
   :root {
     --font-inter: 'Inter', sans-serif;
 
-    /* Inclusive calm futurism — warm charcoal base (not pure cold black),
-       low-sat gray-violet primary, warm off-white text, soft rotating
-       accents. No high-saturation neon, no large glow gradients. */
-    --background: 230 20% 9%;
-    --foreground: 252 25% 92%;
-    --card: 230 18% 13%;
-    --card-foreground: 252 25% 92%;
-    --popover: 230 18% 13%;
-    --popover-foreground: 252 25% 92%;
-    --primary: 249 19% 49%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 230 14% 18%;
-    --secondary-foreground: 252 20% 90%;
-    --muted: 230 14% 18%;
-    --muted-foreground: 250 12% 61%;
-    --accent: 232 25% 59%;
-    --accent-foreground: 230 20% 12%;
-    --destructive: 0 60% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 230 14% 20%;
-    --input: 230 14% 20%;
-    --ring: 249 19% 49%;
-    --chart-1: 249 19% 49%;
-    --chart-2: 232 25% 59%;
-    --chart-3: 146 12% 59%;
-    --chart-4: 37 30% 60%;
-    --chart-5: 336 25% 58%;
+    /* Warm paper journal — ivory/cream base (never pure white, never cold
+       black), warm ink-brown text, terracotta primary, and a rotating set of
+       earthy cross-cultural accents (ochre / indigo / sage / rose). Friendly,
+       academic-but-not-rigid, culturally inclusive. */
+    --background: 40 38% 94%;
+    --foreground: 32 15% 15%;
+    --card: 40 40% 97%;
+    --card-foreground: 32 15% 15%;
+    --popover: 40 40% 97%;
+    --popover-foreground: 32 15% 15%;
+    --primary: 17 42% 48%;
+    --primary-foreground: 40 44% 97%;
+    --secondary: 40 28% 90%;
+    --secondary-foreground: 32 15% 22%;
+    --muted: 40 30% 89%;
+    --muted-foreground: 35 10% 38%;
+    --accent: 41 51% 57%;
+    --accent-foreground: 32 15% 15%;
+    --destructive: 0 55% 48%;
+    --destructive-foreground: 40 44% 97%;
+    --border: 40 26% 84%;
+    --input: 40 26% 84%;
+    --ring: 17 42% 48%;
+    --chart-1: 17 42% 48%;
+    --chart-2: 41 51% 57%;
+    --chart-3: 95 14% 48%;
+    --chart-4: 224 22% 46%;
+    --chart-5: 5 25% 60%;
     --radius: 0.75rem;
 
-    /* Soft inclusive accent set — rotates across sections/genres, never
-       used as a large glow; only borders, icons, tags, small tints. */
-    --accent-indigo: 232 25% 59%;
-    --accent-rose: 336 25% 58%;
-    --accent-ochre: 37 30% 60%;
-    --accent-green: 146 12% 59%;
+    /* Cross-cultural soft accent set — rotates across sections/genres */
+    --accent-terracotta: 17 42% 48%;
+    --accent-ochre: 41 51% 57%;
+    --accent-indigo: 224 22% 46%;
+    --accent-sage: 95 14% 48%;
+    --accent-rose: 5 25% 60%;
 
-    --sidebar-background: 230 20% 8%;
-    --sidebar-foreground: 250 12% 66%;
-    --sidebar-primary: 249 19% 49%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 230 14% 16%;
-    --sidebar-accent-foreground: 252 25% 92%;
-    --sidebar-border: 230 14% 16%;
-    --sidebar-ring: 249 19% 49%;
+    --sidebar-background: 42 34% 90%;
+    --sidebar-foreground: 35 12% 30%;
+    --sidebar-primary: 17 42% 48%;
+    --sidebar-primary-foreground: 40 44% 97%;
+    --sidebar-accent: 40 28% 86%;
+    --sidebar-accent-foreground: 32 15% 18%;
+    --sidebar-border: 40 26% 82%;
+    --sidebar-ring: 17 42% 48%;
   }
 
   .dark {
-    --background: 230 20% 9%;
-    --foreground: 252 25% 92%;
-    --card: 230 18% 13%;
-    --card-foreground: 252 25% 92%;
-    --popover: 230 18% 13%;
-    --popover-foreground: 252 25% 92%;
-    --primary: 249 19% 49%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 230 14% 18%;
-    --secondary-foreground: 252 20% 90%;
-    --muted: 230 14% 18%;
-    --muted-foreground: 250 12% 61%;
-    --accent: 232 25% 59%;
-    --accent-foreground: 230 20% 12%;
-    --destructive: 0 60% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 230 14% 20%;
-    --input: 230 14% 20%;
-    --ring: 249 19% 49%;
-    --sidebar-background: 230 20% 8%;
-    --sidebar-foreground: 250 12% 66%;
-    --sidebar-primary: 249 19% 49%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 230 14% 16%;
-    --sidebar-accent-foreground: 252 25% 92%;
-    --sidebar-border: 230 14% 16%;
-    --sidebar-ring: 249 19% 49%;
+    --background: 40 38% 94%;
+    --foreground: 32 15% 15%;
+    --card: 40 40% 97%;
+    --card-foreground: 32 15% 15%;
+    --popover: 40 40% 97%;
+    --popover-foreground: 32 15% 15%;
+    --primary: 17 42% 48%;
+    --primary-foreground: 40 44% 97%;
+    --secondary: 40 28% 90%;
+    --secondary-foreground: 32 15% 22%;
+    --muted: 40 30% 89%;
+    --muted-foreground: 35 10% 38%;
+    --accent: 41 51% 57%;
+    --accent-foreground: 32 15% 15%;
+    --destructive: 0 55% 48%;
+    --destructive-foreground: 40 44% 97%;
+    --border: 40 26% 84%;
+    --input: 40 26% 84%;
+    --ring: 17 42% 48%;
+    --sidebar-background: 42 34% 90%;
+    --sidebar-foreground: 35 12% 30%;
+    --sidebar-primary: 17 42% 48%;
+    --sidebar-primary-foreground: 40 44% 97%;
+    --sidebar-accent: 40 28% 86%;
+    --sidebar-accent-foreground: 32 15% 18%;
+    --sidebar-border: 40 26% 82%;
+    --sidebar-ring: 17 42% 48%;
   }
 }
 
