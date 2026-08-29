@@ -21,8 +21,9 @@ import DirectChat from '@/pages/DirectChat';
 import SoulmateBoard from '@/pages/SoulmateBoard';
 import UserProfile from '@/pages/UserProfile';
 import ProfileSetup from '@/pages/ProfileSetup';
-import RequireAuth from '@/components/RequireAuth';
-import ProfileSetupGate from '@/components/ProfileSetupGate';
+// Login gates disabled — whole site is public per user request.
+// import RequireAuth from '@/components/RequireAuth';
+// import ProfileSetupGate from '@/components/ProfileSetupGate';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -38,10 +39,13 @@ const AuthenticatedApp = () => {
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      navigateToLogin();
-      return null;
     }
+    // Login no longer required — render the whole site even if the platform
+    // reports auth_required. (auth_required redirect commented out per request.)
+    // else if (authError.type === 'auth_required') {
+    //   navigateToLogin();
+    //   return null;
+    // }
   }
 
   return (
@@ -50,17 +54,17 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Home />} />
         <Route path="/reviews" element={<WrittenReviews />} />
         <Route path="/podcasts" element={<Podcasts />} />
-        <Route path="/podcasts/:categoryId" element={<RequireAuth><ProfileSetupGate><PodcastSpace /></ProfileSetupGate></RequireAuth>} />
-        <Route path="/genre/:genreId" element={<RequireAuth><ProfileSetupGate><GenreSpace /></ProfileSetupGate></RequireAuth>} />
-        <Route path="/album/:id" element={<RequireAuth><ProfileSetupGate><AlbumDetail /></ProfileSetupGate></RequireAuth>} />
+        <Route path="/podcasts/:categoryId" element={<PodcastSpace />} />
+        <Route path="/genre/:genreId" element={<GenreSpace />} />
+        <Route path="/album/:id" element={<AlbumDetail />} />
         <Route path="/about" element={<About />} />
-        <Route path="/profile/setup" element={<RequireAuth><ProfileSetupGate allowSetup><ProfileSetup /></ProfileSetupGate></RequireAuth>} />
-        <Route path="/profile" element={<RequireAuth><ProfileSetupGate><Profile /></ProfileSetupGate></RequireAuth>} />
-        <Route path="/u/:email" element={<RequireAuth><ProfileSetupGate><UserProfile /></ProfileSetupGate></RequireAuth>} />
-        <Route path="/moderation" element={<RequireAuth><ProfileSetupGate><ModerationQueue /></ProfileSetupGate></RequireAuth>} />
-        <Route path="/band-dashboard" element={<RequireAuth><ProfileSetupGate><BandDashboard /></ProfileSetupGate></RequireAuth>} />
-        <Route path="/chat" element={<RequireAuth><ProfileSetupGate><DirectChat /></ProfileSetupGate></RequireAuth>} />
-        <Route path="/soulmate" element={<RequireAuth><ProfileSetupGate><SoulmateBoard /></ProfileSetupGate></RequireAuth>} />
+        <Route path="/profile/setup" element={<ProfileSetup />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/u/:email" element={<UserProfile />} />
+        <Route path="/moderation" element={<ModerationQueue />} />
+        <Route path="/band-dashboard" element={<BandDashboard />} />
+        <Route path="/chat" element={<DirectChat />} />
+        <Route path="/soulmate" element={<SoulmateBoard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
