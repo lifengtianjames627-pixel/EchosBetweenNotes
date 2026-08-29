@@ -20,7 +20,9 @@ import BandDashboard from '@/pages/BandDashboard';
 import DirectChat from '@/pages/DirectChat';
 import SoulmateBoard from '@/pages/SoulmateBoard';
 import UserProfile from '@/pages/UserProfile';
+import ProfileSetup from '@/pages/ProfileSetup';
 import RequireAuth from '@/components/RequireAuth';
+import ProfileSetupGate from '@/components/ProfileSetupGate';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -48,16 +50,17 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Home />} />
         <Route path="/reviews" element={<WrittenReviews />} />
         <Route path="/podcasts" element={<Podcasts />} />
-        <Route path="/podcasts/:categoryId" element={<PodcastSpace />} />
-        <Route path="/genre/:genreId" element={<GenreSpace />} />
-        <Route path="/album/:id" element={<AlbumDetail />} />
+        <Route path="/podcasts/:categoryId" element={<RequireAuth><ProfileSetupGate><PodcastSpace /></ProfileSetupGate></RequireAuth>} />
+        <Route path="/genre/:genreId" element={<RequireAuth><ProfileSetupGate><GenreSpace /></ProfileSetupGate></RequireAuth>} />
+        <Route path="/album/:id" element={<RequireAuth><ProfileSetupGate><AlbumDetail /></ProfileSetupGate></RequireAuth>} />
         <Route path="/about" element={<About />} />
-        <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-        <Route path="/u/:email" element={<RequireAuth><UserProfile /></RequireAuth>} />
-        <Route path="/moderation" element={<RequireAuth><ModerationQueue /></RequireAuth>} />
-        <Route path="/band-dashboard" element={<RequireAuth><BandDashboard /></RequireAuth>} />
-        <Route path="/chat" element={<RequireAuth><DirectChat /></RequireAuth>} />
-        <Route path="/soulmate" element={<RequireAuth><SoulmateBoard /></RequireAuth>} />
+        <Route path="/profile/setup" element={<RequireAuth><ProfileSetupGate allowSetup><ProfileSetup /></ProfileSetupGate></RequireAuth>} />
+        <Route path="/profile" element={<RequireAuth><ProfileSetupGate><Profile /></ProfileSetupGate></RequireAuth>} />
+        <Route path="/u/:email" element={<RequireAuth><ProfileSetupGate><UserProfile /></ProfileSetupGate></RequireAuth>} />
+        <Route path="/moderation" element={<RequireAuth><ProfileSetupGate><ModerationQueue /></ProfileSetupGate></RequireAuth>} />
+        <Route path="/band-dashboard" element={<RequireAuth><ProfileSetupGate><BandDashboard /></ProfileSetupGate></RequireAuth>} />
+        <Route path="/chat" element={<RequireAuth><ProfileSetupGate><DirectChat /></ProfileSetupGate></RequireAuth>} />
+        <Route path="/soulmate" element={<RequireAuth><ProfileSetupGate><SoulmateBoard /></ProfileSetupGate></RequireAuth>} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

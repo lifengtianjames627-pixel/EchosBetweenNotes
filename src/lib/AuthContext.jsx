@@ -128,6 +128,12 @@ export const AuthProvider = ({ children }) => {
     base44.auth.redirectToLogin(window.location.href);
   };
 
+  const updateCurrentUser = async (data) => {
+    const updatedUser = await base44.auth.updateMe(data);
+    setUser(updatedUser);
+    return updatedUser;
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -138,6 +144,7 @@ export const AuthProvider = ({ children }) => {
       appPublicSettings,
       logout,
       navigateToLogin,
+      updateCurrentUser,
       checkAppState
     }}>
       {children}

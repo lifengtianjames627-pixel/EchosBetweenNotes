@@ -29,6 +29,36 @@
       ],
       "description": "Self-declared age bracket. Band-forming posts are only visible within the same bracket so adults and minors never match with each other."
     },
+    "music_preferences": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Music styles selected during profile setup"
+    },
+    "biography": {
+      "type": "string",
+      "description": "Short member biography"
+    },
+    "location_network_allowed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the member allows network-based nearby discovery"
+    },
+    "has_band": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the member is currently in a band"
+    },
+    "band_name": {
+      "type": "string",
+      "description": "Current band name when applicable"
+    },
+    "profile_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the first-time profile setup was completed"
+    },
     "total_browsing_minutes": {
       "type": "number",
       "default": 0

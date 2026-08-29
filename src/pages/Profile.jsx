@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Users, Star, UserPlus, Check, X, Music, Shield, MessageSquare, Search } from 'lucide-react';
 import UserBadges from '@/components/UserBadges';
 import ProfileHero from '@/components/profile/ProfileHero';
+import ProfileDetails from '@/components/profile/ProfileDetails';
 import StatStrip from '@/components/profile/StatStrip';
 import { awardBadge } from '@/lib/badgeUtils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -126,6 +127,8 @@ export default function Profile() {
             <UserPlus className="w-3.5 h-3.5" /> Add Friend
           </button>
         </ProfileHero>
+
+        <ProfileDetails user={user} />
 
         {/* Stats row */}
         <StatStrip stats={[

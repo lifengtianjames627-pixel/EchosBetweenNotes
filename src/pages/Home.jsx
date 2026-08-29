@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { PenLine, Headphones, Users } from 'lucide-react';
 import { useLang } from '@/i18n/LanguageContext';
-import { useAuth } from '@/lib/AuthContext';
 
 const OPTIONS = [
   {
@@ -35,7 +34,6 @@ const OPTIONS = [
 export default function Home() {
   const navigate = useNavigate();
   const { t } = useLang();
-  const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center px-4" style={{ background: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)' }}>
@@ -116,7 +114,7 @@ export default function Home() {
         transition={{ delay: 0.5, duration: 0.7 }}
         className="relative z-10 mt-14 grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-4xl"
       >
-        {OPTIONS.filter(o => o.path !== '/soulmate' || isAuthenticated).map(({ path, icon: Icon, labelKey, descKey, accent, glow }) => (
+        {OPTIONS.map(({ path, icon: Icon, labelKey, descKey, accent, glow }) => (
           <motion.button
             key={path}
             onClick={() => navigate(path)}
