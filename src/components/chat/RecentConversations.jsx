@@ -11,10 +11,10 @@ export default function RecentConversations({ V, conversations, loading, isPinne
     <ChatSection V={V} icon={History} label={t('chat.history')} count={conversations.length}>
       {loading ? (
         <div className="space-y-1.5">
-          {[0, 1, 2].map(i => <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'rgba(124,111,255,0.08)' }} />)}
+          {[0, 1, 2].map(i => <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: '#ece5d6' }} />)}
         </div>
       ) : conversations.length === 0 ? (
-        <p className="text-xs px-4 py-4 rounded-2xl" style={{ color: V.muted, background: 'rgba(255,255,255,0.03)', border: `1px dashed ${V.border}` }}>
+        <p className="text-xs px-4 py-4 rounded-2xl" style={{ color: V.muted, background: V.card, border: `1px dashed ${V.border}` }}>
           {t('chat.historyEmpty')}
         </p>
       ) : (

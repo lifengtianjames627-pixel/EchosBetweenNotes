@@ -71,22 +71,22 @@ export default function MiniChat({ peer, currentUser, onClose }) {
       transition={{ type: 'spring', damping: 20, stiffness: 300 }}
       className="fixed bottom-6 right-6 z-[200] w-80 rounded-2xl overflow-hidden flex flex-col"
       style={{
-        background: 'rgba(8,10,28,0.97)',
-        border: '1px solid rgba(124,111,255,0.3)',
-        boxShadow: '0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,111,255,0.1)',
+        background: '#faf8f2',
+        border: '1px solid #e0d8c8',
+        boxShadow: '0 8px 30px rgba(120,100,80,0.18)',
         height: 440,
       }}
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 shrink-0"
-        style={{ borderBottom: '1px solid rgba(124,111,255,0.15)', background: 'rgba(124,111,255,0.08)' }}>
+        style={{ borderBottom: '1px solid #e0d8c8', background: '#e6ddc9' }}>
         <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
-          style={{ background: 'rgba(124,111,255,0.25)', color: '#a5b4fc' }}>
+          style={{ background: '#f1ebdd', color: '#8a5a20' }}>
           {(peer.name || peer.email || '?')[0].toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold truncate" style={{ color: 'rgba(220,225,255,0.9)' }}>{peer.name || peer.email}</p>
-          <p className="text-[10px]" style={{ color: 'rgba(140,155,210,0.5)' }}>
+          <p className="text-sm font-semibold truncate" style={{ color: '#1a1815' }}>{peer.name || peer.email}</p>
+          <p className="text-[10px]" style={{ color: '#6b6358' }}>
             Temporary chat · {Math.max(0, MAX_MESSAGES - myMessages.length)} messages left
           </p>
         </div>
@@ -97,7 +97,7 @@ export default function MiniChat({ peer, currentUser, onClose }) {
           targetAuthorEmail={peer.email}
           currentUser={currentUser}
         />
-        <button onClick={onClose} style={{ color: 'rgba(140,155,210,0.5)' }}>
+        <button onClick={onClose} style={{ color: '#6b6358' }}>
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -106,11 +106,11 @@ export default function MiniChat({ peer, currentUser, onClose }) {
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full gap-2 px-4">
-            <MessageSquare className="w-8 h-8" style={{ color: 'rgba(124,111,255,0.3)' }} />
-            <p className="text-xs text-center" style={{ color: 'rgba(140,155,210,0.45)' }}>
+            <MessageSquare className="w-8 h-8" style={{ color: '#cdc3b1' }} />
+            <p className="text-xs text-center" style={{ color: '#6b6358' }}>
               Start a conversation!<br />You have {MAX_MESSAGES} messages to make a connection.
             </p>
-            <p className="text-[10px] text-center mt-1" style={{ color: 'rgba(140,155,210,0.35)' }}>
+            <p className="text-[10px] text-center mt-1" style={{ color: '#8a7e6f' }}>
               Never share your phone, WeChat or QQ here.
             </p>
           </div>
@@ -121,9 +121,9 @@ export default function MiniChat({ peer, currentUser, onClose }) {
             <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
               <div className="max-w-[80%] px-3 py-2 rounded-xl text-xs leading-relaxed whitespace-pre-wrap flex items-end gap-1.5"
                 style={{
-                  background: isMe ? 'rgba(124,111,255,0.25)' : 'rgba(255,255,255,0.06)',
-                  color: isMe ? '#c4baff' : 'rgba(200,210,240,0.85)',
-                  border: `1px solid ${isMe ? 'rgba(124,111,255,0.35)' : 'rgba(255,255,255,0.08)'}`,
+                  background: isMe ? '#f1ebdd' : '#f5f2ea',
+                  color: '#1a1815',
+                  border: `1px solid ${isMe ? '#ddd0b6' : '#e6ddc9'}`,
                   opacity: msg._pending ? 0.6 : 1,
                 }}>
                 <span>{msg.content}</span>
@@ -145,9 +145,9 @@ export default function MiniChat({ peer, currentUser, onClose }) {
             className="overflow-hidden shrink-0 px-3"
           >
             <div className="flex gap-2 rounded-xl p-2.5 mb-1"
-              style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)' }}>
-              <ShieldAlert className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: '#fbbf24' }} />
-              <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(251,191,36,0.9)' }}>{warning}</p>
+              style={{ background: '#f6efe1', border: '1px solid #ddd0b6' }}>
+              <ShieldAlert className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: '#a0522d' }} />
+              <p className="text-[10px] leading-relaxed" style={{ color: '#8a5a20' }}>{warning}</p>
             </div>
           </motion.div>
         )}
@@ -157,18 +157,18 @@ export default function MiniChat({ peer, currentUser, onClose }) {
       {limitReached && (
         <div className="px-3 pb-3 shrink-0">
           <div className="rounded-xl p-3 text-center space-y-2"
-            style={{ background: 'rgba(124,111,255,0.1)', border: '1px solid rgba(124,111,255,0.25)' }}>
-            <p className="text-xs" style={{ color: 'rgba(165,180,252,0.8)' }}>
+            style={{ background: '#f6efe1', border: '1px solid #e0d8c8' }}>
+            <p className="text-xs" style={{ color: '#5a534a' }}>
               Message limit reached! Add {peer.name || 'them'} as a friend to keep chatting.
             </p>
             {alreadySentRequest ? (
-              <p className="text-xs font-semibold" style={{ color: '#86efac' }}>✓ Friend request sent!</p>
+              <p className="text-xs font-semibold" style={{ color: '#4d5f3f' }}>✓ Friend request sent!</p>
             ) : (
               <button
                 onClick={() => sendFriendRequest.mutate()}
                 disabled={sendFriendRequest.isPending}
                 className="flex items-center gap-1.5 mx-auto px-4 py-1.5 rounded-full text-xs font-semibold"
-                style={{ background: 'rgba(124,111,255,0.25)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.4)' }}>
+                style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #ddd0b6' }}>
                 <UserPlus className="w-3.5 h-3.5" />
                 {sendFriendRequest.isPending ? 'Sending…' : 'Add Friend'}
               </button>
@@ -179,11 +179,11 @@ export default function MiniChat({ peer, currentUser, onClose }) {
 
       {/* Input */}
       {!limitReached && (
-        <div className="px-3 pb-3 pt-1 shrink-0" style={{ borderTop: '1px solid rgba(124,111,255,0.1)' }}>
+        <div className="px-3 pb-3 pt-1 shrink-0" style={{ borderTop: '1px solid #e6ddc9' }}>
           <div className="flex gap-2 mt-2">
             <input
               className="flex-1 px-3 py-2 rounded-xl text-xs outline-none"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
+              style={{ background: '#ffffff', border: '1px solid #e0d8c8', color: '#1a1815' }}
               placeholder="Type a message…"
               value={text}
               onChange={e => { setText(e.target.value); if (warning) setWarning(null); }}
@@ -193,7 +193,7 @@ export default function MiniChat({ peer, currentUser, onClose }) {
               disabled={!text.trim()}
               onClick={handleSend}
               className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: 'rgba(124,111,255,0.25)', color: '#a5b4fc', opacity: text.trim() ? 1 : 0.5 }}>
+              style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #ddd0b6', opacity: text.trim() ? 1 : 0.5 }}>
               <Send className="w-3.5 h-3.5" />
             </button>
           </div>

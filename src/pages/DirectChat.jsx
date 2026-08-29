@@ -13,13 +13,15 @@ import PeopleAround from '@/components/chat/PeopleAround';
 import { usePins } from '@/components/chat/usePins';
 import { useLang } from '@/i18n/LanguageContext';
 
+// Paper palette — same language as Written Reviews. Shared with the chat
+// subcomponents through the `V` prop.
 const V = {
-  bg: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)',
-  card: 'rgba(12,15,35,0.85)',
-  border: 'rgba(124,111,255,0.18)',
-  accent: '#a5b4fc',
-  text: 'rgba(220,225,255,0.9)',
-  muted: 'rgba(140,155,210,0.55)',
+  bg: '#f3efe6',
+  card: '#faf8f2',
+  border: '#e0d8c8',
+  accent: '#bf7a35',
+  text: '#1a1815',
+  muted: '#6b6358',
 };
 
 export default function DirectChat() {
@@ -88,8 +90,8 @@ export default function DirectChat() {
     return (
       <div className="min-h-screen flex flex-col" style={{ background: V.bg }}>
         <div className="px-5 py-4 sticky top-0 z-10"
-          style={{ background: 'rgba(5,7,20,0.9)', borderBottom: `1px solid ${V.border}`, backdropFilter: 'blur(12px)' }}>
-          <p className="text-base font-bold" style={{ color: V.text }}>{t('chat.title')}</p>
+          style={{ background: '#e6ddc9', borderBottom: `1px solid ${V.border}` }}>
+          <p className="font-playfair italic text-lg" style={{ color: V.text }}>{t('chat.title')}</p>
           <p className="text-xs mt-0.5" style={{ color: V.muted }}>{t('chat.subtitle')}</p>
         </div>
         <div className="px-5 pt-6 pb-16 max-w-lg w-full mx-auto">
@@ -99,7 +101,7 @@ export default function DirectChat() {
             <input
               autoFocus
               className="w-full pl-10 pr-4 py-3 rounded-2xl text-sm outline-none"
-              style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${V.border}`, color: V.text }}
+              style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
               placeholder={t('chat.searchPlaceholder')}
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -115,11 +117,11 @@ export default function DirectChat() {
                   <button
                     key={u.id}
                     onClick={() => openChat(u.email, u.full_name || u.email)}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.01]"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${V.border}` }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-colors"
+                    style={{ background: V.card, border: `1px solid ${V.border}` }}
                   >
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-                      style={{ background: 'rgba(124,111,255,0.2)', color: V.accent }}>
+                      style={{ background: '#f1ebdd', color: '#8a5a20' }}>
                       {(u.full_name || u.email || '?')[0].toUpperCase()}
                     </div>
                     <div className="min-w-0">
@@ -174,12 +176,12 @@ export default function DirectChat() {
     <div className="flex flex-col" style={{ background: V.bg, height: 'calc(100vh - 3rem)' }}>
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 shrink-0"
-        style={{ background: 'rgba(5,7,20,0.9)', borderBottom: `1px solid ${V.border}`, backdropFilter: 'blur(12px)' }}>
+        style={{ background: '#e6ddc9', borderBottom: `1px solid ${V.border}` }}>
         <button onClick={() => navigate('/chat')} style={{ color: V.muted }}>
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold"
-          style={{ background: 'rgba(124,111,255,0.2)', color: V.accent }}>
+          style={{ background: '#f1ebdd', color: '#8a5a20' }}>
           {(peerName || '?')[0].toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
@@ -200,7 +202,7 @@ export default function DirectChat() {
         {messages.length === 0 && (
           <div className="text-center py-10">
             <p className="text-sm" style={{ color: V.muted }}>{t('chat.noMessages')}</p>
-            <p className="text-xs mt-2" style={{ color: 'rgba(140,155,210,0.4)' }}>
+            <p className="text-xs mt-2" style={{ color: '#8a7e6f' }}>
               {t('chat.noContactHint')}
             </p>
           </div>
@@ -212,8 +214,8 @@ export default function DirectChat() {
               <div className="max-w-[70%] px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap flex items-end gap-2"
                 style={{
                   ...(isMe
-                    ? { background: 'rgba(124,111,255,0.25)', border: '1px solid rgba(124,111,255,0.3)' }
-                    : { background: 'rgba(255,255,255,0.06)', border: `1px solid ${V.border}` }),
+                    ? { background: '#f1ebdd', border: '1px solid #ddd0b6' }
+                    : { background: V.card, border: `1px solid ${V.border}` }),
                   color: V.text,
                   opacity: msg._pending ? 0.6 : 1,
                 }}>
@@ -236,9 +238,9 @@ export default function DirectChat() {
             className="overflow-hidden shrink-0 px-5"
           >
             <div className="flex gap-2.5 rounded-2xl p-3 mb-1"
-              style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)' }}>
-              <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#fbbf24' }} />
-              <p className="text-xs leading-relaxed" style={{ color: 'rgba(251,191,36,0.9)' }}>{warning}</p>
+              style={{ background: '#f6efe1', border: '1px solid #ddd0b6' }}>
+              <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#a0522d' }} />
+              <p className="text-xs leading-relaxed" style={{ color: '#8a5a20' }}>{warning}</p>
             </div>
           </motion.div>
         )}
@@ -246,10 +248,10 @@ export default function DirectChat() {
 
       {/* Input */}
       <div className="px-5 py-4 flex gap-3 shrink-0"
-        style={{ borderTop: `1px solid ${V.border}`, background: 'rgba(5,7,20,0.9)', backdropFilter: 'blur(12px)' }}>
+        style={{ borderTop: `1px solid ${V.border}`, background: '#e6ddc9' }}>
         <input
           className="flex-1 px-4 py-2.5 rounded-full text-sm outline-none"
-          style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${V.border}`, color: V.text }}
+          style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
           placeholder={t('chat.typeMessage')}
           value={text}
           onChange={e => { setText(e.target.value); if (warning) setWarning(null); }}
@@ -259,7 +261,7 @@ export default function DirectChat() {
           onClick={handleSend}
           disabled={!text.trim()}
           className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-          style={{ background: 'rgba(124,111,255,0.25)', color: V.accent, border: '1px solid rgba(124,111,255,0.4)', opacity: text.trim() ? 1 : 0.5 }}>
+          style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #ddd0b6', opacity: text.trim() ? 1 : 0.5 }}>
           <Send className="w-4 h-4" />
         </button>
       </div>

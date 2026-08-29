@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useQueryClient } from '@tanstack/react-query';
 import BadgeIcon from '@/components/BadgeIcon';
 import { BADGES, BADGE_CATEGORIES } from '@/lib/badgeConfig';
-import { Shield } from 'lucide-react';
+import { Bookmark } from 'lucide-react';
 
 export default function UserBadges({ user, earnedBadgeIds }) {
   const queryClient = useQueryClient();
@@ -30,7 +30,7 @@ export default function UserBadges({ user, earnedBadgeIds }) {
     <div className="space-y-6">
       {/* Stats row */}
       <div className="flex items-center gap-2">
-        <span className="text-2xl font-bold">{earnedCount}</span>
+        <span className="font-playfair text-2xl" style={{ color: '#1a1815' }}>{earnedCount}</span>
         <span className="text-sm text-muted-foreground">badge{earnedCount !== 1 ? 's' : ''} earned</span>
       </div>
 
@@ -45,14 +45,14 @@ export default function UserBadges({ user, earnedBadgeIds }) {
               key={i}
               className="w-20 h-20 rounded-2xl flex items-center justify-center transition-all"
               style={{
-                background: localEquipped[i] ? 'rgba(124,111,255,0.08)' : 'rgba(0,0,0,0.04)',
-                border: localEquipped[i] ? '1px solid rgba(124,111,255,0.3)' : '1px dashed rgba(0,0,0,0.12)',
+                background: localEquipped[i] ? '#f7f2e6' : '#f1ede3',
+                border: localEquipped[i] ? '1px solid #ddd0b6' : '1px dashed #ddd6c6',
               }}
             >
               {localEquipped[i] ? (
                 <BadgeIcon badgeId={localEquipped[i]} size="sm" />
               ) : (
-                <Shield className="w-5 h-5 text-muted-foreground/20" />
+                <Bookmark className="w-5 h-5" style={{ color: '#cdc3b1' }} />
               )}
             </div>
           ))}
@@ -89,7 +89,7 @@ export default function UserBadges({ user, earnedBadgeIds }) {
                       {isEquipped && (
                         <div
                           className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-white font-bold"
-                          style={{ background: 'rgba(124,111,255,0.95)', fontSize: 9 }}
+                          style={{ background: '#bf7a35', fontSize: 9 }}
                         >
                           ✓
                         </div>
@@ -98,7 +98,7 @@ export default function UserBadges({ user, earnedBadgeIds }) {
                     <div className="text-center" style={{ maxWidth: 80 }}>
                       <p
                         className="text-xs font-semibold leading-tight"
-                        style={{ color: earned ? badge.color : 'rgba(120,120,140,0.5)' }}
+                        style={{ color: earned ? '#1a1815' : '#a9a094' }}
                       >
                         {badge.name}
                       </p>

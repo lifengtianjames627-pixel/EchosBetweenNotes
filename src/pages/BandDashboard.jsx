@@ -5,14 +5,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Edit2, Save, X, Users, Music2, ChevronRight, UserMinus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+// Paper palette, same language as the rest of the site.
 const V = {
-  bg: 'rgba(5,7,20,0.95)',
-  card: 'rgba(12,15,35,0.85)',
-  border: 'rgba(124,111,255,0.18)',
-  accent: '#a5b4fc',
-  accentBg: 'rgba(124,111,255,0.12)',
-  text: 'rgba(220,225,255,0.9)',
-  muted: 'rgba(140,155,210,0.55)',
+  bg: '#f3efe6',
+  card: '#faf8f2',
+  border: '#e0d8c8',
+  accent: '#8a5a20',
+  accentBg: '#f1ebdd',
+  text: '#1a1815',
+  muted: '#6b6358',
 };
 
 function EditBandForm({ band, onSave, onCancel }) {
@@ -32,14 +33,14 @@ function EditBandForm({ band, onSave, onCancel }) {
             <textarea
               rows={5}
               className="w-full px-3 py-2 rounded-xl text-sm outline-none resize-none"
-              style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${V.border}`, color: V.text }}
+              style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
               value={form[key]}
               onChange={e => setForm({ ...form, [key]: e.target.value })}
             />
           ) : (
             <input
               className="w-full px-3 py-2 rounded-xl text-sm outline-none"
-              style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${V.border}`, color: V.text }}
+              style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
               value={form[key]}
               onChange={e => setForm({ ...form, [key]: e.target.value })}
             />
@@ -50,7 +51,7 @@ function EditBandForm({ band, onSave, onCancel }) {
         <label className="text-xs uppercase tracking-widest font-bold mb-1 block" style={{ color: V.muted }}>Genre</label>
         <select
           className="w-full px-3 py-2 rounded-xl text-sm outline-none"
-          style={{ background: 'rgba(12,15,35,0.95)', border: `1px solid ${V.border}`, color: V.text }}
+          style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
           value={form.genre}
           onChange={e => setForm({ ...form, genre: e.target.value })}
         >
@@ -63,7 +64,7 @@ function EditBandForm({ band, onSave, onCancel }) {
         <label className="text-xs uppercase tracking-widest font-bold mb-1 block" style={{ color: V.muted }}>Status</label>
         <select
           className="w-full px-3 py-2 rounded-xl text-sm outline-none"
-          style={{ background: 'rgba(12,15,35,0.95)', border: `1px solid ${V.border}`, color: V.text }}
+          style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
           value={form.status}
           onChange={e => setForm({ ...form, status: e.target.value })}
         >
@@ -76,7 +77,7 @@ function EditBandForm({ band, onSave, onCancel }) {
         <button
           onClick={() => onSave(form)}
           className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold"
-          style={{ background: 'rgba(124,111,255,0.25)', color: V.accent, border: `1px solid rgba(124,111,255,0.4)` }}
+          style={{ background: V.accentBg, color: V.accent, border: '1px solid #ddd0b6' }}
         >
           <Save className="w-3.5 h-3.5" /> Save
         </button>
@@ -161,15 +162,15 @@ export default function BandDashboard() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen p-6" style={{ background: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)' }}>
+    <div className="min-h-screen p-6" style={{ background: V.bg }}>
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-black" style={{ color: V.accent }}>Band Dashboard</h1>
+          <h1 className="font-playfair italic text-2xl" style={{ color: V.text }}>Band Dashboard</h1>
           <button
             onClick={() => setEditing('new')}
             className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
-            style={{ background: 'rgba(124,111,255,0.18)', color: V.accent, border: '1px solid rgba(124,111,255,0.35)' }}
+            style={{ background: V.accentBg, color: V.accent, border: '1px solid #ddd0b6' }}
           >
             <Plus className="w-4 h-4" /> Create Band
           </button>
@@ -207,7 +208,7 @@ export default function BandDashboard() {
                   <div className="flex items-center gap-2">
                     <Music2 className="w-4 h-4" style={{ color: V.accent }} />
                     <h2 className="font-bold text-lg" style={{ color: V.text }}>{band.name}</h2>
-                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(124,111,255,0.15)', color: V.accent }}>
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: V.accentBg, color: V.accent }}>
                       {band.genre?.replace('_',' ')}
                     </span>
                   </div>
@@ -221,7 +222,7 @@ export default function BandDashboard() {
                   </Link>
                   <button onClick={() => setEditing(isEditing ? null : band.id)}
                     className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-                    style={{ background: V.accentBg, color: V.accent, border: '1px solid rgba(124,111,255,0.3)' }}>
+                    style={{ background: V.accentBg, color: V.accent, border: '1px solid #ddd0b6' }}>
                     <Edit2 className="w-3 h-3" /> Edit
                   </button>
                 </div>
@@ -246,11 +247,11 @@ export default function BandDashboard() {
                 <div className="space-y-2">
                   {members.map(m => (
                     <div key={m.id} className="flex items-center justify-between px-3 py-2 rounded-lg"
-                      style={{ background: 'rgba(255,255,255,0.03)' }}>
+                      style={{ background: '#f5f2ea', border: '1px solid #ece5d6' }}>
                       <div>
                         <span className="text-sm font-medium" style={{ color: V.text }}>{m.user_name || m.user_email}</span>
                         <span className="text-xs ml-2" style={{ color: V.muted }}>{m.role}</span>
-                        {m.is_founder && <span className="text-xs ml-2 px-1.5 py-0.5 rounded" style={{ background: 'rgba(124,111,255,0.2)', color: V.accent }}>Founder</span>}
+                        {m.is_founder && <span className="text-xs ml-2 px-1.5 py-0.5 rounded" style={{ background: V.accentBg, color: V.accent }}>Founder</span>}
                       </div>
                       {!m.is_founder && (
                         <button onClick={() => removeMember.mutate(m.id)} title="Remove">
@@ -265,14 +266,14 @@ export default function BandDashboard() {
                   <input
                     placeholder="Member email"
                     className="flex-1 px-3 py-1.5 rounded-lg text-xs outline-none"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${V.border}`, color: V.text }}
+                    style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
                     value={addMemberEmail}
                     onChange={e => setAddMemberEmail(e.target.value)}
                   />
                   <input
                     placeholder="Role"
                     className="w-28 px-3 py-1.5 rounded-lg text-xs outline-none"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${V.border}`, color: V.text }}
+                    style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
                     value={addMemberRole}
                     onChange={e => setAddMemberRole(e.target.value)}
                   />

@@ -9,7 +9,7 @@ export default function PinnedPeople({ V, pins, isPinned, onTogglePin, onOpen })
   return (
     <ChatSection V={V} icon={Pin} label={t('chat.pinned')} count={pins.length}>
       {pins.length === 0 ? (
-        <p className="text-xs px-4 py-4 rounded-2xl" style={{ color: V.muted, background: 'rgba(255,255,255,0.03)', border: `1px dashed ${V.border}` }}>
+        <p className="text-xs px-4 py-4 rounded-2xl" style={{ color: V.muted, background: V.card, border: `1px dashed ${V.border}` }}>
           {t('chat.pinnedEmpty')}
         </p>
       ) : (

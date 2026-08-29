@@ -1,136 +1,139 @@
+// Scholarly badge set — bookmarks, pens, theory books and library seals instead
+// of glowing stars. Muted earthy inks only (ochre / sage / indigo / clay), three
+// tiers per family. `icon` is a lucide-react component name resolved in
+// BadgeIcon; keep ids stable — awarding logic references them.
 export const BADGES = [
-  // Welcome
+  // ── Welcome ────────────────────────────────────────────────────────────────
   {
-    id: 'critic_welcome',
-    category: 'Welcome',
-    name: 'The Critic',
-    desc: 'Joined the Music Critics family. Welcome aboard!',
-    emoji: '🎖️',
-    color: '#a78bfa',
-    glow: 'rgba(167,139,250,0.7)',
+    id: 'critic_welcome', category: 'Welcome', tier: 1,
+    name: 'Reader\'s Card', desc: 'Joined the Chordmates reading room',
+    icon: 'BookMarked', color: '#8a6f4a',
   },
-  // Listening time — periodic
+
+  // ── Attendance (time spent in the app) ─────────────────────────────────────
   {
-    id: 'daily_listener',
-    category: 'Listening Time',
-    name: 'Daily Listener',
-    desc: '45+ minutes on the app in a single day',
-    emoji: '🌅',
-    color: '#fbbf24',
-    glow: 'rgba(251,191,36,0.6)',
+    id: 'daily_listener', category: 'Attendance', tier: 1,
+    name: 'Morning Session', desc: '45+ minutes in a single day',
+    icon: 'Sunrise', color: '#bf7a35',
   },
   {
-    id: 'weekly_devotee',
-    category: 'Listening Time',
-    name: 'Weekly Devotee',
-    desc: '3+ hours on the app in a single week',
-    emoji: '🎧',
-    color: '#f97316',
-    glow: 'rgba(249,115,22,0.6)',
+    id: 'weekly_devotee', category: 'Attendance', tier: 2,
+    name: 'Weekly Attendance', desc: '3+ hours in a single week',
+    icon: 'CalendarDays', color: '#bf7a35',
   },
   {
-    id: 'monthly_obsessive',
-    category: 'Listening Time',
-    name: 'Monthly Obsessive',
-    desc: '30+ hours on the app in a single month',
-    emoji: '🔥',
-    color: '#ef4444',
-    glow: 'rgba(239,68,68,0.6)',
-  },
-  // Listening time — total
-  {
-    id: 'time_10h',
-    category: 'Listening Time',
-    name: 'Decade Listener',
-    desc: '10+ total hours on the app',
-    emoji: '⏱️',
-    color: '#34d399',
-    glow: 'rgba(52,211,153,0.6)',
+    id: 'monthly_obsessive', category: 'Attendance', tier: 3,
+    name: 'Full Term', desc: '30+ hours in a single month',
+    icon: 'Hourglass', color: '#a0522d',
   },
   {
-    id: 'time_100h',
-    category: 'Listening Time',
-    name: 'Century Listener',
-    desc: '100+ total hours on the app',
-    emoji: '⌛',
-    color: '#06b6d4',
-    glow: 'rgba(6,182,212,0.6)',
+    id: 'time_10h', category: 'Attendance', tier: 1,
+    name: 'Ten Hours Read', desc: '10+ total hours in the app',
+    icon: 'Clock3', color: '#6b6358',
   },
   {
-    id: 'time_1000h',
-    category: 'Listening Time',
-    name: 'Millennium Listener',
-    desc: '1,000+ total hours on the app',
-    emoji: '🕰️',
-    color: '#8b5cf6',
-    glow: 'rgba(139,92,246,0.6)',
-  },
-  // Quality — likes received
-  {
-    id: 'likes_100',
-    category: 'Quality',
-    name: 'Rising Star',
-    desc: '100+ total likes received on your reviews',
-    emoji: '⭐',
-    color: '#fbbf24',
-    glow: 'rgba(251,191,36,0.6)',
+    id: 'time_100h', category: 'Attendance', tier: 2,
+    name: 'Hundred Hours Read', desc: '100+ total hours in the app',
+    icon: 'Clock3', color: '#6b6358',
   },
   {
-    id: 'likes_300',
-    category: 'Quality',
-    name: 'Crowd Favorite',
-    desc: '300+ total likes received on your reviews',
-    emoji: '🌟',
-    color: '#f59e0b',
-    glow: 'rgba(245,158,11,0.6)',
+    id: 'time_1000h', category: 'Attendance', tier: 3,
+    name: 'Thousand Hours Read', desc: '1,000+ total hours in the app',
+    icon: 'Clock3', color: '#4f5a7a',
+  },
+
+  // ── Craft (reviews written) ────────────────────────────────────────────────
+  {
+    id: 'reviews_5', category: 'Craft', tier: 1,
+    name: 'First Notebook', desc: 'Wrote 5 reviews',
+    icon: 'NotebookPen', color: '#6f7a5a',
   },
   {
-    id: 'likes_500',
-    category: 'Quality',
-    name: 'Legend',
-    desc: '500+ total likes received on your reviews',
-    emoji: '💫',
-    color: '#d97706',
-    glow: 'rgba(217,119,6,0.6)',
-  },
-  // Community — comments received
-  {
-    id: 'comments_10',
-    category: 'Community',
-    name: 'Conversationalist',
-    desc: '10+ comments received on your reviews',
-    emoji: '💬',
-    color: '#60a5fa',
-    glow: 'rgba(96,165,250,0.6)',
+    id: 'reviews_25', category: 'Craft', tier: 2,
+    name: 'Steady Pen', desc: 'Wrote 25 reviews',
+    icon: 'PenTool', color: '#6f7a5a',
   },
   {
-    id: 'comments_50',
-    category: 'Community',
-    name: 'Community Pillar',
-    desc: '50+ comments received on your reviews',
-    emoji: '🗣️',
-    color: '#3b82f6',
-    glow: 'rgba(59,130,246,0.6)',
+    id: 'reviews_100', category: 'Craft', tier: 3,
+    name: 'Collected Essays', desc: 'Wrote 100 reviews',
+    icon: 'Library', color: '#4f5a7a',
+  },
+
+  // ── Repertoire (genres covered) ────────────────────────────────────────────
+  {
+    id: 'genres_3', category: 'Repertoire', tier: 1,
+    name: 'Three Keys', desc: 'Reviewed music from 3 different genres',
+    icon: 'Music4', color: '#8a6f4a',
   },
   {
-    id: 'comments_100',
-    category: 'Community',
-    name: 'Voice of the People',
-    desc: '100+ comments received on your reviews',
-    emoji: '📢',
-    color: '#2563eb',
-    glow: 'rgba(37,99,235,0.6)',
+    id: 'genres_6', category: 'Repertoire', tier: 2,
+    name: 'Broad Ear', desc: 'Reviewed music from 6 different genres',
+    icon: 'BookOpen', color: '#8a6f4a',
   },
   {
-    id: 'comments_200',
-    category: 'Community',
-    name: 'Icon',
-    desc: '200+ comments received on your reviews',
-    emoji: '👑',
-    color: '#7c3aed',
-    glow: 'rgba(124,58,237,0.6)',
+    id: 'genres_10', category: 'Repertoire', tier: 3,
+    name: 'Theory Shelf', desc: 'Reviewed music from 10 different genres',
+    icon: 'GraduationCap', color: '#4f5a7a',
+  },
+
+  // ── Readership (views on the albums you wrote about) ───────────────────────
+  {
+    id: 'views_100', category: 'Readership', tier: 1,
+    name: 'Read Aloud', desc: '100+ views on albums you reviewed',
+    icon: 'Eye', color: '#6b6358',
+  },
+  {
+    id: 'views_1000', category: 'Readership', tier: 2,
+    name: 'Passed Around', desc: '1,000+ views on albums you reviewed',
+    icon: 'Bookmark', color: '#6b6358',
+  },
+  {
+    id: 'views_5000', category: 'Readership', tier: 3,
+    name: 'Reference Copy', desc: '5,000+ views on albums you reviewed',
+    icon: 'Stamp', color: '#a0522d',
+  },
+
+  // ── Acclaim (likes received) ───────────────────────────────────────────────
+  {
+    id: 'likes_100', category: 'Acclaim', tier: 1,
+    name: 'Margin Praise', desc: '100+ likes received on your reviews',
+    icon: 'Feather', color: '#bf7a35',
+  },
+  {
+    id: 'likes_300', category: 'Acclaim', tier: 2,
+    name: 'Quoted Often', desc: '300+ likes received on your reviews',
+    icon: 'Quote', color: '#bf7a35',
+  },
+  {
+    id: 'likes_500', category: 'Acclaim', tier: 3,
+    name: 'Laurel Seal', desc: '500+ likes received on your reviews',
+    icon: 'Award', color: '#a0522d',
+  },
+
+  // ── Community (comments received) ─────────────────────────────────────────
+  {
+    id: 'comments_10', category: 'Community', tier: 1,
+    name: 'Reading Circle', desc: '10+ comments received on your reviews',
+    icon: 'MessageSquare', color: '#6f7a5a',
+  },
+  {
+    id: 'comments_50', category: 'Community', tier: 2,
+    name: 'Seminar Host', desc: '50+ comments received on your reviews',
+    icon: 'MessagesSquare', color: '#6f7a5a',
+  },
+  {
+    id: 'comments_100', category: 'Community', tier: 3,
+    name: 'Society Chair', desc: '100+ comments received on your reviews',
+    icon: 'Users', color: '#4f5a7a',
+  },
+  {
+    id: 'comments_200', category: 'Community', tier: 3,
+    name: 'Honorary Fellow', desc: '200+ comments received on your reviews',
+    icon: 'Scroll', color: '#4f5a7a',
   },
 ];
 
 export const BADGE_MAP = Object.fromEntries(BADGES.map(b => [b.id, b]));
-export const BADGE_CATEGORIES = ['Welcome', 'Listening Time', 'Quality', 'Community'];
+export const BADGE_CATEGORIES = [
+  'Welcome', 'Attendance', 'Craft', 'Repertoire', 'Readership', 'Acclaim', 'Community',
+];

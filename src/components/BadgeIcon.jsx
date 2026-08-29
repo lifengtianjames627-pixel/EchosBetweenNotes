@@ -1,18 +1,28 @@
 import React from 'react';
+import {
+  BookMarked, Bookmark, BookOpen, Sunrise, CalendarDays, Hourglass, Clock3,
+  NotebookPen, PenTool, Library, Music4, GraduationCap, Eye, Stamp, Feather,
+  Quote, Award, MessageSquare, MessagesSquare, Users, Scroll,
+} from 'lucide-react';
 import { BADGE_MAP } from '@/lib/badgeConfig';
 
-const STAR_POINTS = '50,5 61,35 95,35 67,57 77,91 50,70 23,91 33,57 5,35 39,35';
+const ICONS = {
+  BookMarked, Bookmark, BookOpen, Sunrise, CalendarDays, Hourglass, Clock3,
+  NotebookPen, PenTool, Library, Music4, GraduationCap, Eye, Stamp, Feather,
+  Quote, Award, MessageSquare, MessagesSquare, Users, Scroll,
+};
 
+// A badge reads like a library seal pressed into paper: a soft cream plaque,
+// a thin ink border, the family's icon in muted ink, and tier marks (· ·· ···)
+// along the bottom. No glow, no gradients, no saturated colour.
 export default function BadgeIcon({ badgeId, size = 'md', locked = false, showName = false, onClick }) {
   const badge = BADGE_MAP[badgeId];
   if (!badge) return null;
 
-  const sizeMap = { xs: 28, sm: 44, md: 68, lg: 88 };
-  const s = sizeMap[size] || 68;
-  const fontSize = s * 0.32;
-  // Use unique ID per badge+size combo to avoid SVG gradient conflicts
-  const gradId = `bg-${badgeId}-${size}`;
-  const shineId = `sh-${badgeId}-${size}`;
+  const sizeMap = { xs: 28, sm: 44, md: 62, lg: 82 };
+  const s = sizeMap[size] || 62;
+  const Icon = ICONS[badge.icon] || Bookmark;
+  const ink = locked ? '#a9a094' : badge.color;
 
   return (
     <div
@@ -21,52 +31,39 @@ export default function BadgeIcon({ badgeId, size = 'md', locked = false, showNa
       title={`${badge.name} — ${badge.desc}`}
     >
       <div
+        className="relative flex flex-col items-center justify-center"
         style={{
-          position: 'relative',
           width: s,
           height: s,
-          filter: locked
-            ? 'grayscale(1) opacity(0.28)'
-            : `drop-shadow(0 0 ${Math.round(s * 0.12)}px ${badge.glow})`,
-          transition: 'filter 0.2s, transform 0.2s',
+          background: locked ? '#f0ece2' : '#f7f2e6',
+          border: `1px solid ${locked ? '#e2dbcc' : ink}`,
+          borderRadius: Math.round(s * 0.16),
+          opacity: locked ? 0.55 : 1,
         }}
       >
-        <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-          <defs>
-            <radialGradient id={gradId} cx="45%" cy="30%" r="65%">
-              <stop offset="0%" stopColor={badge.color} stopOpacity="0.95" />
-              <stop offset="60%" stopColor={badge.color} stopOpacity="0.55" />
-              <stop offset="100%" stopColor={badge.color} stopOpacity="0.18" />
-            </radialGradient>
-            <radialGradient id={shineId} cx="38%" cy="22%" r="42%">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-          {/* Outer glow ring */}
-          <circle cx="50" cy="50" r="46" fill="none" stroke={badge.color} strokeWidth="1.5" opacity="0.35" />
-          {/* Star body */}
-          <polygon points={STAR_POINTS} fill={`url(#${gradId})`} stroke={badge.color} strokeWidth="1.5" />
-          {/* Shine overlay */}
-          <polygon points={STAR_POINTS} fill={`url(#${shineId})`} />
-        </svg>
-        {/* Emoji center */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize, lineHeight: 1,
-          paddingBottom: Math.round(s * 0.04),
-        }}>
-          {badge.emoji}
-        </div>
+        <Icon style={{ width: s * 0.38, height: s * 0.38, color: ink }} strokeWidth={1.5} />
+        {s >= 44 && (
+          <div className="flex items-center gap-[3px]" style={{ marginTop: s * 0.08 }}>
+            {[1, 2, 3].map(i => (
+              <span
+                key={i}
+                style={{
+                  width: 3, height: 3, borderRadius: 999,
+                  background: i <= badge.tier ? ink : 'transparent',
+                  border: i <= badge.tier ? 'none' : `1px solid ${locked ? '#ddd6c6' : '#ddd0b6'}`,
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
       {showName && (
         <span
-          className="text-center font-semibold leading-tight"
+          className="text-center leading-tight"
           style={{
-            fontSize: Math.round(s * 0.145),
-            color: locked ? 'rgba(120,120,140,0.45)' : badge.color,
-            maxWidth: s + 16,
+            fontSize: Math.round(s * 0.15),
+            color: locked ? '#a9a094' : '#5a534a',
+            maxWidth: s + 20,
             overflow: 'hidden',
             whiteSpace: 'nowrap',
             textOverflow: 'ellipsis',

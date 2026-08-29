@@ -63,7 +63,7 @@ export default function LocationShareBar({ V, located }) {
         {/* Compact one-line status: the position is on, and the two things you can
             do about it. Details live in the accuracy tooltip, not on screen. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2 rounded-2xl mb-1.5"
-          style={{ background: 'rgba(124,111,255,0.08)', border: `1px solid ${V.border}` }}>
+          style={{ background: '#f6efe1', border: `1px solid ${V.border}` }}>
           <span
             className="flex items-center gap-1.5 text-[11px]"
             style={{ color: V.muted }}
@@ -108,10 +108,10 @@ export default function LocationShareBar({ V, located }) {
   return (
     <>
       <div className="px-4 py-3 rounded-2xl mb-1.5"
-        style={{ background: 'rgba(255,255,255,0.03)', border: `1px dashed ${V.border}` }}>
+        style={{ background: V.card, border: `1px dashed ${V.border}` }}>
         {status === 'imprecise' ? (
           <>
-            <p className="flex items-start gap-1.5 text-[11px] leading-relaxed" style={{ color: '#fbbf24' }}>
+            <p className="flex items-start gap-1.5 text-[11px] leading-relaxed" style={{ color: '#a0522d' }}>
               <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
               {t('loc.imprecise', { m: accuracy ?? '—' })}
             </p>
@@ -162,7 +162,7 @@ export default function LocationShareBar({ V, located }) {
             >
               <Crosshair className="w-3 h-3" /> {t('loc.manual')}
             </button>
-            <p className="flex items-start gap-1.5 text-[10px] mt-2 leading-relaxed" style={{ color: 'rgba(140,155,210,0.5)' }}>
+            <p className="flex items-start gap-1.5 text-[10px] mt-2 leading-relaxed" style={{ color: '#8a7e6f' }}>
               <ShieldCheck className="w-3 h-3 shrink-0 mt-0.5" />
               {status === 'denied' ? t('loc.blocked')
                 : status === 'unsupported' ? t('loc.unsupported')

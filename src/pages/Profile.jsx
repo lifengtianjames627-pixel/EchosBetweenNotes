@@ -9,6 +9,7 @@ import ProfileHero from '@/components/profile/ProfileHero';
 import ProfileDetails from '@/components/profile/ProfileDetails';
 import StatStrip from '@/components/profile/StatStrip';
 import { awardBadge } from '@/lib/badgeUtils';
+import { earnedFromReviews } from '@/lib/badgeProgress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Profile() {
@@ -42,6 +43,20 @@ export default function Profile() {
       awardBadge(user.email, 'critic_welcome', queryClient);
     }
   }, [user?.email, earnedBadges.length === 0]);
+
+  // Albums are needed to work out genre-breadth and readership badges.
+  const { data: allAlbums = [] } = useQuery({
+    queryKey: ['all-albums-for-badges'],
+    queryFn: () => base44.entities.Album.list('-created_date', 500),
+    enabled: !!user,
+  });
+
+  useEffect(() => {
+    if (!user?.email || !myReviews.length) return;
+    earnedFromReviews({ reviews: myReviews, albums: allAlbums }).forEach(id => {
+      if (!earnedBadgeIds.includes(id)) awardBadge(user.email, id, queryClient);
+    });
+  }, [user?.email, myReviews.length, allAlbums.length, earnedBadgeIds.length]);
 
   const { data: myBands = [] } = useQuery({
     queryKey: ['my-bands', user?.email],

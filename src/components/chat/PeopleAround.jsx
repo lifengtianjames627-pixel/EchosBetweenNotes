@@ -45,8 +45,8 @@ export default function PeopleAround({ V, nearby, loading, city, matchedCity, lo
               onClick={() => setView(t.id)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold"
               style={view === t.id
-                ? { background: 'rgba(124,111,255,0.22)', border: '1px solid rgba(124,111,255,0.4)', color: V.accent }
-                : { background: 'rgba(255,255,255,0.04)', border: `1px solid ${V.border}`, color: V.muted }}
+                ? { background: '#f1ebdd', border: '1px solid #ddd0b6', color: '#8a5a20' }
+                : { background: V.card, border: `1px solid ${V.border}`, color: V.muted }}
             >
               <t.icon className="w-3 h-3" /> {t.label}
             </button>
@@ -56,7 +56,7 @@ export default function PeopleAround({ V, nearby, loading, city, matchedCity, lo
 
       {loading ? (
         <div className="space-y-1.5">
-          {[0, 1].map(i => <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'rgba(124,111,255,0.08)' }} />)}
+          {[0, 1].map(i => <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: '#ece5d6' }} />)}
         </div>
       ) : canMap && view === 'map' ? (
         <NearbyMap
@@ -66,7 +66,7 @@ export default function PeopleAround({ V, nearby, loading, city, matchedCity, lo
           onOpen={(email) => navigate(`/u/${encodeURIComponent(email)}`)}
         />
       ) : nearby.length === 0 ? (
-        <p className="text-xs px-4 py-4 rounded-2xl" style={{ color: V.muted, background: 'rgba(255,255,255,0.03)', border: `1px dashed ${V.border}` }}>
+        <p className="text-xs px-4 py-4 rounded-2xl" style={{ color: V.muted, background: V.card, border: `1px dashed ${V.border}` }}>
           {t('chat.nearbyEmpty')}
         </p>
       ) : (

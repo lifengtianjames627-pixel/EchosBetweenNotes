@@ -21,7 +21,7 @@ export async function awardBadge(userEmail, badgeId, queryClient) {
     });
     const badge = BADGE_MAP[badgeId];
     if (badge) {
-      toast(`${badge.emoji} Badge Unlocked: ${badge.name}!`, {
+      toast(`Badge unlocked — ${badge.name}`, {
         description: badge.desc,
         duration: 5000,
       });
