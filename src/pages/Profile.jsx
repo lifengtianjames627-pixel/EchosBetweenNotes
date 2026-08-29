@@ -99,14 +99,14 @@ export default function Profile() {
 
   if (!user) return (
     <div className="flex justify-center py-20">
-      <div className="w-8 h-8 border-4 border-indigo-400/20 border-t-indigo-400 rounded-full animate-spin" />
+      <div className="w-8 h-8 border-4 rounded-full animate-spin" style={{ borderColor: '#e0d8c8', borderTopColor: '#bf7a35' }} />
     </div>
   );
 
   const initial = (user.full_name || user.email || 'U')[0].toUpperCase();
 
   return (
-    <div className="min-h-screen" style={{ background: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)' }}>
+    <div className="min-h-screen" style={{ background: '#f3efe6' }}>
       <div className="max-w-2xl mx-auto px-5 pt-8 pb-16">
 
         {/* Profile header */}
@@ -122,7 +122,7 @@ export default function Profile() {
           <button
             onClick={() => setShowAddFriend(true)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold"
-            style={{ background: 'rgba(124,111,255,0.14)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.3)' }}
+            style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #e0d8c8' }}
           >
             <UserPlus className="w-3.5 h-3.5" /> Add Friend
           </button>
@@ -141,25 +141,25 @@ export default function Profile() {
         {/* Tabs */}
         <Tabs defaultValue="reviews">
           <TabsList className="w-full rounded-xl mb-5"
-            style={{ background: 'rgba(12,15,35,0.8)', border: '1px solid rgba(124,111,255,0.15)' }}>
+            style={{ background: '#faf8f2', border: '1px solid #e0d8c8' }}>
             <TabsTrigger value="reviews" className="flex-1 text-xs"><Star className="w-3.5 h-3.5 mr-1" />Reviews</TabsTrigger>
             <TabsTrigger value="badges" className="flex-1 text-xs">
               <Shield className="w-3.5 h-3.5 mr-1" />Badges
-              {earnedBadgeIds.length > 0 && <span className="ml-1 font-bold" style={{ color: '#a5b4fc' }}>{earnedBadgeIds.length}</span>}
+              {earnedBadgeIds.length > 0 && <span className="ml-1 font-bold" style={{ color: '#bf7a35' }}>{earnedBadgeIds.length}</span>}
             </TabsTrigger>
             <TabsTrigger value="bands" className="flex-1 text-xs"><Music className="w-3.5 h-3.5 mr-1" />Bands</TabsTrigger>
             <TabsTrigger value="friends" className="flex-1 text-xs">
               <Users className="w-3.5 h-3.5 mr-1" />Friends
               {pendingIncoming.length > 0 && (
                 <span className="ml-1 text-[10px] font-bold rounded-full w-4 h-4 inline-flex items-center justify-center"
-                  style={{ background: '#a5b4fc', color: '#000' }}>{pendingIncoming.length}</span>
+                  style={{ background: '#bf7a35', color: '#faf8f2' }}>{pendingIncoming.length}</span>
               )}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="reviews" className="space-y-3">
             {myReviews.length > 0 ? myReviews.map(review => <ReviewCard key={review.id} review={review} />) : (
-              <div className="text-center py-16" style={{ color: 'rgba(140,155,210,0.4)' }}>
+              <div className="text-center py-16" style={{ color: '#8a7e6f' }}>
                 <Star className="w-8 h-8 mx-auto mb-3 opacity-30" />
                 <p className="text-sm">No reviews yet.</p>
               </div>
@@ -173,22 +173,22 @@ export default function Profile() {
           <TabsContent value="bands" className="space-y-3">
             <Link to="/band-dashboard"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-2"
-              style={{ background: 'rgba(124,111,255,0.12)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.25)' }}>
+              style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #e0d8c8' }}>
               <Music className="w-3.5 h-3.5" /> Manage My Bands
             </Link>
             {myBands.length > 0 ? myBands.map(m => (
               <div key={m.id} className="flex items-center gap-3 p-4 rounded-xl"
-                style={{ background: 'rgba(12,15,35,0.8)', border: '1px solid rgba(124,111,255,0.12)' }}>
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'rgba(124,111,255,0.15)' }}>
-                  <Music className="w-4 h-4" style={{ color: '#a5b4fc' }} />
+                style={{ background: '#faf8f2', border: '1px solid #e0d8c8' }}>
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: '#f1ebdd' }}>
+                  <Music className="w-4 h-4" style={{ color: '#bf7a35' }} />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm" style={{ color: 'rgba(220,225,255,0.9)' }}>{m.band_name || 'Band'}</p>
-                  <p className="text-xs" style={{ color: 'rgba(140,155,210,0.45)' }}>{m.role || 'Member'}{m.is_founder && ' · Founder'}</p>
+                  <p className="font-semibold text-sm" style={{ color: '#1a1815' }}>{m.band_name || 'Band'}</p>
+                  <p className="text-xs" style={{ color: '#8a7e6f' }}>{m.role || 'Member'}{m.is_founder && ' · Founder'}</p>
                 </div>
               </div>
             )) : (
-              <div className="text-center py-16" style={{ color: 'rgba(140,155,210,0.4)' }}>
+              <div className="text-center py-16" style={{ color: '#8a7e6f' }}>
                 <Music className="w-8 h-8 mx-auto mb-3 opacity-30" />
                 <p className="text-sm">No bands yet.</p>
               </div>
@@ -198,28 +198,28 @@ export default function Profile() {
           <TabsContent value="friends" className="space-y-4">
             {pendingIncoming.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs uppercase tracking-widest font-bold px-1" style={{ color: 'rgba(124,111,255,0.5)' }}>
+                <p className="text-xs uppercase tracking-widest font-bold px-1" style={{ color: '#bf7a35' }}>
                   Pending · {pendingIncoming.length}
                 </p>
                 {pendingIncoming.map(req => (
                   <div key={req.id} className="flex items-center gap-3 p-4 rounded-xl"
-                    style={{ background: 'rgba(124,111,255,0.07)', border: '1px solid rgba(124,111,255,0.2)' }}>
+                    style={{ background: '#f6efe1', border: '1px solid #ddd0b6' }}>
                     <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm"
-                      style={{ background: 'rgba(124,111,255,0.2)', color: '#a5b4fc' }}>
+                      style={{ background: '#efe4d0', color: '#8a5a20' }}>
                       {req.from_name?.[0]?.toUpperCase() || '?'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm" style={{ color: 'rgba(220,225,255,0.9)' }}>{req.from_name || req.from_email}</p>
-                      {req.message && <p className="text-xs truncate" style={{ color: 'rgba(140,155,210,0.45)' }}>"{req.message}"</p>}
+                      <p className="font-medium text-sm" style={{ color: '#1a1815' }}>{req.from_name || req.from_email}</p>
+                      {req.message && <p className="text-xs truncate" style={{ color: '#8a7e6f' }}>"{req.message}"</p>}
                     </div>
                     <div className="flex gap-2">
                       <button className="w-8 h-8 rounded-lg flex items-center justify-center"
-                        style={{ background: 'rgba(124,111,255,0.2)', color: '#a5b4fc' }}
+                        style={{ background: '#efe4d0', color: '#8a5a20' }}
                         onClick={() => respondToRequest.mutate({ id: req.id, status: 'accepted' })}>
                         <Check className="w-4 h-4" />
                       </button>
                       <button className="w-8 h-8 rounded-lg flex items-center justify-center"
-                        style={{ background: 'rgba(248,113,113,0.15)', color: '#f87171' }}
+                        style={{ background: '#f3e2df', color: '#9c3b33' }}
                         onClick={() => respondToRequest.mutate({ id: req.id, status: 'declined' })}>
                         <X className="w-4 h-4" />
                       </button>
@@ -230,30 +230,30 @@ export default function Profile() {
             )}
 
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-widest font-bold px-1" style={{ color: 'rgba(140,155,210,0.4)' }}>
+              <p className="text-xs uppercase tracking-widest font-bold px-1" style={{ color: '#8a7e6f' }}>
                 Friends · {friendsList.length}
               </p>
               {friendsList.map((f, i) => (
                 <div key={i} className="flex items-center gap-3 p-4 rounded-xl"
-                  style={{ background: 'rgba(12,15,35,0.8)', border: '1px solid rgba(124,111,255,0.12)' }}>
+                  style={{ background: '#faf8f2', border: '1px solid #e0d8c8' }}>
                   <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm"
-                    style={{ background: 'rgba(124,111,255,0.2)', color: '#a5b4fc' }}>
+                    style={{ background: '#efe4d0', color: '#8a5a20' }}>
                     {f.name?.[0]?.toUpperCase() || '?'}
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-sm" style={{ color: 'rgba(220,225,255,0.9)' }}>{f.name || f.email}</p>
-                    <p className="text-xs" style={{ color: 'rgba(140,155,210,0.4)' }}>{f.email}</p>
+                    <p className="font-medium text-sm" style={{ color: '#1a1815' }}>{f.name || f.email}</p>
+                    <p className="text-xs" style={{ color: '#8a7e6f' }}>{f.email}</p>
                   </div>
                   <button
                     onClick={() => navigate(`/chat?with=${encodeURIComponent(f.email)}&name=${encodeURIComponent(f.name || f.email)}`)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
-                    style={{ background: 'rgba(124,111,255,0.12)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.2)' }}>
+                    style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #e0d8c8' }}>
                     <MessageSquare className="w-3.5 h-3.5" /> Chat
                   </button>
                 </div>
               ))}
               {friendsList.length === 0 && (
-                <div className="text-center py-16" style={{ color: 'rgba(140,155,210,0.4)' }}>
+                <div className="text-center py-16" style={{ color: '#8a7e6f' }}>
                   <Users className="w-8 h-8 mx-auto mb-3 opacity-30" />
                   <p className="text-sm">No friends yet.</p>
                 </div>
@@ -268,56 +268,56 @@ export default function Profile() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => { setShowAddFriend(false); setSearchQuery(''); setSearchResults([]); setSelectedFriend(null); }}>
           <div
             className="rounded-2xl p-6 w-full max-w-sm space-y-4"
-            style={{ background: 'rgba(10,12,30,0.98)', border: '1px solid rgba(124,111,255,0.25)' }}
+            style={{ background: '#faf8f2', border: '1px solid #e0d8c8' }}
             onClick={e => e.stopPropagation()}
           >
-            <p className="font-semibold text-base" style={{ color: 'rgba(220,225,255,0.9)' }}>Send Friend Request</p>
+            <p className="font-semibold text-base" style={{ color: '#1a1815' }}>Send Friend Request</p>
             <div className="space-y-3">
               <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(140,155,210,0.5)' }} />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#8a7e6f' }} />
                 <input className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm outline-none"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
+                  style={{ background: '#ffffff', border: '1px solid #e0d8c8', color: '#1a1815' }}
                   value={searchQuery}
                   onChange={e => { setSearchQuery(e.target.value); setSelectedFriend(null); setFriendEmail(''); }}
                   placeholder="Search by name or email…" />
                 {(searching || searchResults.length > 0) && searchQuery.trim().length >= 2 && !selectedFriend && (
                   <div className="absolute left-0 right-0 mt-1.5 rounded-xl overflow-hidden max-h-48 overflow-y-auto z-10"
-                    style={{ background: 'rgba(15,17,38,0.98)', border: '1px solid rgba(124,111,255,0.25)' }}>
+                    style={{ background: '#faf8f2', border: '1px solid #e0d8c8' }}>
                     {searching ? (
-                      <p className="text-xs px-4 py-3" style={{ color: 'rgba(140,155,210,0.5)' }}>Searching…</p>
+                      <p className="text-xs px-4 py-3" style={{ color: '#8a7e6f' }}>Searching…</p>
                     ) : searchResults.length > 0 ? (
                       searchResults.map(u => (
                         <button key={u.email} type="button"
                           onClick={() => { setSelectedFriend(u); setFriendEmail(u.email); setSearchQuery(u.full_name || u.email); }}
-                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-white/5">
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-black/5">
                           <div className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
-                            style={{ background: 'rgba(124,111,255,0.2)', color: '#a5b4fc' }}>
+                            style={{ background: '#efe4d0', color: '#8a5a20' }}>
                             {(u.full_name || u.email)[0].toUpperCase()}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm truncate" style={{ color: 'rgba(220,225,255,0.9)' }}>{u.full_name || 'Listener'}</p>
-                            <p className="text-xs truncate" style={{ color: 'rgba(140,155,210,0.45)' }}>{u.email}</p>
+                            <p className="text-sm truncate" style={{ color: '#1a1815' }}>{u.full_name || 'Listener'}</p>
+                            <p className="text-xs truncate" style={{ color: '#8a7e6f' }}>{u.email}</p>
                           </div>
                         </button>
                       ))
                     ) : (
-                      <p className="text-xs px-4 py-3" style={{ color: 'rgba(140,155,210,0.5)' }}>No users found.</p>
+                      <p className="text-xs px-4 py-3" style={{ color: '#8a7e6f' }}>No users found.</p>
                     )}
                   </div>
                 )}
               </div>
               <input className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
+                style={{ background: '#ffffff', border: '1px solid #e0d8c8', color: '#1a1815' }}
                 value={friendMsg} onChange={e => setFriendMsg(e.target.value)} placeholder="Add a message (optional)" />
             </div>
             <div className="flex gap-3 pt-1">
               <button disabled={!friendEmail || sendFriendRequest.isPending}
                 onClick={() => sendFriendRequest.mutate()}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold"
-                style={{ background: 'rgba(124,111,255,0.2)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.3)', opacity: !friendEmail ? 0.4 : 1 }}>
+                style={{ background: '#efe4d0', color: '#8a5a20', border: '1px solid #ddd0b6', opacity: !friendEmail ? 0.4 : 1 }}>
                 {sendFriendRequest.isPending ? 'Sending…' : 'Send'}
               </button>
-              <button onClick={() => { setShowAddFriend(false); setSearchQuery(''); setSearchResults([]); setSelectedFriend(null); }} className="px-5 py-2.5 rounded-xl text-sm" style={{ color: 'rgba(140,155,210,0.5)' }}>Cancel</button>
+              <button onClick={() => { setShowAddFriend(false); setSearchQuery(''); setSearchResults([]); setSelectedFriend(null); }} className="px-5 py-2.5 rounded-xl text-sm" style={{ color: '#8a7e6f' }}>Cancel</button>
             </div>
           </div>
         </div>

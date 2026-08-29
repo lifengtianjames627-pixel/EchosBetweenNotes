@@ -63,9 +63,9 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
   });
 
   const pill = (extra = {}) => ({
-    background: 'rgba(124,111,255,0.14)',
-    color: '#a5b4fc',
-    border: '1px solid rgba(124,111,255,0.3)',
+    background: '#f1ebdd',
+    color: '#8a5a20',
+    border: '1px solid #e0d8c8',
     ...extra,
   });
 
@@ -74,7 +74,7 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
       <div className="flex flex-wrap gap-2.5">
         {isFriend ? (
           <span className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold"
-            style={pill({ background: 'rgba(52,211,153,0.14)', color: '#6ee7b7', border: '1px solid rgba(52,211,153,0.3)' })}>
+            style={pill({ background: '#eaeee0', color: '#4d5f3f', border: '1px solid #d6dcc6' })}>
             <Check className="w-3.5 h-3.5" /> Friends
           </span>
         ) : pendingOut ? (
@@ -106,9 +106,9 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
           disabled={introUsed}
           className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold"
           style={pill({
-            background: 'rgba(192,132,252,0.14)',
-            color: '#e9d5ff',
-            border: '1px solid rgba(192,132,252,0.3)',
+            background: '#efe4d0',
+            color: '#8a5a20',
+            border: '1px solid #ddd0b6',
             opacity: introUsed ? 0.5 : 1,
           })}
         >
@@ -118,7 +118,7 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
       </div>
 
       {!isFriend && (
-        <p className="text-[10px] mt-2 leading-relaxed" style={{ color: 'rgba(140,155,210,0.5)' }}>
+        <p className="text-[10px] mt-2 leading-relaxed" style={{ color: '#8a7e6f' }}>
           {introUsed
             ? 'One introduction message only — you can keep talking once your friend request is accepted.'
             : 'Before you are friends you can send one introduction message.'}
@@ -134,7 +134,7 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
             onKeyDown={e => { if (e.key === 'Enter' && text.trim()) sendIntro.mutate(); }}
             placeholder="Say hi — one message…"
             className="flex-1 px-4 py-2.5 rounded-full text-sm outline-none"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(124,111,255,0.25)', color: 'rgba(220,225,255,0.95)' }}
+            style={{ background: '#ffffff', border: '1px solid #e0d8c8', color: '#1a1815' }}
           />
           <button
             onClick={() => text.trim() && sendIntro.mutate()}

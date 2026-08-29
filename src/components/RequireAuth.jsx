@@ -17,7 +17,7 @@ export default function RequireAuth({ children }) {
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="flex justify-center py-20">
-        <div className="w-8 h-8 border-4 border-indigo-400/20 border-t-indigo-400 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 rounded-full animate-spin" style={{ borderColor: '#e0d8c8', borderTopColor: '#bf7a35' }} />
       </div>
     );
   }

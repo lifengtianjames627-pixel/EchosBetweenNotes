@@ -50,16 +50,16 @@ export default function UserProfile() {
       : email;
 
   return (
-    <div className="min-h-screen" style={{ background: 'radial-gradient(ellipse at 50% 0%, #0d1535 0%, #070910 55%, #020304 100%)' }}>
+    <div className="min-h-screen" style={{ background: '#f3efe6' }}>
       <div className="max-w-2xl mx-auto px-5 pt-6 pb-16">
-        <Link to="/chat" className="inline-flex items-center gap-1.5 text-xs mb-4" style={{ color: 'rgba(140,155,210,0.6)' }}>
+        <Link to="/chat" className="inline-flex items-center gap-1.5 text-xs mb-4" style={{ color: '#6b6358' }}>
           <ArrowLeft className="w-3.5 h-3.5" /> Back
         </Link>
 
         {isLoading ? (
-          <div className="h-44 rounded-3xl animate-pulse" style={{ background: 'rgba(124,111,255,0.08)' }} />
+          <div className="h-44 animate-pulse" style={{ background: '#ece5d6', borderRadius: 12 }} />
         ) : profile?.found === false ? (
-          <p className="text-sm py-16 text-center" style={{ color: 'rgba(140,155,210,0.5)' }}>This member could not be found.</p>
+          <p className="text-sm py-16 text-center" style={{ color: '#8a7e6f' }}>This member could not be found.</p>
         ) : (
           <>
             <ProfileHero
@@ -76,7 +76,7 @@ export default function UserProfile() {
               )}
               {profile?.is_me && (
                 <Link to="/profile" className="px-4 py-2.5 rounded-full text-xs font-semibold"
-                  style={{ background: 'rgba(124,111,255,0.14)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.3)' }}>
+                  style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #e0d8c8' }}>
                   This is you — open your profile
                 </Link>
               )}
@@ -89,12 +89,12 @@ export default function UserProfile() {
               { label: 'Equipped', val: (profile?.equipped_badges || []).length },
             ]} />
 
-            <p className="text-xs uppercase tracking-widest font-bold px-1 mb-3" style={{ color: 'rgba(124,111,255,0.5)' }}>
+            <p className="text-xs uppercase tracking-widest font-bold px-1 mb-3" style={{ color: '#bf7a35' }}>
               Reviews
             </p>
             <div className="space-y-3">
               {reviews.length > 0 ? reviews.map(r => <ReviewCard key={r.id} review={r} />) : (
-                <div className="text-center py-14" style={{ color: 'rgba(140,155,210,0.4)' }}>
+                <div className="text-center py-14" style={{ color: '#8a7e6f' }}>
                   <Star className="w-8 h-8 mx-auto mb-3 opacity-30" />
                   <p className="text-sm">No reviews yet.</p>
                 </div>

@@ -21,9 +21,10 @@ import DirectChat from '@/pages/DirectChat';
 import SoulmateBoard from '@/pages/SoulmateBoard';
 import UserProfile from '@/pages/UserProfile';
 import ProfileSetup from '@/pages/ProfileSetup';
-// Login gates disabled — whole site is public per user request.
-// import RequireAuth from '@/components/RequireAuth';
-// import ProfileSetupGate from '@/components/ProfileSetupGate';
+// Access tiers: guests can browse reviews / podcasts / genres / albums / about.
+// Everything personal or social needs login; moderation needs admin.
+import RequireAuth from '@/components/RequireAuth';
+import RequireAdmin from '@/components/RequireAdmin';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -58,13 +59,13 @@ const AuthenticatedApp = () => {
         <Route path="/genre/:genreId" element={<GenreSpace />} />
         <Route path="/album/:id" element={<AlbumDetail />} />
         <Route path="/about" element={<About />} />
-        <Route path="/profile/setup" element={<ProfileSetup />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/u/:email" element={<UserProfile />} />
-        <Route path="/moderation" element={<ModerationQueue />} />
-        <Route path="/band-dashboard" element={<BandDashboard />} />
-        <Route path="/chat" element={<DirectChat />} />
-        <Route path="/soulmate" element={<SoulmateBoard />} />
+        <Route path="/profile/setup" element={<RequireAuth><ProfileSetup /></RequireAuth>} />
+        <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+        <Route path="/u/:email" element={<RequireAuth><UserProfile /></RequireAuth>} />
+        <Route path="/moderation" element={<RequireAdmin><ModerationQueue /></RequireAdmin>} />
+        <Route path="/band-dashboard" element={<RequireAuth><BandDashboard /></RequireAuth>} />
+        <Route path="/chat" element={<RequireAuth><DirectChat /></RequireAuth>} />
+        <Route path="/soulmate" element={<RequireAuth><SoulmateBoard /></RequireAuth>} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
