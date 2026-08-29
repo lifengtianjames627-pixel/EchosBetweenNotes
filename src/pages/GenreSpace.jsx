@@ -9,7 +9,7 @@ import MusicSlider from '@/components/MusicSlider';
 import AddMusicModal from '@/components/AddMusicModal';
 import MusicItemDetail from '@/components/MusicItemDetail';
 import GenreRankings from '@/components/GenreRankings';
-import GenreHeroMark from '@/components/genre-dashboard/GenreHeroMark';
+import GenrePhotoHero from '@/components/genre-dashboard/GenrePhotoHero';
 import { storeCoverImage } from '@/lib/storeCoverImage';
 import { fetchCoverCascade } from '@/components/TrackList';
 import { useLang } from '@/i18n/LanguageContext';
@@ -245,58 +245,13 @@ export default function GenreSpace() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 pt-14 pb-24">
-        {/* Genre hero — editorial, asymmetric */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.2, 0, 0.1, 1] }}
-          className="mb-20 relative"
-        >
-          <GenreHeroMark genreId={genreId} accent={v.accent} />
-
-          {/* Ghost large number / letter behind */}
-          <div
-            className="absolute -top-8 -left-4 select-none pointer-events-none font-playfair"
-            style={{ fontSize: 'clamp(8rem, 22vw, 18rem)', color: `${v.accent}06`, letterSpacing: '-0.06em', lineHeight: 1 }}
-          >
-            {gLabel(genreId, genre.label).slice(0, 2)}
-          </div>
-
-          <div className="relative">
-            {/* Small label above */}
-            <p className="text-xs uppercase tracking-[0.28em] mb-4 font-semibold" style={{ color: v.text }}>
-              {gTagline(genreId, v.tagline)}
-            </p>
-
-            {/* Main title — large serif, left-aligned */}
-            <h1
-              className="font-playfair leading-none mb-6"
-              style={{
-                ...v.headerStyle,
-                fontFamily: '"Playfair Display", Georgia, serif',
-                fontWeight: v.headerStyle?.fontWeight || 700,
-                fontSize: 'clamp(3.5rem, 9vw, 6.5rem)',
-                color: v.accent,
-                textShadow: `0 0 60px ${v.accentGlow}, 0 0 120px ${v.accentGlow}`,
-                letterSpacing: '-0.03em',
-              }}
-            >
-              {gLabel(genreId, genre.label)}
-            </h1>
-
-            {/* Description — right-offset, constrained */}
-            <div className="max-w-sm ml-auto">
-              <p className="text-base leading-relaxed" style={{ color: v.text }}>{gDesc(genreId, genre.desc)}</p>
-            </div>
-
-            {/* Thin accent rule */}
-            <div className="mt-10 flex items-center gap-5">
-              <div className="h-px flex-1" style={{ background: `${v.accent}20` }} />
-              <span className="text-xs uppercase tracking-[0.3em] font-semibold" style={{ color: v.muted }}>{gLabel(genreId, genre.label)}</span>
-              <div className="h-px w-8" style={{ background: `${v.accent}20` }} />
-            </div>
-          </div>
-        </motion.div>
+        <GenrePhotoHero
+          genreId={genreId}
+          label={gLabel(genreId, genre.label)}
+          tagline={gTagline(genreId, v.tagline)}
+          description={gDesc(genreId, genre.desc)}
+          v={v}
+        />
 
         {isLoading ? (
           <div className="space-y-8 mt-8">
