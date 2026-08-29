@@ -15,6 +15,7 @@ import { storeCoverImage } from '@/lib/storeCoverImage';
 import { fetchCoverCascade } from '@/components/TrackList';
 import { useLang } from '@/i18n/LanguageContext';
 import { useGenreText } from '@/i18n/useGenreText';
+import { GENRE_ATMOSPHERES } from '@/lib/genreAtmospheres';
 
 // Per-genre visual configs
 const GENRE_VISUALS = {
@@ -167,7 +168,7 @@ export default function GenreSpace() {
   };
 
   const genre = GENRES.find(g => g.id === genreId);
-  const v = GENRE_VISUALS[genreId] || GENRE_VISUALS.electronic;
+  const v = { ...(GENRE_VISUALS[genreId] || GENRE_VISUALS.electronic), ...(GENRE_ATMOSPHERES[genreId] || GENRE_ATMOSPHERES.electronic) };
   const entityGenre = genre?.entityGenre;
 
   const { data: allItems = [], isLoading } = useQuery({
@@ -227,7 +228,7 @@ export default function GenreSpace() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: v.bg }}>
+    <div className="min-h-screen" style={{ backgroundImage: v.pageBg || v.bg, backgroundAttachment: 'fixed' }}>
       {/* Top bar */}
       <div className="sticky top-0 z-40 backdrop-blur-xl" style={{ background: 'rgba(0,0,0,0.5)', borderBottom: `1px solid ${v.accent}12` }}>
         <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between">
@@ -252,7 +253,6 @@ export default function GenreSpace() {
           tagline={gTagline(genreId, v.tagline)}
           description={gDesc(genreId, genre.desc)}
           v={v}
-          featuredImage={genreId === 'metal' ? '' : albums.find(item => item.cover_url)?.cover_url}
         />
 
         {isLoading ? (
