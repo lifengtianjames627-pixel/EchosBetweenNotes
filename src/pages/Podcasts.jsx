@@ -46,7 +46,7 @@ export default function Podcasts() {
       </div>
 
       <div className="sticky top-0 z-40 backdrop-blur-xl border-b" style={{ background: 'rgba(0,0,0,0.6)', borderColor: 'rgba(124,111,255,0.12)' }}>
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center">
+        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center">
           <button onClick={() => navigate('/')} className="flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70" style={{ color: 'rgba(160,175,215,0.6)' }}>
             <ArrowLeft className="w-4 h-4" /> {t('nav.home')}
           </button>
@@ -55,7 +55,7 @@ export default function Podcasts() {
 
       <div className="relative z-10 pt-12 pb-20">
         {/* Section header (constrained) */}
-        <div className="max-w-5xl mx-auto px-4 mb-8">
+        <div className="max-w-7xl mx-auto px-4 mb-8">
           <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'rgba(124,111,255,0.15)', border: '1px solid rgba(124,111,255,0.3)' }}>
@@ -80,7 +80,7 @@ export default function Podcasts() {
         </div>
 
         {/* Carousel (aligned with header, soft right fade) */}
-        <div className="max-w-5xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 right-0 w-16 z-10" style={{ background: 'linear-gradient(to left, #070910 30%, transparent)' }} />
           <div ref={trackRef} className="overflow-x-auto no-scrollbar pb-2" style={{ scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
