@@ -43,7 +43,7 @@ const GENRE_VISUALS = {
     tagline: 'Timeless · Precise · Profound',
   },
   metal: {
-    bg: 'radial-gradient(ellipse at 50% 0%, #0a0a0a 0%, #050505 100%)',
+    bg: 'radial-gradient(ellipse at 35% 8%, #301015 0%, #10121b 48%, #06070b 100%)',
     accent: '#cc1111', accentGlow: 'rgba(204,17,17,0.45)',
     text: '#e0e0e0', muted: '#666',
     cardBg: 'rgba(15,10,10,0.9)', cardBorder: 'rgba(204,17,17,0.25)',
@@ -252,6 +252,7 @@ export default function GenreSpace() {
           tagline={gTagline(genreId, v.tagline)}
           description={gDesc(genreId, genre.desc)}
           v={v}
+          featuredImage={genreId === 'metal' ? '' : albums.find(item => item.cover_url)?.cover_url}
         />
 
         {isLoading ? (
@@ -292,7 +293,7 @@ export default function GenreSpace() {
               onAddClick={() => setAddModal('single')}
             />
 
-            <GenreCommunity genreId={genreId} accent={v.accent} />
+            <GenreCommunity albumIds={allItems.map(item => item.id)} accent={v.accent} text={v.text} />
           </div>
         )}
       </div>

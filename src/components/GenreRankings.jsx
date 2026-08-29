@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star, TrendingUp, Trophy, Eye } from 'lucide-react';
 import { useLang } from '@/i18n/LanguageContext';
+import CoverImage from '@/components/music/CoverImage';
 
 export default function GenreRankings({ items, v }) {
   const { t } = useLang();
@@ -65,41 +66,10 @@ export default function GenreRankings({ items, v }) {
           {tab === 'rating' ? t('genre.noRated') : t('genre.noViews')}
         </p>
       ) : (
-        <div className="space-y-2">
+        <div className="grid gap-3 md:grid-cols-2">
           {ranked.map((item, i) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl"
-              style={{ background: `${v.accent}0a`, border: `1px solid ${v.cardBorder}` }}
-            >
-              <span className="text-lg w-7 text-center shrink-0">{MEDALS[i] || `#${i + 1}`}</span>
-              <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0" style={{ background: `${v.accent}18` }}>
-                {item.cover_url
-                  ? <img src={item.cover_url} alt={item.title} className="w-full h-full object-cover" />
-                  : <div className="w-full h-full flex items-center justify-center text-sm">🎵</div>
-                }
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate" style={{ color: v.text }}>{item.title}</p>
-                <p className="text-xs truncate" style={{ color: v.muted }}>{item.artist}</p>
-              </div>
-              <div className="shrink-0 text-right">
-                {tab === 'rating' ? (
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5" fill="currentColor" style={{ color: v.accent }} />
-                    <span className="text-sm font-bold" style={{ color: v.accent }}>{item.avg_rating?.toFixed(1)}</span>
-                    <span className="text-[10px]" style={{ color: `${v.muted}80` }}>({item.review_count || 0})</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1">
-                    <Eye className="w-3.5 h-3.5" style={{ color: v.accent }} />
-                    <span className="text-sm font-bold" style={{ color: v.accent }}>{item.click_count || 0}</span>
-                  </div>
-                )}
-              </div>
+            <motion.div key={item.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="group flex min-h-28 items-center gap-4 overflow-hidden rounded-2xl p-3 text-left" style={{ background: `${v.accent}12`, border: `1px solid ${v.cardBorder}` }}>
+              <span className="w-8 text-center text-lg shrink-0">{MEDALS[i] || `#${i + 1}`}</span><div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl" style={{ background: `${v.accent}18` }}><CoverImage src={item.cover_url} alt={item.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /></div><div className="min-w-0 flex-1"><p className="truncate text-base font-semibold" style={{ color: v.text }}>{item.title}</p><p className="mt-1 truncate text-xs" style={{ color: v.muted }}>{item.artist}</p><div className="mt-3 flex items-center gap-1">{tab === 'rating' ? <><Star className="h-3.5 w-3.5" fill="currentColor" style={{ color: v.accent }} /><span className="text-sm font-bold" style={{ color: v.accent }}>{item.avg_rating?.toFixed(1)}</span><span className="text-[10px]" style={{ color: `${v.muted}80` }}>({item.review_count || 0})</span></> : <><Eye className="h-3.5 w-3.5" style={{ color: v.accent }} /><span className="text-sm font-bold" style={{ color: v.accent }}>{item.click_count || 0}</span></>}</div></div>
             </motion.div>
           ))}
         </div>
