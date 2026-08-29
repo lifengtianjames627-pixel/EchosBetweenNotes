@@ -15,6 +15,7 @@ import VirtualItemModal from '@/components/VirtualItemModal';
 import { Search } from 'lucide-react';
 import { loadDraft, saveDraft, clearDraft } from '@/lib/reviewDraft';
 import { useAuthed } from '@/hooks/useAuthed';
+import CoverImage from '@/components/music/CoverImage';
 
 function StarPicker({ rating, onRate, accent, muted }) {
   return (
@@ -363,11 +364,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
         <div className="flex gap-4 p-5 pb-4 sticky top-0 z-10 backdrop-blur-lg relative overflow-hidden" style={{ background: v.cardBg }}>
           <GenreDecoration genreId={localItem.genre} accent={v.accent} />
           <div className="w-20 h-20 rounded-xl shrink-0 overflow-hidden relative z-[1]" style={{ background: `${v.accent}15` }}>
-            {localItem.cover_url ? (
-              <img src={localItem.cover_url} alt={localItem.title} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-2xl">🎵</div>
-            )}
+            <CoverImage src={localItem.cover_url} alt={localItem.title} className="w-full h-full object-cover" />
           </div>
           <div className="flex-1 min-w-0 relative z-[1]">
             <div className="flex items-start justify-between gap-2">

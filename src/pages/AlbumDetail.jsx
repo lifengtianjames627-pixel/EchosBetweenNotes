@@ -12,6 +12,7 @@ import ReviewCard from '@/components/ReviewCard';
 import { ArrowLeft, Star, MessageSquare, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthed } from '@/hooks/useAuthed';
+import CoverImage from '@/components/music/CoverImage';
 
 export default function AlbumDetail() {
   const { id } = useParams();
@@ -75,8 +76,8 @@ export default function AlbumDetail() {
 
   return (
     <div className="space-y-8">
-      <Link to="/discover" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back to Discover
+      <Link to="/reviews" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back to Reviews
       </Link>
 
       {/* Album Header */}
@@ -87,13 +88,7 @@ export default function AlbumDetail() {
       >
         <div className="w-full md:w-72 shrink-0">
           <div className="aspect-square rounded-2xl overflow-hidden bg-muted shadow-lg">
-            {album.cover_url ? (
-              <img src={album.cover_url} alt={album.title} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
-                <span className="text-6xl">🎵</span>
-              </div>
-            )}
+            <CoverImage src={album.cover_url} alt={album.title} className="w-full h-full object-cover" />
           </div>
         </div>
         <div className="flex-1">

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Plus, Disc3, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLang } from '@/i18n/LanguageContext';
 import { useAuthed } from '@/hooks/useAuthed';
+import CoverImage from '@/components/music/CoverImage';
 
 // SVG grain filter for film/vinyl texture
 function GrainFilter({ id }) {
@@ -143,11 +144,7 @@ export default function MusicSlider({ items, v, onItemClick, onAddClick, kind = 
                     : `0 6px 20px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.04)`,
                 }}
               >
-                {item.cover_url ? (
-                  <img src={item.cover_url} alt={item.title} loading="lazy" decoding="async" width={176} height={176} className="w-full h-full object-cover" />
-                ) : (
-                  <VinylPlaceholder accent={v.accent} />
-                )}
+                <CoverImage src={item.cover_url} alt={item.title} className="w-full h-full object-cover" />
 
                 {/* Film grain overlay */}
                 <div

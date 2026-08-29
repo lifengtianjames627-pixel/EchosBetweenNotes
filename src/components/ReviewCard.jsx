@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import StarRating from './StarRating';
 import { Heart, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import CoverImage from '@/components/music/CoverImage';
 
 export default function ReviewCard({ review, showAlbum = true }) {
   return (
@@ -12,13 +13,7 @@ export default function ReviewCard({ review, showAlbum = true }) {
         {showAlbum && (
           <Link to={`/album/${review.album_id}`} className="shrink-0">
             <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted">
-              {review.album_cover_url ? (
-                <img src={review.album_cover_url} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
-                  <span className="text-lg">🎵</span>
-                </div>
-              )}
+              <CoverImage src={review.album_cover_url} alt={review.album_title || 'Album artwork'} className="w-full h-full object-cover" />
             </div>
           </Link>
         )}

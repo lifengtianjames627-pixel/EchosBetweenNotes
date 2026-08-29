@@ -4,23 +4,14 @@ import { Card } from '@/components/ui/card';
 import StarRating from './StarRating';
 import GenreBadge from './GenreBadge';
 import { MessageSquare } from 'lucide-react';
+import CoverImage from '@/components/music/CoverImage';
 
 export default function AlbumCard({ album }) {
   return (
     <Link to={`/album/${album.id}`}>
       <Card className="group overflow-hidden border-0 shadow-sm hover:shadow-xl transition-all duration-300 bg-card">
         <div className="aspect-square relative overflow-hidden bg-muted">
-          {album.cover_url ? (
-            <img 
-              src={album.cover_url} 
-              alt={album.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
-              <span className="text-4xl">🎵</span>
-            </div>
-          )}
+          <CoverImage src={album.cover_url} alt={album.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           {album.genre && (
             <div className="absolute top-3 left-3">
               <GenreBadge genre={album.genre} />
