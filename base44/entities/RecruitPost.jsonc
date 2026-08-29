@@ -1,6 +1,55 @@
 {
   "name": "RecruitPost",
   "type": "object",
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.moderation_status": {
+            "$nin": [
+              "pending_review",
+              "blocked"
+            ]
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  },
   "properties": {
     "kind": {
       "type": "string",
