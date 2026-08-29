@@ -10,6 +10,7 @@ import Layout from '@/components/Layout.jsx';
 import Home from '@/pages/Home';
 import WrittenReviews from '@/pages/WrittenReviews';
 import Podcasts from '@/pages/Podcasts';
+import PodcastSpace from '@/pages/PodcastSpace';
 import AlbumDetail from '@/pages/AlbumDetail';
 import GenreSpace from '@/pages/GenreSpace';
 import Profile from '@/pages/Profile';
@@ -47,6 +48,7 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Home />} />
         <Route path="/reviews" element={<WrittenReviews />} />
         <Route path="/podcasts" element={<Podcasts />} />
+        <Route path="/podcasts/:categoryId" element={<PodcastSpace />} />
         <Route path="/genre/:genreId" element={<GenreSpace />} />
         <Route path="/album/:id" element={<AlbumDetail />} />
         <Route path="/about" element={<About />} />
