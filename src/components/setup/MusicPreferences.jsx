@@ -1,6 +1,6 @@
 import React from 'react';
 
-const OPTIONS = ['Indie', 'Pop', 'Rock', 'Hip-hop', 'R&B', 'Electronic', 'Jazz', 'Classical', 'K-pop', 'Metal', 'Folk', 'Soundtracks'];
+const OPTIONS = ['Rock', 'Pop', 'Classical', 'Metal', 'Jazz', 'Blues', 'R&B', 'Core', 'Country', 'Hip-hop', 'Indie', 'Grunge', 'Electronic', 'Funk', 'ACG', 'Cinematic'];
 
 export default function MusicPreferences({ values, onToggle }) {
   return <section>
