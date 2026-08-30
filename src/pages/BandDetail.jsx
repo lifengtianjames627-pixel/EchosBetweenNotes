@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import GenreBadge from '@/components/GenreBadge';
 import { ArrowLeft, Users, Guitar, Crown, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { displayName } from '@/lib/displayName';
 
 export default function BandDetail() {
   const { id } = useParams();
@@ -43,7 +44,7 @@ export default function BandDetail() {
         band_id: id,
         band_name: band.name,
         user_email: currentUser.email,
-        user_name: currentUser.full_name,
+        user_name: displayName(currentUser),
         role: myRole || 'Member',
         is_founder: false,
       });

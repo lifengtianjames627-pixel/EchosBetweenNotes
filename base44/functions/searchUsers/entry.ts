@@ -14,9 +14,9 @@ Deno.serve(async (req) => {
 
     const results = allUsers
       .filter(u => u.email !== user.email)
-      .filter(u => (u.full_name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q))
+      .filter(u => (u.display_name || u.full_name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q))
       .slice(0, 10)
-      .map(u => ({ full_name: u.full_name, email: u.email }));
+      .map(u => ({ full_name: u.display_name || u.full_name || '', email: u.email }));
 
     return Response.json({ results });
   } catch (error) {

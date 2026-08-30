@@ -3,11 +3,13 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ReviewCard from '@/components/ReviewCard';
 import { Link, useNavigate } from 'react-router-dom';
-import { Users, Star, UserPlus, Check, X, Music, Shield, MessageSquare, Search } from 'lucide-react';
+import { Users, Star, UserPlus, Check, X, Music, Shield, MessageSquare, Search, UserCog } from 'lucide-react';
 import UserBadges from '@/components/UserBadges';
 import ProfileHero from '@/components/profile/ProfileHero';
 import ProfileDetails from '@/components/profile/ProfileDetails';
 import StatStrip from '@/components/profile/StatStrip';
+import EditNameModal from '@/components/profile/EditNameModal';
+import { displayName } from '@/lib/displayName';
 import { awardBadge } from '@/lib/badgeUtils';
 import { earnedFromReviews } from '@/lib/badgeProgress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,6 +24,7 @@ export default function Profile() {
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
+  const [showEditName, setShowEditName] = useState(false);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
 
@@ -89,7 +92,7 @@ export default function Profile() {
 
   const sendFriendRequest = useMutation({
     mutationFn: () => base44.entities.FriendRequest.create({
-      from_email: user.email, from_name: user.full_name,
+      from_email: user.email, from_name: displayName(user),
       to_email: friendEmail, message: friendMsg, status: 'pending',
     }),
     onSuccess: () => {
@@ -118,7 +121,7 @@ export default function Profile() {
     </div>
   );
 
-  const initial = (user.full_name || user.email || 'U')[0].toUpperCase();
+  const initial = (displayName(user) || 'U')[0].toUpperCase();
 
   return (
     <div className="min-h-screen" style={{ background: '#f3efe6' }}>
@@ -126,7 +129,7 @@ export default function Profile() {
 
         {/* Profile header */}
         <ProfileHero
-          name={user.full_name || 'Listener'}
+          name={displayName(user) || 'Listener'}
           email={user.email}
           initial={initial}
           badges={user?.equipped_badges || []}
@@ -134,6 +137,13 @@ export default function Profile() {
           pictureUrl={user?.profile_picture_url}
           editable
         >
+          <button
+            onClick={() => setShowEditName(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold"
+            style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #e0d8c8' }}
+          >
+            <UserCog className="w-3.5 h-3.5" /> Edit name
+          </button>
           <button
             onClick={() => setShowAddFriend(true)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold"
@@ -277,6 +287,8 @@ export default function Profile() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {showEditName && <EditNameModal user={user} onClose={() => setShowEditName(false)} />}
 
       {/* Add Friend Modal */}
       {showAddFriend && (

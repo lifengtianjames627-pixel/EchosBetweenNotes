@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { X, Star, Search } from 'lucide-react';
 import { loadDraft, saveDraft, clearDraft } from '@/lib/reviewDraft';
+import { displayName } from '@/lib/displayName';
 
 // A "virtual" music item modal — used for tracks clicked inside an album (type='single')
 // or an album searched for from a single (type='album'). The underlying Album/Single
@@ -109,7 +110,7 @@ export default function VirtualItemModal({ v, initialTitle = '', initialArtist =
       album_cover_url: coverUrl || '',
       rating,
       content,
-      reviewer_name: currentUser?.full_name || 'Anonymous',
+      reviewer_name: displayName(currentUser) || 'Anonymous',
       reviewer_email: currentUser?.email || '',
       reviewer_equipped_badges: currentUser?.equipped_badges || [],
       likes_count: 0,

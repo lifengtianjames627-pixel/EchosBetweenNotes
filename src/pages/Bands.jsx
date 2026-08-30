@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import GenreBadge, { genreLabels } from '@/components/GenreBadge';
 import { Plus, Users, Search, Guitar } from 'lucide-react';
+import { displayName } from '@/lib/displayName';
 import { Card } from '@/components/ui/card';
 
 export default function Bands() {
@@ -43,7 +44,7 @@ export default function Bands() {
         band_id: band.id,
         band_name: data.name,
         user_email: currentUser.email,
-        user_name: currentUser.full_name,
+        user_name: displayName(currentUser),
         role: 'Founder',
         is_founder: true,
       });

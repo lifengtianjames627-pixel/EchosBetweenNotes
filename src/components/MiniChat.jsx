@@ -6,6 +6,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useChat, makeChatId } from '@/lib/useChat';
 import { findContactInfo } from '@/lib/contactFilter';
 import ReportButton from '@/components/soulmate/ReportButton';
+import { displayName } from '@/lib/displayName';
 
 const MAX_MESSAGES = 5;
 
@@ -38,7 +39,7 @@ export default function MiniChat({ peer, currentUser, onClose }) {
   const sendFriendRequest = useMutation({
     mutationFn: () => base44.entities.FriendRequest.create({
       from_email: currentUser.email,
-      from_name: currentUser.full_name || '',
+      from_name: displayName(currentUser),
       to_email: peer.email,
       to_name: peer.name || '',
       status: 'pending',

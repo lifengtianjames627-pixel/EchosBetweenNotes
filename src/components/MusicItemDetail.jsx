@@ -6,6 +6,7 @@ import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube, Maximize
 import CivilityNotice from '@/components/CivilityNotice';
 import BadgeIcon from '@/components/BadgeIcon';
 import { awardBadge } from '@/lib/badgeUtils';
+import { displayName } from '@/lib/displayName';
 import TrackList from '@/components/TrackList';
 import SingleCoverMatch from '@/components/SingleCoverMatch';
 import ReviewActions from '@/components/ReviewActions';
@@ -49,7 +50,7 @@ function CommentSection({ reviewId, v, currentUser }) {
     mutationFn: (content) => base44.entities.Comment.create({
       review_id: reviewId,
       content,
-      author_name: currentUser?.full_name || 'Anonymous',
+      author_name: displayName(currentUser) || 'Anonymous',
       author_email: currentUser?.email || '',
     }),
     onSuccess: async () => {
@@ -172,7 +173,7 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
         rating: d.rating,
         title: d.title,
         content: d.content,
-        reviewer_name: currentUser?.full_name || 'Anonymous',
+        reviewer_name: displayName(currentUser) || 'Anonymous',
         reviewer_email: currentUser?.email || '',
         reviewer_equipped_badges: currentUser?.equipped_badges || [],
         likes_count: 0,

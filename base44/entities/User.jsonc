@@ -10,6 +10,10 @@
       ],
       "default": "user"
     },
+    "display_name": {
+      "type": "string",
+      "description": "Member-chosen display name. Shown across the app in place of the platform full_name when set."
+    },
     "equipped_badges": {
       "type": "array",
       "items": {

@@ -5,6 +5,7 @@ import { notify } from '@/lib/notify';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthed } from '@/hooks/useAuthed';
+import { displayName } from '@/lib/displayName';
 
 export default function ReviewActions({ review, v, currentUser }) {
   const queryClient = useQueryClient();
@@ -66,10 +67,10 @@ export default function ReviewActions({ review, v, currentUser }) {
         notify({
           owner_email: review.reviewer_email,
           type: 'like',
-          title: `${currentUser.full_name || currentUser.email} liked your review`,
+          title: `${displayName(currentUser)} liked your review`,
           body: review.album_title ? `On "${review.album_title}"` : '',
           link: `/album/${review.album_id}`,
-          actor_name: currentUser.full_name || currentUser.email,
+          actor_name: displayName(currentUser),
         });
       }
     },
@@ -89,16 +90,16 @@ export default function ReviewActions({ review, v, currentUser }) {
         setOptimisticSub(true);
         await base44.entities.Subscription.create({
           subscriber_email: currentUser.email,
-          subscriber_name: currentUser.full_name || '',
+          subscriber_name: displayName(currentUser),
           target_email: review.reviewer_email,
           target_name: review.reviewer_name || '',
         });
         notify({
           owner_email: review.reviewer_email,
           type: 'follow',
-          title: `${currentUser.full_name || currentUser.email} started following you`,
+          title: `${displayName(currentUser)} started following you`,
           link: `/u/${encodeURIComponent(currentUser.email)}`,
-          actor_name: currentUser.full_name || currentUser.email,
+          actor_name: displayName(currentUser),
         });
       }
     },

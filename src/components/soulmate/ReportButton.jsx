@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Flag, X, Check } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useMutation } from '@tanstack/react-query';
+import { displayName } from '@/lib/displayName';
 
 const REASONS = [
   { id: 'contact_info', label: 'Sharing phone / WeChat / QQ' },
@@ -29,7 +30,7 @@ export default function ReportButton({ targetType, targetId, targetSummary, targ
       target_summary: (targetSummary || '').slice(0, 500),
       target_author_email: targetAuthorEmail || '',
       reporter_email: currentUser?.email || '',
-      reporter_name: currentUser?.full_name || '',
+      reporter_name: displayName(currentUser),
       reason,
       details,
       status: 'open',

@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Edit2, Save, X, Users, Music2, ChevronRight, UserMinus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { displayName } from '@/lib/displayName';
 
 // Paper palette, same language as the rest of the site.
 const V = {
@@ -124,7 +125,7 @@ export default function BandDashboard() {
         band_id: band.id,
         band_name: form.name,
         user_email: user.email,
-        user_name: user.full_name,
+        user_name: displayName(user),
         role: 'Founder',
         is_founder: true,
       });

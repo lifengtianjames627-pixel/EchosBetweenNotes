@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { findContactInfo } from '@/lib/contactFilter';
 import SafetyNotice from '@/components/soulmate/SafetyNotice';
+import { displayName } from '@/lib/displayName';
 
 export const INSTRUMENTS = [
   'Vocals', 'Guitar', 'Lead Guitar', 'Bass', 'Drums', 'Keys',
@@ -99,7 +100,7 @@ export default function CreatePostModal({ currentUser, onClose }) {
       await base44.entities.RecruitPost.create({
         ...data,
         author_email: currentUser.email,
-        author_name: currentUser.full_name || currentUser.email,
+        author_name: displayName(currentUser),
         author_age_group: currentUser.age_group,
         status: 'active',
         moderation_status: action === 'review' ? 'pending_review' : 'approved',

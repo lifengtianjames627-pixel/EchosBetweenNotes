@@ -9,6 +9,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useLang } from '@/i18n/LanguageContext';
 import LanguageButton from '@/components/LanguageButton';
 import SiteFooter from '@/components/SiteFooter';
+import { displayName } from '@/lib/displayName';
 
 const NAV_ITEMS = [
   { path: '/', icon: HomeIcon, labelKey: 'nav.home' },
@@ -137,10 +138,10 @@ export default function Layout() {
               </button>
               <Link to="/profile" className="flex items-center gap-2 px-2.5 py-1.5 rounded-full transition-colors" style={{ border: '1px solid rgba(26,24,21,0.14)' }}>
                 <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: '#1a1815', color: '#faf8f2' }}>
-                  {(currentUser.full_name || currentUser.email || 'U')[0].toUpperCase()}
+                  {(displayName(currentUser) || 'U')[0].toUpperCase()}
                 </div>
                 <span className="text-xs font-semibold hidden sm:inline max-w-[140px] truncate" style={{ color: '#1a1815' }}>
-                  {currentUser.full_name || t('nav.myAccount')}
+                  {displayName(currentUser) || t('nav.myAccount')}
                 </span>
               </Link>
             </>

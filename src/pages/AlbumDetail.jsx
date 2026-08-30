@@ -15,6 +15,7 @@ import ReviewDetailModal from '@/components/reviews/ReviewDetailModal';
 import { useAuthed } from '@/hooks/useAuthed';
 import CoverImage from '@/components/music/CoverImage';
 import { trackGenre } from '@/lib/trackGenre';
+import { displayName } from '@/lib/displayName';
 
 export default function AlbumDetail() {
   const { id } = useParams();
@@ -56,7 +57,7 @@ export default function AlbumDetail() {
         album_title: album.title,
         album_artist: album.artist,
         album_cover_url: album.cover_url || '',
-        reviewer_name: currentUser?.full_name || 'Anonymous',
+        reviewer_name: displayName(currentUser) || 'Anonymous',
         likes_count: 0,
       });
       const newCount = (album.review_count || 0) + 1;

@@ -22,7 +22,7 @@ export default async function(req) {
     return Response.json({
       found: true,
       email: target.email,
-      full_name: target.full_name || '',
+      full_name: target.display_name || target.full_name || '',
       profile_picture_url: target.profile_picture_url || '',
       equipped_badges: target.equipped_badges || [],
       last_active: lastActive,

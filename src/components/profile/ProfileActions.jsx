@@ -6,6 +6,7 @@ import { UserPlus, MessageSquare, Check, Clock, Send, Lock } from 'lucide-react'
 import { base44 } from '@/api/base44Client';
 import { makeChatId } from '@/lib/useChat';
 import { notify } from '@/lib/notify';
+import { displayName } from '@/lib/displayName';
 
 // Friend + message controls on another member's profile.
 // Before you are friends you get exactly ONE message — enough to introduce
@@ -44,7 +45,7 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
 
   const addFriend = useMutation({
     mutationFn: () => base44.entities.FriendRequest.create({
-      from_email: me.email, from_name: me.full_name || me.email,
+      from_email: me.email, from_name: displayName(me),
       to_email: targetEmail, to_name: targetName, status: 'pending',
     }),
     onSuccess: () => {
@@ -52,9 +53,9 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
       notify({
         owner_email: targetEmail,
         type: 'friend_request',
-        title: `${me.full_name || me.email} sent you a friend request`,
+        title: `${displayName(me)} sent you a friend request`,
         link: '/profile',
-        actor_name: me.full_name || me.email,
+        actor_name: displayName(me),
       });
     },
   });
@@ -63,7 +64,7 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
     mutationFn: () => base44.entities.ChatMessage.create({
       chat_id: chatId,
       sender_email: me.email,
-      sender_name: me.full_name || me.email,
+      sender_name: displayName(me),
       content: text.trim(),
     }),
     onSuccess: () => {

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { displayName } from '@/lib/displayName';
 
 // Shared chat data layer for both the mini popup and the full page.
 //
@@ -46,7 +47,7 @@ export function useChat({ chatId, currentUser, limit = 200 }) {
       chat_id: chatId,
       participants: chatId.split('|'),
       sender_email: currentUser.email,
-      sender_name: currentUser.full_name || currentUser.email,
+      sender_name: displayName(currentUser),
       ...normalize(payload),
     }),
     onMutate: async (payload) => {
@@ -58,7 +59,7 @@ export function useChat({ chatId, currentUser, limit = 200 }) {
           id: `pending-${Date.now()}`,
           chat_id: chatId,
           sender_email: currentUser.email,
-          sender_name: currentUser.full_name || currentUser.email,
+          sender_name: displayName(currentUser),
           ...normalize(payload),
           created_date: new Date().toISOString(),
           _pending: true,
