@@ -127,7 +127,7 @@ export default function Home() {
           <div className="absolute inset-0 pointer-events-none" aria-hidden>
             <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
               {[10, 27.5, 45, 62.5, 80].map(y => (
-                <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#bf7a35" strokeWidth="0.6" opacity="0.38" vectorEffect="non-scaling-stroke" />
+                <path key={y} d={`M0 ${y} Q 25 ${y - 7} 50 ${y} T 100 ${y}`} stroke="#bf7a35" strokeWidth="0.8" fill="none" opacity="0.5" vectorEffect="non-scaling-stroke" />
               ))}
             </svg>
           </div>
