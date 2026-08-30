@@ -104,7 +104,7 @@ function WavyStaff() {
   const wave = (y) => {
     let d = `M 0 ${y}`;
     for (let x = 0; x <= 200; x += 4) {
-      d += ` L ${x} ${(y + Math.sin((x / 100) * 2 * Math.PI) * 4).toFixed(2)}`;
+      d += ` L ${x} ${(y + Math.sin((x / 100) * 2 * Math.PI) * 2.4).toFixed(2)}`;
     }
     return d;
   };
