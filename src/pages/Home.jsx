@@ -127,13 +127,15 @@ export default function Home() {
           <div className="absolute inset-0 pointer-events-none" aria-hidden>
             <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
               {[10, 27.5, 45, 62.5, 80].map(y => (
-                <path key={y} d={`M0 ${y} Q 25 ${y - 7} 50 ${y} T 100 ${y}`} stroke="#bf7a35" strokeWidth="0.8" fill="none" opacity="0.5" vectorEffect="non-scaling-stroke" />
+                <path key={y} d={`M0 ${y} Q 25 ${y - 12} 50 ${y} T 100 ${y}`} stroke="#bf7a35" strokeWidth="1" fill="none" opacity="0.6" vectorEffect="non-scaling-stroke" />
               ))}
             </svg>
           </div>
           <span className="hidden sm:block mb-2 relative z-10"><Clef /></span>
           <h1 className="relative z-10 font-playfair italic leading-none text-center" style={{ fontSize: 'clamp(2.6rem, 8vw, 6rem)', color: '#1a1815', letterSpacing: '-0.01em' }}>
-            Echo Between Notes
+            <span style={{ display: 'inline-block', transform: 'translateY(-10px)' }}>Echo</span>{' '}
+            <span style={{ display: 'inline-block', transform: 'translateY(7px)' }}>Between</span>{' '}
+            <span style={{ display: 'inline-block', transform: 'translateY(-8px)' }}>Notes</span>
           </h1>
         </div>
         <div className="flex items-center gap-3 mt-5">
