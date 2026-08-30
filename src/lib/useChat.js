@@ -38,14 +38,17 @@ export function useChat({ chatId, currentUser, limit = 200 }) {
     return unsubscribe;
   }, [chatId]);
 
+  // Accepts either a plain string or { content, attachment_url, attachment_name, attachment_kind }.
+  const normalize = (payload) => (typeof payload === 'string' ? { content: payload } : payload);
+
   const send = useMutation({
-    mutationFn: (content) => base44.entities.ChatMessage.create({
+    mutationFn: (payload) => base44.entities.ChatMessage.create({
       chat_id: chatId,
       sender_email: currentUser.email,
       sender_name: currentUser.full_name || currentUser.email,
-      content,
+      ...normalize(payload),
     }),
-    onMutate: async (content) => {
+    onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData(queryKey) || [];
       queryClient.setQueryData(queryKey, [
@@ -55,14 +58,14 @@ export function useChat({ chatId, currentUser, limit = 200 }) {
           chat_id: chatId,
           sender_email: currentUser.email,
           sender_name: currentUser.full_name || currentUser.email,
-          content,
+          ...normalize(payload),
           created_date: new Date().toISOString(),
           _pending: true,
         },
       ]);
       return { previous };
     },
-    onError: (_err, _content, context) => {
+    onError: (_err, _payload, context) => {
       if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey }),

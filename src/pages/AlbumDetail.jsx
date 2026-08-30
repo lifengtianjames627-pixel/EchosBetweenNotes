@@ -10,7 +10,8 @@ import StarRating from '@/components/StarRating';
 import GenreBadge from '@/components/GenreBadge';
 import ReviewCard from '@/components/ReviewCard';
 import { ArrowLeft, Calendar, MessageSquare } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import ReviewDetailModal from '@/components/reviews/ReviewDetailModal';
 import { useAuthed } from '@/hooks/useAuthed';
 import CoverImage from '@/components/music/CoverImage';
 
@@ -19,6 +20,7 @@ export default function AlbumDetail() {
   const queryClient = useQueryClient();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewData, setReviewData] = useState({ rating: 0, title: '', content: '' });
+  const [openReview, setOpenReview] = useState(null);
   const { authed, login } = useAuthed();
 
   const { data: album, isLoading: loadingAlbum } = useQuery({
@@ -158,7 +160,9 @@ export default function AlbumDetail() {
           {reviews.length > 0 ? (
             <div className="space-y-3">
               {reviews.map((review) => (
-                <ReviewCard key={review.id} review={review} showAlbum={false} />
+                <button key={review.id} onClick={() => setOpenReview(review)} className="block w-full text-left">
+                  <ReviewCard review={review} showAlbum={false} />
+                </button>
               ))}
             </div>
           ) : (
@@ -168,6 +172,10 @@ export default function AlbumDetail() {
           )}
         </section>
       </div>
+
+      <AnimatePresence>
+        {openReview && <ReviewDetailModal review={openReview} onClose={() => setOpenReview(null)} />}
+      </AnimatePresence>
     </div>
   );
 }

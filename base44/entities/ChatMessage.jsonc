@@ -14,6 +14,23 @@
     },
     "content": {
       "type": "string"
+    },
+    "attachment_url": {
+      "type": "string",
+      "description": "URL of an attached image or PDF"
+    },
+    "attachment_name": {
+      "type": "string",
+      "description": "Original file name of the attachment"
+    },
+    "attachment_kind": {
+      "type": "string",
+      "enum": [
+        "image",
+        "pdf",
+        "file"
+      ],
+      "description": "How the attachment should be rendered"
     }
   },
   "required": [

@@ -3,7 +3,10 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, ArrowLeft, Search, MessageSquare, ShieldAlert, Clock } from 'lucide-react';
+import { ArrowLeft, Search, MessageSquare, ShieldAlert, Clock, PanelLeftOpen } from 'lucide-react';
+import ConversationSidebar from '@/components/chat/ConversationSidebar';
+import MessageComposer from '@/components/chat/MessageComposer';
+import MessageAttachment from '@/components/chat/MessageAttachment';
 import { useChat, makeChatId } from '@/lib/useChat';
 import { findContactInfo } from '@/lib/contactFilter';
 import ReportButton from '@/components/soulmate/ReportButton';
@@ -33,6 +36,7 @@ export default function DirectChat() {
   const [text, setText] = useState('');
   const [search, setSearch] = useState('');
   const [warning, setWarning] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const bottomRef = useRef(null);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
@@ -45,17 +49,18 @@ export default function DirectChat() {
   }, [messages.length]);
 
   // Contact details stay out of chat — in-app messages are logged and reportable.
-  const handleSend = () => {
-    const content = text.trim();
-    if (!content || !chatId) return;
-    const contact = findContactInfo(content);
+  // Returns false when the message was blocked so the composer keeps its draft.
+  const handleSend = (payload) => {
+    if (!chatId) return false;
+    const contact = findContactInfo(payload.content || '');
     if (contact.length > 0) {
       setWarning(t('chat.keepWarning', { items: contact.join(', ') }));
-      return;
+      return false;
     }
     setWarning(null);
     setText('');
-    send.mutate(content);
+    send.mutate(payload);
+    return true;
   };
 
   const { data: searchResults = [] } = useQuery({
@@ -76,7 +81,7 @@ export default function DirectChat() {
   const { data: directory, isLoading: directoryLoading } = useQuery({
     queryKey: ['chat-directory'],
     queryFn: async () => (await base44.functions.invoke('chatDirectory', {})).data,
-    enabled: !!user && !peerEmail,
+    enabled: !!user,
     refetchInterval: 60000, // keeps online/offline dots fresh
   });
 
@@ -180,10 +185,27 @@ export default function DirectChat() {
   }
 
   return (
-    <div className="flex flex-col" style={{ background: V.bg, height: 'calc(100vh - 3rem)' }}>
+    <div className="flex" style={{ background: V.bg, height: 'calc(100vh - 3.5rem)' }}>
+      {/* Collapsible conversations panel — the chat itself keeps ~3/4 of the width */}
+      {sidebarOpen && (
+        <ConversationSidebar
+          V={V}
+          conversations={directory?.conversations || []}
+          activeEmail={peerEmail}
+          onOpen={openChat}
+          onCollapse={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <div className="flex-1 min-w-0 flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 shrink-0"
         style={{ background: '#e6ddc9', borderBottom: `1px solid ${V.border}` }}>
+        {!sidebarOpen && (
+          <button onClick={() => setSidebarOpen(true)} title="Show conversations" className="hidden md:block" style={{ color: V.muted }}>
+            <PanelLeftOpen className="w-5 h-5" />
+          </button>
+        )}
         <button onClick={() => navigate('/chat')} style={{ color: V.muted }}>
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -218,7 +240,7 @@ export default function DirectChat() {
           const isMe = msg.sender_email === user.email;
           return (
             <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-              <div className="max-w-[70%] px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap flex items-end gap-2"
+              <div className="max-w-[70%] px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap flex flex-col gap-1"
                 style={{
                   ...(isMe
                     ? { background: '#f1ebdd', border: '1px solid #ddd0b6' }
@@ -226,8 +248,11 @@ export default function DirectChat() {
                   color: V.text,
                   opacity: msg._pending ? 0.6 : 1,
                 }}>
-                <span>{msg.content}</span>
-                {msg._pending && <Clock className="w-3 h-3 shrink-0 mb-0.5 opacity-70" />}
+                <span className="flex items-end gap-2">
+                  <span>{msg.content}</span>
+                  {msg._pending && <Clock className="w-3 h-3 shrink-0 mb-0.5 opacity-70" />}
+                </span>
+                <MessageAttachment V={V} url={msg.attachment_url} name={msg.attachment_name} kind={msg.attachment_kind} />
               </div>
             </div>
           );
@@ -253,24 +278,14 @@ export default function DirectChat() {
         )}
       </AnimatePresence>
 
-      {/* Input */}
-      <div className="px-5 py-4 flex gap-3 shrink-0"
-        style={{ borderTop: `1px solid ${V.border}`, background: '#e6ddc9' }}>
-        <input
-          className="flex-1 px-4 py-2.5 rounded-full text-sm outline-none"
-          style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
-          placeholder={t('chat.typeMessage')}
-          value={text}
-          onChange={e => { setText(e.target.value); if (warning) setWarning(null); }}
-          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-        />
-        <button
-          onClick={handleSend}
-          disabled={!text.trim()}
-          className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-          style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #ddd0b6', opacity: text.trim() ? 1 : 0.5 }}>
-          <Send className="w-4 h-4" />
-        </button>
+      {/* Composer — multi-line, emoji + image/PDF attachments, character count */}
+      <MessageComposer
+        V={V}
+        value={text}
+        onChange={(v) => { setText(v); if (warning) setWarning(null); }}
+        onSend={handleSend}
+        placeholder={t('chat.typeMessage')}
+      />
       </div>
     </div>
   );
