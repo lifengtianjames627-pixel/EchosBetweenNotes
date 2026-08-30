@@ -6,38 +6,47 @@ import { useLang } from '@/i18n/LanguageContext';
 // Three entries — staggered like a sound wave (middle dips), each crowned with
 // a small, quiet musical motif instead of a plain hairline.
 const OPTIONS = [
-  { path: '/reviews',  icon: PenLine,   labelKey: 'home.reviews',   descKey: 'home.reviewsDesc',   motif: 'wave',  lift: 'sm:-mt-2' },
-  { path: '/podcasts', icon: Headphones, labelKey: 'home.podcasts',  descKey: 'home.podcastsDesc',  motif: 'note',  lift: 'sm:mt-10' },
-  { path: '/soulmate', icon: Users,     labelKey: 'home.soulmate',  descKey: 'home.soulmateDesc',  motif: 'bars',  lift: 'sm:-mt-2' },
+  { path: '/reviews',  icon: PenLine,   labelKey: 'home.reviews',   descKey: 'home.reviewsDesc',   motif: 'staff', lift: 'sm:-mt-2' },
+  { path: '/podcasts', icon: Headphones, labelKey: 'home.podcasts',  descKey: 'home.podcastsDesc',  motif: 'wave',  lift: 'sm:mt-10' },
+  { path: '/soulmate', icon: Users,     labelKey: 'home.soulmate',  descKey: 'home.soulmateDesc',  motif: 'slur',  lift: 'sm:-mt-2' },
 ];
 
-// Traditional engraved-note motifs — solid noteheads, straight stems, flags
-// and beams, the way they look on printed sheet music.
-function Notehead({ cx, cy, ink, r = 5 }) {
-  return <ellipse cx={cx} cy={cy} rx={r} ry={r * 0.78} transform={`rotate(-22 ${cx} ${cy})`} fill={ink} opacity="0.78" />;
-}
+// Three distinct musical visuals — one per card — so they never read as
+// the same icon recolored. Staff fragment, sound wave, tied-note slur.
 function Motif({ kind }) {
   const ink = '#bf7a35';
-  if (kind === 'wave') return ( // beamed eighths ♫
-    <svg width="40" height="34" viewBox="0 0 40 34" fill="none">
-      <Notehead cx={6} cy={28} ink={ink} />
-      <Notehead cx={26} cy={28} ink={ink} />
-      <path d="M10.7 28 V 8 M30.7 28 V 8" stroke={ink} strokeWidth="1.4" opacity="0.78" />
-      <path d="M10.4 7.6 H 31" stroke={ink} strokeWidth="2.6" strokeLinecap="round" opacity="0.78" />
+  const op = 0.8;
+  if (kind === 'staff') return ( // printed staff with two beamed notes
+    <svg width="66" height="38" viewBox="0 0 66 38" fill="none">
+      {[10, 16, 22, 28, 34].map(y => (
+        <line key={y} x1="2" y1={y} x2="64" y2={y} stroke={ink} strokeWidth="0.7" opacity="0.4" />
+      ))}
+      <ellipse cx="20" cy="25" rx="4" ry="3" transform="rotate(-20 20 25)" fill={ink} opacity={op} />
+      <ellipse cx="44" cy="22" rx="4" ry="3" transform="rotate(-20 44 22)" fill={ink} opacity={op} />
+      <path d="M23.5 25 V 9 M47.5 22 V 6" stroke={ink} strokeWidth="1.2" opacity={op} />
+      <path d="M23.3 8.6 H 47.3" stroke={ink} strokeWidth="2.2" strokeLinecap="round" opacity={op} />
     </svg>
   );
-  if (kind === 'note') return ( // single eighth note ♪
+  if (kind === 'wave') return ( // symmetric sound-wave bars
+    <svg width="60" height="30" viewBox="0 0 60 30" fill="none">
+      {[[6, 9, 21], [14, 5, 25], [22, 11, 19], [30, 3, 27], [38, 8, 22], [46, 12, 18], [54, 6, 24]].map(([x, y1, y2], i) => (
+        <line key={i} x1={x} y1={y1} x2={x} y2={y2} stroke={ink} strokeWidth="2" strokeLinecap="round" opacity={op} />
+      ))}
+    </svg>
+  );
+  if (kind === 'slur') return ( // two notes joined by a slur arc
+    <svg width="46" height="40" viewBox="0 0 46 40" fill="none">
+      <ellipse cx="9" cy="32" rx="5" ry="3.8" transform="rotate(-20 9 32)" fill={ink} opacity={op} />
+      <ellipse cx="34" cy="28" rx="5" ry="3.8" transform="rotate(-20 34 28)" fill={ink} opacity={op} />
+      <path d="M13.7 32 V 14 M38.7 28 V 10" stroke={ink} strokeWidth="1.4" opacity={op} />
+      <path d="M12 12 Q 25 3 39 7" stroke={ink} strokeWidth="1.3" fill="none" opacity={op} />
+    </svg>
+  );
+  if (kind === 'note') return ( // single eighth note (for scattered decor)
     <svg width="20" height="34" viewBox="0 0 20 34" fill="none">
-      <Notehead cx={6} cy={28} ink={ink} />
-      <path d="M10.7 28 V 6" stroke={ink} strokeWidth="1.4" opacity="0.78" />
-      <path d="M10.7 6 C 17 8 18.5 14 15 18" stroke={ink} strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.78" />
-    </svg>
-  );
-  if (kind === 'bars') return ( // two quarter notes ♩ ♩
-    <svg width="32" height="34" viewBox="0 0 32 34" fill="none">
-      <Notehead cx={6} cy={28} ink={ink} r={4.5} />
-      <Notehead cx={22} cy={28} ink={ink} r={4.5} />
-      <path d="M10.2 28 V 8 M26.2 28 V 8" stroke={ink} strokeWidth="1.4" opacity="0.78" />
+      <ellipse cx="6" cy="28" rx="5" ry="3.8" transform="rotate(-20 6 28)" fill={ink} opacity={op} />
+      <path d="M10.7 28 V 6" stroke={ink} strokeWidth="1.4" opacity={op} />
+      <path d="M10.7 6 C 17 8 18.5 14 15 18" stroke={ink} strokeWidth="1.4" fill="none" strokeLinecap="round" opacity={op} />
     </svg>
   );
   return null;
@@ -69,14 +78,13 @@ function Clef() {
 
 // Tiny scattered notes instead of stars — same faint decoration role.
 const NOTES = [
-  { top: '15%', left: '8%', kind: 'note' }, { top: '24%', right: '12%', kind: 'wave' },
-  { top: '64%', left: '14%', kind: 'bars' }, { top: '72%', right: '8%', kind: 'note' },
+  { top: '15%', left: '8%', kind: 'staff' }, { top: '24%', right: '12%', kind: 'wave' },
+  { top: '64%', left: '14%', kind: 'slur' }, { top: '72%', right: '8%', kind: 'note' },
   { top: '46%', left: '52%', kind: 'wave' },
 ];
 function FloatNote({ kind }) {
-  const scale = kind === 'note' ? 0.7 : kind === 'bars' ? 0.8 : 0.7;
   return (
-    <span className="block opacity-[0.13]" style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}>
+    <span className="block opacity-[0.12]" style={{ transform: 'scale(0.6)', transformOrigin: 'center' }}>
       <Motif kind={kind} />
     </span>
   );
