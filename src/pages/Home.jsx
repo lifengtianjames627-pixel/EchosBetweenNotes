@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { PenLine, Headphones, Users } from 'lucide-react';
 import { useLang } from '@/i18n/LanguageContext';
 import HomeFeed from '@/components/HomeFeed';
@@ -95,13 +96,46 @@ function FloatNote({ kind }) {
 // shifted along a gentle sine so the line stays balanced but never rigid.
 const TITLE_TEXT = 'Echo Between Notes';
 const TITLE_OFFSETS = TITLE_TEXT.split('').map((_, i) => Math.round(Math.sin(i / 2.1) * 13));
+// Five-line staff as a travelling sine wave — the group pans so the wave
+// appears to flutter left→right like a flag. Wave spans 0–300 with period 100
+// so the visible 0–200 region stays filled and the loop is seamless.
+function WavyStaff() {
+  const lines = [10, 27.5, 45, 62.5, 80];
+  const wave = (y) => {
+    let d = `M 0 ${y}`;
+    for (let x = 0; x <= 200; x += 4) {
+      d += ` L ${x} ${(y + Math.sin((x / 100) * 2 * Math.PI) * 4).toFixed(2)}`;
+    }
+    return d;
+  };
+  return (
+    <motion.svg
+      className="w-[200%] h-full"
+      preserveAspectRatio="none"
+      viewBox="0 0 200 100"
+      aria-hidden
+      animate={{ x: ['-50%', '0%'] }}
+      transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
+    >
+      {lines.map(y => (
+        <path key={y} d={wave(y)} stroke="#bf7a35" strokeWidth="1" fill="none" opacity="0.6" vectorEffect="non-scaling-stroke" />
+      ))}
+    </motion.svg>
+  );
+}
+
 function FlowingTitle() {
   return (
     <h1 className="relative z-10 font-playfair italic leading-none text-center" style={{ fontSize: 'clamp(2.6rem, 8vw, 6rem)', color: '#1a1815', letterSpacing: '-0.01em' }}>
       {TITLE_TEXT.split('').map((ch, i) => (
-        <span key={i} style={{ display: 'inline-block', transform: `translateY(${TITLE_OFFSETS[i]}px)` }}>
+        <motion.span
+          key={i}
+          style={{ display: 'inline-block' }}
+          animate={{ y: [TITLE_OFFSETS[i] - 5, TITLE_OFFSETS[i] + 5, TITLE_OFFSETS[i] - 5] }}
+          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut', delay: i * 0.1 }}
+        >
           {ch === ' ' ? '\u00A0' : ch}
-        </span>
+        </motion.span>
       ))}
     </h1>
   );
@@ -142,12 +176,8 @@ export default function Home() {
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-24 min-h-[calc(100vh-3.5rem)]">
         <div className="relative inline-flex items-end gap-4">
           {/* Five staff lines running through the title — same ochre as the clef */}
-          <div className="absolute inset-0 pointer-events-none" aria-hidden>
-            <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
-              {[10, 27.5, 45, 62.5, 80].map(y => (
-                <path key={y} d={`M0 ${y} Q 12.5 ${y - 14} 25 ${y} T 50 ${y} T 75 ${y} T 100 ${y}`} stroke="#bf7a35" strokeWidth="1" fill="none" opacity="0.65" vectorEffect="non-scaling-stroke" />
-              ))}
-            </svg>
+          <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+            <WavyStaff />
           </div>
           <span className="hidden sm:block mb-2 relative z-10"><Clef /></span>
           <FlowingTitle />
