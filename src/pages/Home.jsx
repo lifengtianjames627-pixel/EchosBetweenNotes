@@ -11,23 +11,33 @@ const OPTIONS = [
   { path: '/soulmate', icon: Users,     labelKey: 'home.soulmate',  descKey: 'home.soulmateDesc',  motif: 'bars',  lift: 'sm:-mt-2' },
 ];
 
-// Quiet musical motifs — single ochre hairline, no fill, no glow.
+// Traditional engraved-note motifs — solid noteheads, straight stems, flags
+// and beams, the way they look on printed sheet music.
+function Notehead({ cx, cy, ink, r = 5 }) {
+  return <ellipse cx={cx} cy={cy} rx={r} ry={r * 0.78} transform={`rotate(-22 ${cx} ${cy})`} fill={ink} opacity="0.78" />;
+}
 function Motif({ kind }) {
-  const s = { stroke: '#bf7a35', fill: 'none', strokeWidth: 1.3, strokeLinecap: 'round', strokeLinejoin: 'round' };
-  if (kind === 'wave') return (
-    <svg width="72" height="18" viewBox="0 0 72 18" {...s}>
-      <path d="M2 9 Q 9 1 16 9 T 30 9 T 44 9 T 58 9 T 70 9" opacity="0.7" />
+  const ink = '#bf7a35';
+  if (kind === 'wave') return ( // beamed eighths ♫
+    <svg width="40" height="34" viewBox="0 0 40 34" fill="none">
+      <Notehead cx={6} cy={28} ink={ink} />
+      <Notehead cx={26} cy={28} ink={ink} />
+      <path d="M10.7 28 V 8 M30.7 28 V 8" stroke={ink} strokeWidth="1.4" opacity="0.78" />
+      <path d="M10.4 7.6 H 31" stroke={ink} strokeWidth="2.6" strokeLinecap="round" opacity="0.78" />
     </svg>
   );
-  if (kind === 'note') return (
-    <svg width="22" height="30" viewBox="0 0 22 30" {...s}>
-      <path d="M8 24 a4.5 4.5 0 1 0 4.5 -4.5 V5 L18 7" opacity="0.7" />
-      <circle cx="8" cy="24" r="4.5" opacity="0.7" />
+  if (kind === 'note') return ( // single eighth note ♪
+    <svg width="20" height="34" viewBox="0 0 20 34" fill="none">
+      <Notehead cx={6} cy={28} ink={ink} />
+      <path d="M10.7 28 V 6" stroke={ink} strokeWidth="1.4" opacity="0.78" />
+      <path d="M10.7 6 C 17 8 18.5 14 15 18" stroke={ink} strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.78" />
     </svg>
   );
-  if (kind === 'bars') return (
-    <svg width="56" height="18" viewBox="0 0 56 18" {...s}>
-      <path d="M3 15 V7 M11 15 V3 M19 15 V10 M27 15 V5 M35 15 V12 M43 15 V6 M51 15 V9" strokeWidth="2" opacity="0.7" />
+  if (kind === 'bars') return ( // two quarter notes ♩ ♩
+    <svg width="32" height="34" viewBox="0 0 32 34" fill="none">
+      <Notehead cx={6} cy={28} ink={ink} r={4.5} />
+      <Notehead cx={22} cy={28} ink={ink} r={4.5} />
+      <path d="M10.2 28 V 8 M26.2 28 V 8" stroke={ink} strokeWidth="1.4" opacity="0.78" />
     </svg>
   );
   return null;
@@ -45,13 +55,14 @@ function StaffLines() {
   );
 }
 
-// A small treble-clef-ish flourish to the left of the title.
+// A small treble clef to the left of the title — engraved style.
 function Clef() {
+  const ink = '#bf7a35';
   return (
-    <svg width="34" height="56" viewBox="0 0 34 56" fill="none" stroke="#bf7a35" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" opacity="0.5">
-      <path d="M17 6 C 10 12 10 22 17 26 C 25 30 25 40 17 44 C 12 47 9 44 11 40 C 13 36 19 36 21 40" />
-      <path d="M17 26 V 50" />
-      <circle cx="17" cy="50" r="2.5" fill="#bf7a35" stroke="none" opacity="0.7" />
+    <svg width="30" height="60" viewBox="0 0 30 60" fill="none" stroke={ink} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.55">
+      <path d="M15 6 C 9 9 6 16 6 23 C 6 31 13 34 16 30 C 19 26 17 21 13 22 C 10 23 10 28 14 30 C 20 33 25 38 25 46 C 25 53 19 57 13 57 C 9 57 7 54 8 51 C 9 48 13 48 14 51 C 15 54 12 55 10 54" />
+      <path d="M15 6 V 52" />
+      <circle cx="15" cy="55" r="2.4" fill={ink} stroke="none" opacity="0.7" />
     </svg>
   );
 }
