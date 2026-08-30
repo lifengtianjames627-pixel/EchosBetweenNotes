@@ -122,9 +122,17 @@ export default function Home() {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-24 min-h-[calc(100vh-3.5rem)]">
-        <div className="flex items-end gap-4">
-          <span className="hidden sm:block mb-2"><Clef /></span>
-          <h1 className="font-playfair italic leading-none text-center" style={{ fontSize: 'clamp(2.6rem, 8vw, 6rem)', color: '#1a1815', letterSpacing: '-0.01em' }}>
+        <div className="relative inline-flex items-end gap-4">
+          {/* Five staff lines running through the title — same ochre as the clef */}
+          <div className="absolute inset-0 pointer-events-none" aria-hidden>
+            <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+              {[10, 27.5, 45, 62.5, 80].map(y => (
+                <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#bf7a35" strokeWidth="0.6" opacity="0.38" vectorEffect="non-scaling-stroke" />
+              ))}
+            </svg>
+          </div>
+          <span className="hidden sm:block mb-2 relative z-10"><Clef /></span>
+          <h1 className="relative z-10 font-playfair italic leading-none text-center" style={{ fontSize: 'clamp(2.6rem, 8vw, 6rem)', color: '#1a1815', letterSpacing: '-0.01em' }}>
             Echo Between Notes
           </h1>
         </div>
