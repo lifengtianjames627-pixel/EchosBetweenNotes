@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home as HomeIcon, Info, Shield, LogOut, LogIn, MessageSquare, User } from 'lucide-react';
 import MiniChat from '@/components/MiniChat';
+import NotificationBell from '@/components/NotificationBell';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { AnimatePresence } from 'framer-motion';
@@ -29,6 +30,15 @@ export default function Layout() {
     queryKey: ['me'],
     queryFn: () => base44.auth.me(),
   });
+
+  // Unread direct-message count for the Messages nav badge (polled).
+  const { data: msgUnreadData } = useQuery({
+    queryKey: ['messageUnread'],
+    queryFn: () => base44.functions.invoke('messageUnread', {}).then(r => r.data?.unread || 0),
+    enabled: !!currentUser?.email,
+    refetchInterval: 30000,
+  });
+  const messageUnread = msgUnreadData || 0;
 
   // ── Time tracking ──────────────────────────────────────────────────────────
   const sessionStartRef = useRef(Date.now());
@@ -91,11 +101,16 @@ export default function Layout() {
   const isAdmin = currentUser?.role === 'admin';
   const isActive = (path) => path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
-  const navLink = (path, labelKey) => {
+  const navLink = (path, labelKey, badge = 0) => {
     const active = isActive(path);
     return (
-      <Link key={path} to={path} className="px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap" style={active ? { color: '#1a1815', borderBottom: '2px solid #bf7a35' } : { color: '#6b6358' }}>
+      <Link key={path} to={path} className="relative px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap" style={active ? { color: '#1a1815', borderBottom: '2px solid #bf7a35' } : { color: '#6b6358' }}>
         {t(labelKey)}
+        {badge > 0 && (
+          <span className="absolute -top-0.5 -right-2 min-w-[15px] h-[15px] px-1 rounded-full flex items-center justify-center text-[9px] font-bold text-white" style={{ background: '#c0392b' }}>
+            {badge > 9 ? '9+' : badge}
+          </span>
+        )}
       </Link>
     );
   };
@@ -108,10 +123,11 @@ export default function Layout() {
           Echo Between Notes
         </Link>
         <nav className="hidden sm:flex items-center gap-0.5 ml-1 min-w-0 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-          {NAV_ITEMS.filter(item => item.path !== '/chat' || currentUser).map(item => navLink(item.path, item.labelKey))}
+          {NAV_ITEMS.filter(item => item.path !== '/chat' || currentUser).map(item => navLink(item.path, item.labelKey, item.path === '/chat' ? messageUnread : 0))}
           {isAdmin && ADMIN_ITEMS.map(item => navLink(item.path, item.labelKey))}
         </nav>
         <div className="ml-auto flex items-center gap-2 shrink-0">
+          {currentUser && <NotificationBell />}
           <LanguageButton />
           <Link to="/about" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors" style={{ color: '#6b6358', border: '1px solid rgba(26,24,21,0.14)' }}>
             <Info className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('nav.about')}</span>

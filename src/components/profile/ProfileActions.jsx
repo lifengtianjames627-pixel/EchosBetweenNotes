@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { UserPlus, MessageSquare, Check, Clock, Send, Lock } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { makeChatId } from '@/lib/useChat';
+import { notify } from '@/lib/notify';
 
 // Friend + message controls on another member's profile.
 // Before you are friends you get exactly ONE message — enough to introduce
@@ -46,7 +47,16 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
       from_email: me.email, from_name: me.full_name || me.email,
       to_email: targetEmail, to_name: targetName, status: 'pending',
     }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['fr-sent'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['fr-sent'] });
+      notify({
+        owner_email: targetEmail,
+        type: 'friend_request',
+        title: `${me.full_name || me.email} sent you a friend request`,
+        link: '/profile',
+        actor_name: me.full_name || me.email,
+      });
+    },
   });
 
   const sendIntro = useMutation({

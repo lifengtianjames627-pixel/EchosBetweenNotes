@@ -1,5 +1,6 @@
 import { base44 } from '@/api/base44Client';
 import { BADGE_MAP } from '@/lib/badgeConfig';
+import { notify } from '@/lib/notify';
 import { toast } from 'sonner';
 
 export const getWeekKey = () => {
@@ -24,6 +25,13 @@ export async function awardBadge(userEmail, badgeId, queryClient) {
       toast(`Badge unlocked — ${badge.name}`, {
         description: badge.desc,
         duration: 5000,
+      });
+      notify({
+        owner_email: userEmail,
+        type: 'badge',
+        title: `New badge unlocked — ${badge.name}`,
+        body: badge.desc || '',
+        link: '/profile',
       });
     }
     queryClient?.invalidateQueries({ queryKey: ['earned-badges', userEmail] });

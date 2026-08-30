@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ThumbsUp, ThumbsDown, Bell, BellOff } from 'lucide-react';
 import { awardBadge } from '@/lib/badgeUtils';
+import { notify } from '@/lib/notify';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthed } from '@/hooks/useAuthed';
@@ -62,6 +63,14 @@ export default function ReviewActions({ review, v, currentUser }) {
         if (totalLikes >= 100) awardBadge(review.reviewer_email, 'likes_100', queryClient);
         if (totalLikes >= 300) awardBadge(review.reviewer_email, 'likes_300', queryClient);
         if (totalLikes >= 500) awardBadge(review.reviewer_email, 'likes_500', queryClient);
+        notify({
+          owner_email: review.reviewer_email,
+          type: 'like',
+          title: `${currentUser.full_name || currentUser.email} liked your review`,
+          body: review.album_title ? `On "${review.album_title}"` : '',
+          link: `/album/${review.album_id}`,
+          actor_name: currentUser.full_name || currentUser.email,
+        });
       }
     },
     onSuccess: () => {
@@ -83,6 +92,13 @@ export default function ReviewActions({ review, v, currentUser }) {
           subscriber_name: currentUser.full_name || '',
           target_email: review.reviewer_email,
           target_name: review.reviewer_name || '',
+        });
+        notify({
+          owner_email: review.reviewer_email,
+          type: 'follow',
+          title: `${currentUser.full_name || currentUser.email} started following you`,
+          link: `/u/${encodeURIComponent(currentUser.email)}`,
+          actor_name: currentUser.full_name || currentUser.email,
         });
       }
     },

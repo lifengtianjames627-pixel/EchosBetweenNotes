@@ -83,6 +83,10 @@
     },
     "monthly_minutes_month": {
       "type": "string"
+    },
+    "messages_last_seen": {
+      "type": "string",
+      "description": "ISO date of the last time the user opened Messages \u2014 used to count unread direct messages for the nav badge"
     }
   },
   "required": [

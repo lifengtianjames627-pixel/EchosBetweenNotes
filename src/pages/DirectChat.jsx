@@ -48,6 +48,14 @@ export default function DirectChat() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length]);
 
+  // Opening Messages marks all current messages as seen — drives the unread
+  // badge in the top nav back to zero.
+  useEffect(() => {
+    if (user?.email) {
+      base44.auth.updateMe({ messages_last_seen: new Date().toISOString() }).catch(() => {});
+    }
+  }, [user?.email]);
+
   // Contact details stay out of chat — in-app messages are logged and reportable.
   // Returns false when the message was blocked so the composer keeps its draft.
   const handleSend = (payload) => {
