@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReviewDetailModal from '@/components/reviews/ReviewDetailModal';
 import { useAuthed } from '@/hooks/useAuthed';
 import CoverImage from '@/components/music/CoverImage';
+import { trackGenre } from '@/lib/trackGenre';
 
 export default function AlbumDetail() {
   const { id } = useParams();
@@ -30,6 +31,12 @@ export default function AlbumDetail() {
       return albums[0];
     },
   });
+
+  // Count this album's genre toward the listener's taste profile (drives the
+  // home "For You" feed). Self-gates for guests.
+  useEffect(() => {
+    if (album?.genre) trackGenre(album.genre);
+  }, [album?.genre, id]);
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['album-reviews', id],

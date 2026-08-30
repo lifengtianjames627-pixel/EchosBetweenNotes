@@ -89,8 +89,8 @@ export default function HomeFeed() {
     );
   }
 
-  const { recentReviews = [], recentPodcasts = [], forYou = [], aiBlurb, hasPreferences, isLoggedIn } = data || {};
-  const showForYou = isLoggedIn && hasPreferences && forYou.length > 0;
+  const { recentReviews = [], recentPodcasts = [], forYou = [], aiBlurb, tasteLabels, hasTaste, isLoggedIn } = data || {};
+  const showForYou = isLoggedIn && hasTaste && forYou.length > 0;
 
   if (recentReviews.length === 0 && recentPodcasts.length === 0 && !showForYou) return null;
 
@@ -99,6 +99,11 @@ export default function HomeFeed() {
       {showForYou && (
         <section className="mb-12">
           <SectionHeader icon={Sparkles} title="For You" />
+          {tasteLabels && (
+            <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: '#bf7a35' }}>
+              Because you listen to {tasteLabels}
+            </p>
+          )}
           {aiBlurb && (
             <p className="text-sm italic mb-4 leading-relaxed" style={{ color: '#6b6358' }}>
               {aiBlurb}

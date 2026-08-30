@@ -8,9 +8,18 @@ const PREF_TO_GENRE = {
   'Electronic': 'electronic', 'Funk': 'funk', 'ACG': 'acg', 'Cinematic': 'cinematic',
 };
 
+const GENRE_LABEL = {
+  rock: 'Rock', pop: 'Pop', classical: 'Classical', metal: 'Metal',
+  jazz: 'Jazz', blues: 'Blues', r_and_b: 'R&B', punk: 'Core',
+  country: 'Country', hip_hop: 'Hip-hop', indie: 'Indie', grunge: 'Grunge',
+  electronic: 'Electronic', funk: 'Funk', acg: 'ACG', cinematic: 'Cinematic',
+};
+
 // Home feed: newest reviews + podcasts for everyone, plus an AI-curated
-// "For You" selection for logged-in members based on their music_preferences.
-// Uses the service role so the feed works for guests (public content) too.
+// "For You" selection. Taste is a blend of the listener's actual genre clicks
+// (GenreTally, which dominates over time) and their stated music_preferences
+// (a baseline so first-login still gets a feed). Uses the service role so the
+// feed works for guests (public content) too.
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -23,7 +32,7 @@ export default async function(req) {
 
     const podcasts = await base44.asServiceRole.entities.Podcast.list('-created_date', 10);
 
-    // Join review → album genre so we can match against preferences.
+    // Join review → album genre so we can match against taste.
     const albums = await base44.asServiceRole.entities.Album.list('-created_date', 100);
     const genreById = {};
     (albums || []).forEach(a => { if (a && a.id) genreById[a.id] = a.genre; });
@@ -31,24 +40,43 @@ export default async function(req) {
 
     const recentReviews = enriched.slice(0, 6);
 
-    // "For You" — genre-matched, then AI-curated with a personal reason each.
-    const prefs = (user?.music_preferences || []).map(p => PREF_TO_GENRE[p]).filter(Boolean);
+    // Taste weights: clicks count fully, preferences add a small baseline.
+    const weights = {};
+    let tallies = [];
+    if (user) {
+      (user.music_preferences || []).forEach(p => {
+        const g = PREF_TO_GENRE[p];
+        if (g) weights[g] = (weights[g] || 0) + 2;
+      });
+      try {
+        tallies = await base44.asServiceRole.entities.GenreTally.filter({ user_email: user.email });
+      } catch (e) { tallies = []; }
+      (tallies || []).forEach(t => {
+        if (t.genre) weights[t.genre] = (weights[t.genre] || 0) + (t.count || 0);
+      });
+    }
+    const topGenres = Object.keys(weights)
+      .filter(g => weights[g] > 0)
+      .sort((a, b) => weights[b] - weights[a]);
+    const tasteLabels = topGenres.slice(0, 6).map(g => GENRE_LABEL[g] || g).join(', ');
+
     let forYou = [];
     let aiBlurb = '';
-    if (prefs.length > 0) {
-      const matched = enriched.filter(r => r._genre && prefs.includes(r._genre));
+    if (topGenres.length > 0) {
+      const matched = enriched.filter(r => r._genre && topGenres.includes(r._genre));
+      // Strongest tastes first, then newest.
+      matched.sort((a, b) => (weights[b._genre] - weights[a._genre]) || (new Date(b.created_date) - new Date(a.created_date)));
       forYou = matched.slice(0, 8);
       if (forYou.length > 0) {
         const candidates = forYou.map(r => ({
           id: r.id, title: r.album_title, artist: r.album_artist, genre: r._genre,
           rating: r.rating, snippet: (r.content || '').slice(0, 140),
         }));
-        const prefLabels = (user.music_preferences || []).join(', ');
         let res = { blurb: '', picks: [] };
         try {
           res = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt:
-              `A music-loving high schooler just opened their homepage. Their favourite genres: ${prefLabels}. ` +
+              `A music-loving high schooler just opened their homepage. Their taste, strongest first: ${tasteLabels}. ` +
               `From these recent reviews, pick the ${Math.min(4, candidates.length)} most relevant for them and write a warm, ` +
               `specific one-line reason for each (address them as "you", tie it to their taste). ` +
               `Also write a one-sentence intro greeting them and naming their taste.\nReviews:\n${JSON.stringify(candidates)}`,
@@ -88,7 +116,8 @@ export default async function(req) {
       recentPodcasts: (podcasts || []).slice(0, 4),
       forYou: forYou.map(strip),
       aiBlurb,
-      hasPreferences: prefs.length > 0,
+      tasteLabels,
+      hasTaste: topGenres.length > 0,
       isLoggedIn: !!user,
     });
   } catch (error) {

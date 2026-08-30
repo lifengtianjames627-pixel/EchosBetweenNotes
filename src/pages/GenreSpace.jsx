@@ -17,6 +17,7 @@ import { storeCoverImage } from '@/lib/storeCoverImage';
 import { fetchCoverCascade } from '@/components/TrackList';
 import { useLang } from '@/i18n/LanguageContext';
 import { useGenreText } from '@/i18n/useGenreText';
+import { trackGenre } from '@/lib/trackGenre';
 
 // Per-genre visual configs
 const GENRE_VISUALS = {
@@ -189,6 +190,12 @@ export default function GenreSpace() {
     },
     enabled: !!entityGenre,
   });
+
+  // Count this genre visit toward the listener's taste profile (drives the
+  // home "For You" feed). Self-gates for guests.
+  useEffect(() => {
+    if (entityGenre) trackGenre(entityGenre);
+  }, [entityGenre]);
 
   const albums = allItems.filter(i => !i.type || i.type === 'album');
   const singles = allItems.filter(i => i.type === 'single');
