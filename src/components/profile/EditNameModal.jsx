@@ -27,7 +27,11 @@ export default function EditNameModal({ user, onClose }) {
     setSaving(true); setErr('');
     try {
       await base44.auth.updateMe({ display_name: trimmed });
+      // Re-sync this member's name to every historical record that snapshotted it
+      // (reviews, posts, comments, messages, …) so the new name shows everywhere.
+      await base44.functions.invoke('propagateProfile', {});
       await queryClient.invalidateQueries({ queryKey: ['me'] });
+      queryClient.invalidateQueries(); // refresh all cached lists so new names render
       onClose();
     } catch (e2) {
       setErr('Could not save. Try again.');
