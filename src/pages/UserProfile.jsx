@@ -42,6 +42,13 @@ export default function UserProfile() {
     enabled: !!email,
   });
 
+  // Admin-only: registration date + aggregate usage averages (never messages).
+  const { data: adminUser } = useQuery({
+    queryKey: ['admin-user-info', email],
+    queryFn: () => base44.entities.User.filter({ email }),
+    enabled: !!email && me?.role === 'admin',
+  });
+
   const name = profile?.full_name || email;
   const status = profile?.online
     ? 'Online now'
@@ -88,6 +95,18 @@ export default function UserProfile() {
               { label: 'Bands', val: bands.length },
               { label: 'Equipped', val: (profile?.equipped_badges || []).length },
             ]} />
+
+            {me?.role === 'admin' && adminUser?.[0] && (
+              <div className="mt-4 p-4" style={{ background: '#faf8f2', border: '1px solid #e0d8c8', borderRadius: 10 }}>
+                <p className="text-[10px] uppercase tracking-widest font-bold mb-3" style={{ color: '#bf7a35' }}>Admin view</p>
+                <div className="grid grid-cols-2 gap-3 text-xs" style={{ color: '#5a534a' }}>
+                  <div><span style={{ color: '#8a7e6f' }}>Joined</span><br />{adminUser[0].created_date ? new Date(adminUser[0].created_date).toLocaleDateString() : '—'}</div>
+                  <div><span style={{ color: '#8a7e6f' }}>Role</span><br />{adminUser[0].role}</div>
+                  <div><span style={{ color: '#8a7e6f' }}>Today</span><br />{adminUser[0].daily_minutes || 0} min</div>
+                  <div><span style={{ color: '#8a7e6f' }}>Total</span><br />{adminUser[0].total_browsing_minutes || 0} min</div>
+                </div>
+              </div>
+            )}
 
             <p className="text-xs uppercase tracking-widest font-bold px-1 mb-3" style={{ color: '#bf7a35' }}>
               Reviews

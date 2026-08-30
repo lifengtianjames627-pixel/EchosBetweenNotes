@@ -21,6 +21,9 @@ import DirectChat from '@/pages/DirectChat';
 import SoulmateBoard from '@/pages/SoulmateBoard';
 import UserProfile from '@/pages/UserProfile';
 import ProfileSetup from '@/pages/ProfileSetup';
+import Manage from '@/pages/Manage';
+import Privacy from '@/pages/Privacy';
+import Terms from '@/pages/Terms';
 // Access tiers: guests can browse reviews / podcasts / genres / albums / about.
 // Everything personal or social needs login; moderation needs admin.
 import RequireAuth from '@/components/RequireAuth';
@@ -66,6 +69,9 @@ const AuthenticatedApp = () => {
         <Route path="/band-dashboard" element={<RequireAuth><BandDashboard /></RequireAuth>} />
         <Route path="/chat" element={<RequireAuth><DirectChat /></RequireAuth>} />
         <Route path="/soulmate" element={<RequireAuth><SoulmateBoard /></RequireAuth>} />
+        <Route path="/manage" element={<RequireAdmin><Manage /></RequireAdmin>} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

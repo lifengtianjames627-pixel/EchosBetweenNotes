@@ -1,10 +1,31 @@
 {
   "name": "ChatMessage",
   "type": "object",
+  "rls": {
+    "read": {
+      "data.participants": "{{user.email}}"
+    },
+    "create": {
+      "data.participants": "{{user.email}}"
+    },
+    "update": {
+      "data.sender_email": "{{user.email}}"
+    },
+    "delete": {
+      "data.sender_email": "{{user.email}}"
+    }
+  },
   "properties": {
     "chat_id": {
       "type": "string",
       "description": "Sorted pair of two emails joined by '|'"
+    },
+    "participants": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The two emails in the conversation \u2014 gates read access to participants only (admins cannot read others' messages)"
     },
     "sender_email": {
       "type": "string"

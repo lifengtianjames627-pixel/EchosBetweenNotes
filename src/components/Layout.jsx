@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home as HomeIcon, Info, Shield, LogOut, LogIn, MessageSquare, User } from 'lucide-react';
+import { Home as HomeIcon, Shield, LogOut, LogIn, MessageSquare, User, Users } from 'lucide-react';
 import MiniChat from '@/components/MiniChat';
 import NotificationBell from '@/components/NotificationBell';
 import { useQuery } from '@tanstack/react-query';
@@ -8,6 +8,7 @@ import { base44 } from '@/api/base44Client';
 import { AnimatePresence } from 'framer-motion';
 import { useLang } from '@/i18n/LanguageContext';
 import LanguageButton from '@/components/LanguageButton';
+import SiteFooter from '@/components/SiteFooter';
 
 const NAV_ITEMS = [
   { path: '/', icon: HomeIcon, labelKey: 'nav.home' },
@@ -129,9 +130,6 @@ export default function Layout() {
         <div className="ml-auto flex items-center gap-2 shrink-0">
           {currentUser && <NotificationBell />}
           <LanguageButton />
-          <Link to="/about" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors" style={{ color: '#6b6358', border: '1px solid rgba(26,24,21,0.14)' }}>
-            <Info className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('nav.about')}</span>
-          </Link>
           {currentUser ? (
             <>
               <button onClick={() => base44.auth.logout()} title={t('nav.logout')} className="w-9 h-9 rounded-full flex items-center justify-center transition-colors" style={{ color: '#6b6358', border: '1px solid rgba(26,24,21,0.14)' }}>
@@ -164,11 +162,22 @@ export default function Layout() {
         <Outlet />
       </main>
 
+      <SiteFooter />
+
       <AnimatePresence>
         {miniChat && currentUser && (
           <MiniChat peer={miniChat} currentUser={currentUser} onClose={() => setMiniChat(null)} />
         )}
       </AnimatePresence>
+
+      {isAdmin && (
+        <Link to="/manage" title="Manage members"
+          className="fixed right-4 bottom-6 z-30 flex items-center gap-1.5 pl-3 pr-4 py-2 rounded-full shadow-md transition-transform hover:scale-105"
+          style={{ background: '#1a1815', color: '#faf8f2' }}>
+          <Users className="w-4 h-4" />
+          <span className="text-xs font-semibold">Manage</span>
+        </Link>
+      )}
     </div>
   );
 }

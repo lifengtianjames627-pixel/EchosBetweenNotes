@@ -44,6 +44,7 @@ export function useChat({ chatId, currentUser, limit = 200 }) {
   const send = useMutation({
     mutationFn: (payload) => base44.entities.ChatMessage.create({
       chat_id: chatId,
+      participants: chatId.split('|'),
       sender_email: currentUser.email,
       sender_name: currentUser.full_name || currentUser.email,
       ...normalize(payload),
