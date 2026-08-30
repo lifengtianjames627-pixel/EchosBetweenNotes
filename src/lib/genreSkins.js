@@ -33,7 +33,7 @@ export const GENRE_SKINS = {
     accent: '#8b6914', accent2: '#6d5210',
     overlay: 'linear-gradient(90deg, rgba(26,39,68,0.86) 0%, rgba(26,39,68,0.62) 55%, rgba(26,39,68,0.34) 100%)',
     titleFont: SERIF, titleTransform: 'none', titleStyle: { fontWeight: 600, letterSpacing: '0.01em' },
-    radius: 3, heroHeight: 400, narrow: true, ...LIGHT_INK,
+    radius: 3, heroHeight: 400, ...LIGHT_INK,
   },
   metal: {
     accent: '#8b0000', accent2: '#666666',
