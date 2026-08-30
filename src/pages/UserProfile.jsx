@@ -49,12 +49,13 @@ export default function UserProfile() {
     enabled: !!email && me?.role === 'admin',
   });
 
-  const name = profile?.full_name || email;
+  const isAdmin = me?.role === 'admin';
+  const name = profile?.full_name || (isAdmin ? email : 'Anonymous');
   const status = profile?.online
     ? 'Online now'
     : profile?.last_active
       ? `Last online ${formatDistanceToNow(new Date(profile.last_active), { addSuffix: true })}`
-      : email;
+      : (isAdmin ? email : 'Offline');
 
   return (
     <div className="min-h-screen" style={{ background: '#f3efe6' }}>
@@ -71,7 +72,7 @@ export default function UserProfile() {
           <>
             <ProfileHero
               name={name}
-              email={email}
+              email={isAdmin ? email : ''}
               initial={(name || '?')[0].toUpperCase()}
               badges={profile?.equipped_badges || []}
               online={profile?.online}
@@ -79,7 +80,7 @@ export default function UserProfile() {
               pictureUrl={profile?.profile_picture_url}
             >
               {me && !profile?.is_me && (
-                <ProfileActions me={me} targetEmail={email} targetName={profile?.full_name || email} />
+                <ProfileActions me={me} targetEmail={email} targetName={name} />
               )}
               {profile?.is_me && (
                 <Link to="/profile" className="px-4 py-2.5 rounded-full text-xs font-semibold"
@@ -96,10 +97,11 @@ export default function UserProfile() {
               { label: 'Equipped', val: (profile?.equipped_badges || []).length },
             ]} />
 
-            {me?.role === 'admin' && adminUser?.[0] && (
+            {isAdmin && adminUser?.[0] && (
               <div className="mt-4 p-4" style={{ background: '#faf8f2', border: '1px solid #e0d8c8', borderRadius: 10 }}>
                 <p className="text-[10px] uppercase tracking-widest font-bold mb-3" style={{ color: '#bf7a35' }}>Admin view</p>
                 <div className="grid grid-cols-2 gap-3 text-xs" style={{ color: '#5a534a' }}>
+                  <div className="col-span-2"><span style={{ color: '#8a7e6f' }}>Email</span><br />{email}</div>
                   <div><span style={{ color: '#8a7e6f' }}>Joined</span><br />{adminUser[0].created_date ? new Date(adminUser[0].created_date).toLocaleDateString() : '—'}</div>
                   <div><span style={{ color: '#8a7e6f' }}>Role</span><br />{adminUser[0].role}</div>
                   <div><span style={{ color: '#8a7e6f' }}>Today</span><br />{adminUser[0].daily_minutes || 0} min</div>
