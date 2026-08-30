@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { displayName } from '@/lib/displayName';
+import { useReviewerProfileRefresh } from '@/components/ReviewerProfileProvider';
 import { Loader2, X } from 'lucide-react';
 
 // Paper-styled modal that lets a member set a display name. The platform
@@ -10,6 +11,7 @@ import { Loader2, X } from 'lucide-react';
 // back to the platform name.
 export default function EditNameModal({ user, onClose }) {
   const queryClient = useQueryClient();
+  const refreshProfiles = useReviewerProfileRefresh();
   const [value, setValue] = useState(user?.display_name || '');
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
@@ -30,6 +32,7 @@ export default function EditNameModal({ user, onClose }) {
       // Re-sync this member's name to every historical record that snapshotted it
       // (reviews, posts, comments, messages, …) so the new name shows everywhere.
       await base44.functions.invoke('propagateProfile', {});
+      refreshProfiles(); // drop live-profile cache so review cards re-fetch the new name
       await queryClient.invalidateQueries({ queryKey: ['me'] });
       queryClient.invalidateQueries(); // refresh all cached lists so new names render
       onClose();

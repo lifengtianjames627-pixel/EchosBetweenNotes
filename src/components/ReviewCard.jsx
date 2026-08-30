@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Heart, User, ChevronDown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import CoverImage from '@/components/music/CoverImage';
+import { useReviewerProfile } from '@/components/ReviewerProfileProvider';
 
 // Paper review card — cream bg, thin warm border, near-black ink, ochre rating
 // number (no star component). Long reviews are clipped with a Read more toggle
@@ -10,6 +11,8 @@ import CoverImage from '@/components/music/CoverImage';
 export default function ReviewCard({ review, showAlbum = true }) {
   const [expanded, setExpanded] = useState(false);
   const isLong = (review.content || '').length > 220;
+  const profile = useReviewerProfile(review.reviewer_email);
+  const reviewerName = profile?.name || review.reviewer_name || 'Anonymous';
 
   return (
     <div className="p-5 transition-colors" style={{ background: '#faf8f2', border: '1px solid #e6ddc9' }}>
@@ -55,10 +58,12 @@ export default function ReviewCard({ review, showAlbum = true }) {
           )}
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center gap-1.5 text-xs" style={{ color: '#8a7e6f' }}>
-              <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#e6ddc9' }}>
-                <User className="w-3 h-3" style={{ color: '#6b6358' }} />
+              <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center shrink-0" style={{ background: '#e6ddc9' }}>
+                {profile?.picture_url
+                  ? <img src={profile.picture_url} alt="" className="w-full h-full object-cover" />
+                  : <User className="w-3 h-3" style={{ color: '#6b6358' }} />}
               </div>
-              <span>{review.reviewer_name || 'Anonymous'}</span>
+              <span>{reviewerName}</span>
               {review.created_date && (
                 <>
                   <span>·</span>

@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Camera, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { useReviewerProfileRefresh } from '@/components/ReviewerProfileProvider';
 
 // Paper avatar: a cream plate with an ochre serif monogram by default, or the
 // member's own uploaded picture. `editable` shows a small camera button that
@@ -10,6 +11,7 @@ export default function ProfileAvatar({ pictureUrl, initial, size = 74, editable
   const fileRef = useRef(null);
   const [busy, setBusy] = useState(false);
   const queryClient = useQueryClient();
+  const refreshProfiles = useReviewerProfileRefresh();
 
   const upload = async (file) => {
     if (!file) return;
@@ -17,6 +19,7 @@ export default function ProfileAvatar({ pictureUrl, initial, size = 74, editable
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       await base44.auth.updateMe({ profile_picture_url: file_url });
+      refreshProfiles(); // drop live-profile cache so review avatars re-fetch
       queryClient.invalidateQueries({ queryKey: ['me'] });
       queryClient.invalidateQueries({ queryKey: ['public-profile'] });
       onUploaded?.(file_url);

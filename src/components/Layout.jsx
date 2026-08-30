@@ -9,6 +9,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useLang } from '@/i18n/LanguageContext';
 import LanguageButton from '@/components/LanguageButton';
 import SiteFooter from '@/components/SiteFooter';
+import { ReviewerProfileProvider } from '@/components/ReviewerProfileProvider';
 import { displayName } from '@/lib/displayName';
 
 const NAV_ITEMS = [
@@ -160,7 +161,9 @@ export default function Layout() {
       </nav>
 
       <main className="flex-1 min-w-0">
-        <Outlet />
+        <ReviewerProfileProvider>
+          <Outlet />
+        </ReviewerProfileProvider>
       </main>
 
       <SiteFooter />
