@@ -18,6 +18,7 @@ import { fetchCoverCascade } from '@/components/TrackList';
 import { useLang } from '@/i18n/LanguageContext';
 import { useGenreText } from '@/i18n/useGenreText';
 import { trackGenre } from '@/lib/trackGenre';
+import ScoreGenreRail from '@/components/ScoreGenreRail';
 
 // Per-genre visual configs
 const GENRE_VISUALS = {
@@ -283,11 +284,11 @@ export default function GenreSpace() {
       <div className="sticky top-0 z-40" style={{ background: 'rgba(230,221,201,0.92)', borderBottom: '1px solid rgba(26,24,21,0.1)' }}>
         <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/reviews')}
             className="flex items-center gap-2 text-xs font-semibold transition-colors hover:text-[#1a1815]"
             style={{ color: '#6b6358' }}
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> {t('nav.home')}
+            <ArrowLeft className="w-3.5 h-3.5" /> {t('common.back')}
           </button>
           <span className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: '#8a7e6f' }}>
             {gLabel(genreId, genre.label)} {t('genre.space')}
@@ -295,6 +296,14 @@ export default function GenreSpace() {
           <div className="w-16" />
         </div>
       </div>
+
+      {/* Sheet-music genre switcher — jump between any of the 16 genres or
+          back to the Reviews home without retracing to the landing page. */}
+      <ScoreGenreRail
+        genres={GENRES}
+        activeId={genreId}
+        reviewsPath="/reviews"
+      />
 
       <div className={`mx-auto px-6 pt-14 pb-24 ${skin.narrow ? 'max-w-3xl' : 'max-w-5xl'}`}>
         <GenreHero
