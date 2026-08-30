@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { PenLine, Headphones, Users } from 'lucide-react';
 import { useLang } from '@/i18n/LanguageContext';
 import HomeFeed from '@/components/HomeFeed';
+import MusicTastePrompt from '@/components/MusicTastePrompt';
 
 // Three entries — staggered like a sound wave (middle dips), each crowned with
 // a small, quiet musical motif instead of a plain hairline.
@@ -147,6 +148,7 @@ export default function Home() {
 
   return (
     <>
+    <MusicTastePrompt />
     <div className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden">
       {/* Layer 1 — blurred ambient music scene (the "world" behind the paper) */}
       <div className="absolute inset-0 z-0">
