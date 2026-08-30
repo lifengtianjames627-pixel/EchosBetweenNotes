@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Search, MessageSquare, ShieldAlert, Clock, PanelLeftOpen } from 'lucide-react';
@@ -29,6 +29,7 @@ const V = {
 
 export default function DirectChat() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { t } = useLang();
   const params = new URLSearchParams(window.location.search);
   const peerEmail = params.get('with');
@@ -48,13 +49,26 @@ export default function DirectChat() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length]);
 
-  // Opening Messages marks all current messages as seen — drives the unread
-  // badge in the top nav back to zero.
+  // Opening a specific conversation marks just that peer's thread as seen —
+  // resets only this conversation's red badge (and its share of the nav total).
+  // Re-reads the freshest map first so other peers' seen timestamps aren't lost.
   useEffect(() => {
-    if (user?.email) {
-      base44.auth.updateMe({ messages_last_seen: new Date().toISOString() }).catch(() => {});
-    }
-  }, [user?.email]);
+    if (!user?.email || !peerEmail) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const fresh = await base44.auth.me();
+        const prev = (typeof fresh.messages_last_seen === 'object' && fresh.messages_last_seen && !Array.isArray(fresh.messages_last_seen))
+          ? fresh.messages_last_seen : {};
+        await base44.auth.updateMe({ messages_last_seen: { ...prev, [peerEmail]: new Date().toISOString() } });
+        if (cancelled) return;
+        queryClient.invalidateQueries({ queryKey: ['me'] });
+        queryClient.invalidateQueries({ queryKey: ['messageUnread'] });
+        queryClient.invalidateQueries({ queryKey: ['chat-directory'] });
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [user?.email, peerEmail]);
 
   // Contact details stay out of chat — in-app messages are logged and reportable.
   // Returns false when the message was blocked so the composer keeps its draft.

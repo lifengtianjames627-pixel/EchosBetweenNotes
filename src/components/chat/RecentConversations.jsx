@@ -27,6 +27,7 @@ export default function RecentConversations({ V, conversations, loading, isPinne
               email={c.peer_email}
               subtitle={`${c.from_me ? t('chat.you') : ''}${c.last_message}`}
               meta={c.last_at ? formatDistanceToNow(new Date(c.last_at), { addSuffix: true }) : ''}
+              unread={c.unread || 0}
               pinned={isPinned(c.peer_email)}
               onOpen={() => onOpen(c.peer_email, c.peer_name)}
               onTogglePin={() => onTogglePin({ peer_email: c.peer_email, peer_name: c.peer_name })}

@@ -37,6 +37,13 @@ export default async function(req) {
 
     const svc = base44.asServiceRole;
 
+    // Per-peer "last seen" map drives per-conversation unread counts. A legacy
+    // single ISO string (old global timestamp) is honoured so existing users
+    // don't suddenly see every old message as unread.
+    const seenRaw = user.messages_last_seen;
+    const seenMap = (typeof seenRaw === 'object' && seenRaw && !Array.isArray(seenRaw)) ? seenRaw : {};
+    const legacyGlobal = (typeof seenRaw === 'string' && seenRaw) ? new Date(seenRaw) : null;
+    const lastSeenFor = (peer) => seenMap[peer] ? new Date(seenMap[peer]) : (legacyGlobal || new Date(0));
     // Fingerprint the caller's network (same Wi-Fi = same public address) and
     // remember it on their record so friends on the same network find each other.
     const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim()
@@ -69,13 +76,15 @@ export default async function(req) {
           last_message: m.content || '',
           last_at: m.created_date,
           from_me: m.sender_email === user.email,
+          unread: 0,
         };
         byPeer.set(peer, row);
         conversations.push(row);
       }
       const row = byPeer.get(peer);
-      if (m.sender_email !== user.email && m.sender_name && row.peer_name === peer) {
-        row.peer_name = m.sender_name;
+      if (m.sender_email !== user.email) {
+        if (m.sender_name && row.peer_name === peer) row.peer_name = m.sender_name;
+        if (new Date(m.created_date) > lastSeenFor(peer)) row.unread = (row.unread || 0) + 1;
       }
     }
 

@@ -45,6 +45,11 @@ export default function ConversationSidebar({ V, conversations = [], activeEmail
                   {formatDistanceToNow(new Date(c.last_at))}
                 </span>
               )}
+              {c.unread > 0 && (
+                <span className="shrink-0 min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center text-[9px] font-bold text-white" style={{ background: '#c0392b' }}>
+                  {c.unread > 9 ? '9+' : c.unread}
+                </span>
+              )}
             </button>
           );
         })}

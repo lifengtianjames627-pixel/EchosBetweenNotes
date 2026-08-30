@@ -85,8 +85,8 @@
       "type": "string"
     },
     "messages_last_seen": {
-      "type": "string",
-      "description": "ISO date of the last time the user opened Messages \u2014 used to count unread direct messages for the nav badge"
+      "type": "object",
+      "description": "Per-peer last-seen map { peerEmail: ISOString }. A conversation's unread count is messages from that peer after their timestamp. (Legacy: a single ISO string = global last-seen, still honoured.)"
     }
   },
   "required": [
