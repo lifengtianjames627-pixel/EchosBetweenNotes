@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PenLine, Headphones, Users } from 'lucide-react';
 import { useLang } from '@/i18n/LanguageContext';
+import HomeFeed from '@/components/HomeFeed';
 
 // Three entries — staggered like a sound wave (middle dips), each crowned with
 // a small, quiet musical motif instead of a plain hairline.
@@ -90,11 +91,28 @@ function FloatNote({ kind }) {
   );
 }
 
+// Title letters flow through the staff like notes riding a wave — each
+// shifted along a gentle sine so the line stays balanced but never rigid.
+const TITLE_TEXT = 'Echo Between Notes';
+const TITLE_OFFSETS = TITLE_TEXT.split('').map((_, i) => Math.round(Math.sin(i / 2.1) * 13));
+function FlowingTitle() {
+  return (
+    <h1 className="relative z-10 font-playfair italic leading-none text-center" style={{ fontSize: 'clamp(2.6rem, 8vw, 6rem)', color: '#1a1815', letterSpacing: '-0.01em' }}>
+      {TITLE_TEXT.split('').map((ch, i) => (
+        <span key={i} style={{ display: 'inline-block', transform: `translateY(${TITLE_OFFSETS[i]}px)` }}>
+          {ch === ' ' ? '\u00A0' : ch}
+        </span>
+      ))}
+    </h1>
+  );
+}
+
 export default function Home() {
   const navigate = useNavigate();
   const { t } = useLang();
 
   return (
+    <>
     <div className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden">
       {/* Layer 1 — blurred ambient music scene (the "world" behind the paper) */}
       <div className="absolute inset-0 z-0">
@@ -127,16 +145,12 @@ export default function Home() {
           <div className="absolute inset-0 pointer-events-none" aria-hidden>
             <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
               {[10, 27.5, 45, 62.5, 80].map(y => (
-                <path key={y} d={`M0 ${y} Q 25 ${y - 12} 50 ${y} T 100 ${y}`} stroke="#bf7a35" strokeWidth="1" fill="none" opacity="0.6" vectorEffect="non-scaling-stroke" />
+                <path key={y} d={`M0 ${y} Q 12.5 ${y - 14} 25 ${y} T 50 ${y} T 75 ${y} T 100 ${y}`} stroke="#bf7a35" strokeWidth="1" fill="none" opacity="0.65" vectorEffect="non-scaling-stroke" />
               ))}
             </svg>
           </div>
           <span className="hidden sm:block mb-2 relative z-10"><Clef /></span>
-          <h1 className="relative z-10 font-playfair italic leading-none text-center" style={{ fontSize: 'clamp(2.6rem, 8vw, 6rem)', color: '#1a1815', letterSpacing: '-0.01em' }}>
-            <span style={{ display: 'inline-block', transform: 'translateY(-10px)' }}>Echo</span>{' '}
-            <span style={{ display: 'inline-block', transform: 'translateY(7px)' }}>Between</span>{' '}
-            <span style={{ display: 'inline-block', transform: 'translateY(-8px)' }}>Notes</span>
-          </h1>
+          <FlowingTitle />
         </div>
         <div className="flex items-center gap-3 mt-5">
           <span className="h-px w-12" style={{ background: '#bf7a35', opacity: 0.6 }} />
@@ -167,5 +181,7 @@ export default function Home() {
         </div>
       </div>
     </div>
+    <HomeFeed />
+    </>
   );
 }
