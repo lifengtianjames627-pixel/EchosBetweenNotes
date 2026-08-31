@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, ChevronDown, ChevronUp, Send } from 'lucide-react';
+import { MessageSquare, ChevronDown, ChevronUp, Send, Trash2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { awardBadge } from '@/lib/badgeUtils';
@@ -15,6 +15,7 @@ export default function CommentSection({ reviewId, v, currentUser }) {
   const [commentMod, setCommentMod] = useState(null); // null | 'blocked' | 'pending'
   const { authed, login } = useAuthed();
   const queryClient = useQueryClient();
+  const isAdmin = currentUser?.role === 'admin';
 
   const { data: allComments = [] } = useQuery({
     queryKey: ['comments', reviewId],
@@ -112,17 +113,36 @@ export default function CommentSection({ reviewId, v, currentUser }) {
                   ⏳ Your comment is being checked and will appear once approved.
                 </div>
               )}
-              {comments.map(c => (
-                <div key={c.id} className="flex gap-2">
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: `${v.accent}25`, color: v.accent }}>
-                    {(c.author_name || 'A')[0].toUpperCase()}
+              {comments.map(c => {
+                const canDelete = isAdmin || c.author_email === currentUser?.email;
+                return (
+                  <div key={c.id} className="flex gap-2">
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: `${v.accent}25`, color: v.accent }}>
+                      {(c.author_name || 'A')[0].toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-semibold mr-1.5" style={{ color: v.text }}>{c.author_name || 'Anonymous'}</span>
+                      <span className="text-xs" style={{ color: v.muted }}>{c.content}</span>
+                    </div>
+                    {canDelete && (
+                      <button
+                        onClick={() => {
+                          if (window.confirm('Delete this comment?')) {
+                            base44.entities.Comment.delete(c.id).then(() =>
+                              queryClient.invalidateQueries({ queryKey: ['comments', reviewId] })
+                            );
+                          }
+                        }}
+                        className="shrink-0 opacity-40 hover:opacity-100 transition-opacity"
+                        style={{ color: '#dc2626' }}
+                        title="Delete comment"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
-                  <div>
-                    <span className="text-xs font-semibold mr-1.5" style={{ color: v.text }}>{c.author_name || 'Anonymous'}</span>
-                    <span className="text-xs" style={{ color: v.muted }}>{c.content}</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             {authed ? (
             <div className="mt-3 flex gap-2">
