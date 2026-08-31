@@ -1,7 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, User, Heart } from 'lucide-react';
+import { X, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import ReviewActions from '@/components/ReviewActions';
+import CommentSection from '@/components/CommentSection';
 
 const SECTIONS = [
   ['band_style', 'Style'],
@@ -10,8 +14,24 @@ const SECTIONS = [
   ['band_history', 'Band history'],
 ];
 
-// Full reading view for one review — nothing clipped.
+// Paper palette — the review-reading modal isn't in a genre context, so it
+// uses the site-wide warm-paper tokens instead of a per-genre skin.
+const V = {
+  accent: '#bf7a35',
+  muted: '#6b6358',
+  accentGlow: 'rgba(191,122,53,0.25)',
+  text: '#1a1815',
+  cardBorder: '#e6ddc9',
+};
+
+// Full reading view for one review — full text, working like/dislike/subscribe,
+// and a live comment thread. Same interactivity as the in-album review view.
 export default function ReviewDetailModal({ review, onClose }) {
+  const { data: currentUser } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => base44.auth.me(),
+  });
+
   if (!review) return null;
   return (
     <motion.div
@@ -61,8 +81,13 @@ export default function ReviewDetailModal({ review, onClose }) {
             {review.reviewer_name || 'Anonymous'}
             {review.created_date && <> · {formatDistanceToNow(new Date(review.created_date), { addSuffix: true })}</>}
           </span>
-          <span className="flex items-center gap-1"><Heart className="w-3.5 h-3.5" /> {review.likes_count || 0}</span>
         </div>
+
+        {/* Interactive like / dislike / subscribe */}
+        <ReviewActions review={review} v={V} currentUser={currentUser} />
+
+        {/* Comment thread */}
+        <CommentSection reviewId={review.id} v={V} currentUser={currentUser} />
       </motion.div>
     </motion.div>
   );
