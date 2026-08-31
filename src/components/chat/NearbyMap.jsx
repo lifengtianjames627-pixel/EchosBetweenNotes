@@ -13,7 +13,7 @@ import FitToPeople from './FitToPeople';
 // fan out in a small ring so every avatar stays tappable.
 function avatarIcon(person) {
   const offline = person.online === false;
-  const initial = (person.name || person.email || '?')[0].toUpperCase();
+  const initial = (person.name || '?')[0].toUpperCase();
   const ring = offline ? '#c4bba9' : person.color;
   const fill = offline ? '#f0ece2' : '#faf8f2';
   const ink = offline ? '#8a7e6f' : person.color;
@@ -87,7 +87,7 @@ export default function NearbyMap({ V, center, people, onOpen }) {
               eventHandlers={{ click: () => onOpen(p.email, p.name) }}
             >
               <Tooltip>
-                {p.name}
+                {p.name || 'Anonymous'}
                 {' · '}{p.online ? t('chat.online') : t('chat.offlineSpot')}
                 {p.same_network ? ` · ${t('chat.sameWifi')}` : p.distance_km !== null ? ` · ${p.distance_km} km` : ''}
                 {' — '}{t('chat.tapProfile')}

@@ -20,7 +20,7 @@ export default function PinnedPeople({ V, pins, isPinned, onTogglePin, onOpen })
               V={V}
               name={p.peer_name}
               email={p.peer_email}
-              subtitle={p.peer_email}
+              subtitle={null}
               pinned={isPinned(p.peer_email)}
               onOpen={() => onOpen(p.peer_email, p.peer_name)}
               onTogglePin={() => onTogglePin({ peer_email: p.peer_email, peer_name: p.peer_name })}

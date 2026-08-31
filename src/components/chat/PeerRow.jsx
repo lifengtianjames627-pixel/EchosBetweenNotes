@@ -12,7 +12,7 @@ export default function PeerRow({ V, name, email, subtitle, meta, color, pinned,
             style={color
               ? { background: `${color}26`, color, border: `1.5px solid ${color}`, opacity: online === false ? 0.55 : 1 }
               : { background: '#f1ebdd', color: '#8a5a20', opacity: online === false ? 0.55 : 1 }}>
-            {(name || email || '?')[0].toUpperCase()}
+            {(name || '?')[0].toUpperCase()}
           </div>
           {online !== undefined && online !== null && (
             <span
@@ -25,7 +25,7 @@ export default function PeerRow({ V, name, email, subtitle, meta, color, pinned,
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-sm truncate" style={{ color: V.text }}>{name || email}</p>
+          <p className="font-semibold text-sm truncate" style={{ color: V.text }}>{name || 'Anonymous'}</p>
           {subtitle && <p className="text-xs truncate" style={{ color: V.muted }}>{subtitle}</p>}
         </div>
         {meta && <span className="text-[10px] shrink-0 ml-2" style={{ color: '#8a7e6f' }}>{meta}</span>}

@@ -34,11 +34,11 @@ export default function ConversationSidebar({ V, conversations = [], activeEmail
             >
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
                 style={{ background: '#f1ebdd', color: '#8a5a20' }}>
-                {(c.peer_name || c.peer_email || '?')[0].toUpperCase()}
+                {(c.peer_name || '?')[0].toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold truncate" style={{ color: V.text }}>{c.peer_name || c.peer_email}</p>
-                <p className="text-xs truncate" style={{ color: V.muted }}>{c.last_message || c.peer_email}</p>
+                <p className="text-sm font-semibold truncate" style={{ color: V.text }}>{c.peer_name || 'Anonymous'}</p>
+                <p className="text-xs truncate" style={{ color: V.muted }}>{c.last_message || ''}</p>
               </div>
               {c.last_at && (
                 <span className="text-[10px] shrink-0" style={{ color: V.muted }}>

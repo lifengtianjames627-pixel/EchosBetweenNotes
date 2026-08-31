@@ -250,7 +250,7 @@ export default function BandDashboard() {
                     <div key={m.id} className="flex items-center justify-between px-3 py-2 rounded-lg"
                       style={{ background: '#f5f2ea', border: '1px solid #ece5d6' }}>
                       <div>
-                        <span className="text-sm font-medium" style={{ color: V.text }}>{m.user_name || m.user_email}</span>
+                        <span className="text-sm font-medium" style={{ color: V.text }}>{m.user_name || 'Anonymous'}</span>
                         <span className="text-xs ml-2" style={{ color: V.muted }}>{m.role}</span>
                         {m.is_founder && <span className="text-xs ml-2 px-1.5 py-0.5 rounded" style={{ background: V.accentBg, color: V.accent }}>Founder</span>}
                       </div>

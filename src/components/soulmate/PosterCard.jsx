@@ -9,12 +9,12 @@ import { useLang } from '@/i18n/LanguageContext';
 export default function PosterCard({ post, currentUser, index = 0 }) {
   const { t } = useLang();
   const isMine = post.author_email === currentUser?.email;
-  const initial = (post.author_name || post.author_email || '?')[0].toUpperCase();
+  const initial = (post.author_name || '?')[0].toUpperCase();
 
   const openChat = () => {
     if (isMine || !post.author_email) return;
     window.dispatchEvent(new CustomEvent('openMiniChat', {
-      detail: { email: post.author_email, name: post.author_name || post.author_email },
+      detail: { email: post.author_email, name: post.author_name || '' },
     }));
   };
 

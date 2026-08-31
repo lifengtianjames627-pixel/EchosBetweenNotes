@@ -33,7 +33,7 @@ export default function DirectChat() {
   const { t } = useLang();
   const params = new URLSearchParams(window.location.search);
   const peerEmail = params.get('with');
-  const peerName = params.get('name') || peerEmail;
+  const peerName = params.get('name') || '';
   const [text, setText] = useState('');
   const [search, setSearch] = useState('');
   const [warning, setWarning] = useState(null);
@@ -108,7 +108,7 @@ export default function DirectChat() {
   });
 
   const openChat = (email, name) =>
-    navigate(`/chat?with=${encodeURIComponent(email)}&name=${encodeURIComponent(name || email)}`);
+    navigate(`/chat?with=${encodeURIComponent(email)}&name=${encodeURIComponent(name || '')}`);
 
   if (!user) return null;
 
@@ -146,7 +146,7 @@ export default function DirectChat() {
                   searchResults.map(u => (
                     <button
                       key={u.id}
-                      onClick={() => openChat(u.email, u.full_name || u.email)}
+                      onClick={() => openChat(u.email, u.full_name || '')}
                       className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-colors"
                       style={{ background: V.card, border: `1px solid ${V.border}` }}
                     >
@@ -155,8 +155,7 @@ export default function DirectChat() {
                         {(u.full_name || u.email || '?')[0].toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-semibold text-sm truncate" style={{ color: V.text }}>{u.full_name || u.email}</p>
-                        <p className="text-xs truncate" style={{ color: V.muted }}>{u.email}</p>
+                        <p className="font-semibold text-sm truncate" style={{ color: V.text }}>{u.full_name || 'Anonymous'}</p>
                       </div>
                       <MessageSquare className="w-4 h-4 ml-auto shrink-0" style={{ color: V.muted }} />
                     </button>
@@ -236,8 +235,7 @@ export default function DirectChat() {
           {(peerName || '?')[0].toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-sm truncate" style={{ color: V.text }}>{peerName}</p>
-          <p className="text-xs truncate" style={{ color: V.muted }}>{peerEmail}</p>
+          <p className="font-semibold text-sm truncate" style={{ color: V.text }}>{peerName || 'Anonymous'}</p>
         </div>
         <ReportButton
           targetType="chat_message"

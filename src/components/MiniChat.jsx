@@ -83,10 +83,10 @@ export default function MiniChat({ peer, currentUser, onClose }) {
         style={{ borderBottom: '1px solid #e0d8c8', background: '#e6ddc9' }}>
         <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
           style={{ background: '#f1ebdd', color: '#8a5a20' }}>
-          {(peer.name || peer.email || '?')[0].toUpperCase()}
+          {(peer.name || '?')[0].toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold truncate" style={{ color: '#1a1815' }}>{peer.name || peer.email}</p>
+          <p className="text-sm font-semibold truncate" style={{ color: '#1a1815' }}>{peer.name || 'Anonymous'}</p>
           <p className="text-[10px]" style={{ color: '#6b6358' }}>
             Temporary chat · {Math.max(0, MAX_MESSAGES - myMessages.length)} messages left
           </p>

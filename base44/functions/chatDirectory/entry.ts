@@ -63,6 +63,13 @@ export default async function(req) {
       svc.entities.User.list(),
     ]);
 
+    // Resolve every member's current display name so peer names never fall
+    // back to their email address (privacy).
+    const nameByEmail = new Map();
+    for (const u of users) {
+      if (u.email) nameByEmail.set(u.email, u.display_name || u.full_name || '');
+    }
+
     const myMessages = messages.filter(m => (m.chat_id || '').split('|').includes(user.email));
     const conversations = [];
     const byPeer = new Map();
@@ -72,7 +79,7 @@ export default async function(req) {
       if (!byPeer.has(peer)) {
         const row = {
           peer_email: peer,
-          peer_name: peer,
+          peer_name: nameByEmail.get(peer) || '',
           last_message: m.content || '',
           last_at: m.created_date,
           from_me: m.sender_email === user.email,
@@ -83,7 +90,7 @@ export default async function(req) {
       }
       const row = byPeer.get(peer);
       if (m.sender_email !== user.email) {
-        if (m.sender_name && row.peer_name === peer) row.peer_name = m.sender_name;
+        if (m.sender_name && !row.peer_name) row.peer_name = m.sender_name;
         if (new Date(m.created_date) > lastSeenFor(peer)) row.unread = (row.unread || 0) + 1;
       }
     }
@@ -148,7 +155,7 @@ export default async function(req) {
         location_updated: u.location_updated || null,
         email: u.email,
         picture_url: u.profile_picture_url || '',
-        name: u.display_name || u.full_name || post?.author_name || u.email,
+        name: u.display_name || u.full_name || post?.author_name || '',
         city: post?.city || '',
         school: post?.school || '',
         kind: post?.kind || null,

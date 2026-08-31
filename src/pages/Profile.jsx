@@ -234,7 +234,7 @@ export default function Profile() {
                       {req.from_name?.[0]?.toUpperCase() || '?'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm" style={{ color: '#1a1815' }}>{req.from_name || req.from_email}</p>
+                      <p className="font-medium text-sm" style={{ color: '#1a1815' }}>{req.from_name || 'Anonymous'}</p>
                       {req.message && <p className="text-xs truncate" style={{ color: '#8a7e6f' }}>"{req.message}"</p>}
                     </div>
                     <div className="flex gap-2">
@@ -266,11 +266,10 @@ export default function Profile() {
                     {f.name?.[0]?.toUpperCase() || '?'}
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-sm" style={{ color: '#1a1815' }}>{f.name || f.email}</p>
-                    <p className="text-xs" style={{ color: '#8a7e6f' }}>{f.email}</p>
+                    <p className="font-medium text-sm" style={{ color: '#1a1815' }}>{f.name || 'Anonymous'}</p>
                   </div>
                   <button
-                    onClick={() => navigate(`/chat?with=${encodeURIComponent(f.email)}&name=${encodeURIComponent(f.name || f.email)}`)}
+                    onClick={() => navigate(`/chat?with=${encodeURIComponent(f.email)}&name=${encodeURIComponent(f.name || '')}`)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
                     style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #e0d8c8' }}>
                     <MessageSquare className="w-3.5 h-3.5" /> Chat
@@ -315,15 +314,14 @@ export default function Profile() {
                     ) : searchResults.length > 0 ? (
                       searchResults.map(u => (
                         <button key={u.email} type="button"
-                          onClick={() => { setSelectedFriend(u); setFriendEmail(u.email); setSearchQuery(u.full_name || u.email); }}
+                          onClick={() => { setSelectedFriend(u); setFriendEmail(u.email); setSearchQuery(u.full_name || 'Anonymous'); }}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-black/5">
                           <div className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
                             style={{ background: '#efe4d0', color: '#8a5a20' }}>
-                            {(u.full_name || u.email)[0].toUpperCase()}
+                            {(u.full_name || '?')[0].toUpperCase()}
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm truncate" style={{ color: '#1a1815' }}>{u.full_name || 'Listener'}</p>
-                            <p className="text-xs truncate" style={{ color: '#8a7e6f' }}>{u.email}</p>
                           </div>
                         </button>
                       ))

@@ -514,7 +514,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
                         style={{ color: v.accent, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
                         onClick={() => {
                           if (currentUser?.email && review.reviewer_email && review.reviewer_email !== currentUser.email) {
-                            window.dispatchEvent(new CustomEvent('openMiniChat', { detail: { email: review.reviewer_email, name: review.reviewer_name || review.reviewer_email } }));
+                            window.dispatchEvent(new CustomEvent('openMiniChat', { detail: { email: review.reviewer_email, name: review.reviewer_name || '' } }));
                           }
                         }}
                         title={review.reviewer_email !== currentUser?.email ? 'Start a chat' : undefined}
