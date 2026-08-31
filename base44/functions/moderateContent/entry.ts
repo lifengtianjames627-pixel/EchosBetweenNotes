@@ -30,6 +30,8 @@ ONLY FLAG if the text contains:
 - sexual: sexually explicit content
 - violence: direct threats of violence against a real person
 - privacy: sharing someone's private personal information
+- profanity: Chinese internet slang used as insults — the characters 冯 and 福 used as substitutes for vulgar/obscene words (冯 is a phonetic stand-in for a vulgar word, 福 is used similarly). Treat these as profanity when used to insult or mock a person, NOT when used as a genuine surname (冯 is a common Chinese surname) or in a blessing context (福 means fortune/blessing).
+- politics: any political stance, party affiliation, or partisan discussion — including but not limited to: 共产党 (Communist Party), 国民党 (KMT), 民进党 (DPP), 民主党 (Democratic Party), 共和党 (Republican Party), MAGA, Trump, Biden, 习近平, 蔡英文, 党派, 政治立场, 左派/右派, liberal, conservative, or any other political party/figure/ideology. This is a music forum, not a political platform.
 
 A single strong word is NOT enough to flag. The entire line/sentence must be aggressive or harmful in context.
 
