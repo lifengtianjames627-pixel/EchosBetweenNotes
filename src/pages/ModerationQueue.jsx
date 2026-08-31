@@ -10,9 +10,10 @@ const STATUS_COLORS = {
   blocked: { color: '#9c3b33', bg: '#f3e2df', label: 'Blocked' },
 };
 
-function ReviewCard({ review, onApprove, onReject, isPending }) {
+function ModCard({ item, type, onApprove, onReject, isPending }) {
   const [expanded, setExpanded] = useState(false);
-  const s = STATUS_COLORS[review.moderation_status] || STATUS_COLORS.pending_review;
+  const s = STATUS_COLORS[item.moderation_status] || STATUS_COLORS.pending_review;
+  const isReview = type === 'review';
 
   return (
     <motion.div
@@ -25,30 +26,35 @@ function ReviewCard({ review, onApprove, onReject, isPending }) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold" style={{ color: '#1a1815' }}>{review.reviewer_name || 'Anonymous'}</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider" style={{ background: isReview ? '#e6ddc9' : '#dcd0e0', color: isReview ? '#6b5a3a' : '#5a4a6b' }}>
+              {isReview ? 'Review' : 'Comment'}
+            </span>
+            <span className="text-sm font-semibold" style={{ color: '#1a1815' }}>{item.reviewer_name || item.author_name || 'Anonymous'}</span>
             <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: s.bg, color: s.color }}>{s.label}</span>
-            {review.moderation_confidence != null && (
-              <span className="text-xs opacity-50">confidence: {Math.round(review.moderation_confidence * 100)}%</span>
+            {item.moderation_confidence != null && (
+              <span className="text-xs opacity-50">confidence: {Math.round(item.moderation_confidence * 100)}%</span>
             )}
           </div>
           <p className="text-xs mt-0.5" style={{ color: '#6b6358' }}>
-            {review.album_title} · {review.album_artist}
+            {isReview
+              ? `${item.album_title || '—'} · ${item.album_artist || '—'}`
+              : `Comment on review`}
           </p>
         </div>
         <div className="flex gap-2 shrink-0">
           <button
-            onClick={() => onApprove(review.id)}
-            disabled={isPending || review.moderation_status === 'approved'}
+            onClick={() => onApprove(item.id)}
+            disabled={isPending || item.moderation_status === 'approved'}
             className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-            style={{ background: '#eaeee0', color: '#4d5f3f', border: '1px solid #d6dcc6', opacity: review.moderation_status === 'approved' ? 0.4 : 1 }}
+            style={{ background: '#eaeee0', color: '#4d5f3f', border: '1px solid #d6dcc6', opacity: item.moderation_status === 'approved' ? 0.4 : 1 }}
           >
             <Check className="w-3.5 h-3.5" /> Approve
           </button>
           <button
-            onClick={() => onReject(review.id)}
-            disabled={isPending || review.moderation_status === 'blocked'}
+            onClick={() => onReject(item.id)}
+            disabled={isPending || item.moderation_status === 'blocked'}
             className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-            style={{ background: '#f3e2df', color: '#9c3b33', border: '1px solid #e6cdc8', opacity: review.moderation_status === 'blocked' ? 0.4 : 1 }}
+            style={{ background: '#f3e2df', color: '#9c3b33', border: '1px solid #e6cdc8', opacity: item.moderation_status === 'blocked' ? 0.4 : 1 }}
           >
             <X className="w-3.5 h-3.5" /> Reject
           </button>
@@ -56,14 +62,14 @@ function ReviewCard({ review, onApprove, onReject, isPending }) {
       </div>
 
       {/* AI flag info */}
-      {review.moderation_reason && (
+      {item.moderation_reason && (
         <div className="flex items-start gap-2 px-3 py-2 rounded-lg" style={{ background: '#f6efe1', border: '1px solid #e0d8c8' }}>
           <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: '#a0522d' }} />
           <div>
-            <p className="text-xs" style={{ color: '#8a5a20' }}>{review.moderation_reason}</p>
-            {review.moderation_categories?.length > 0 && (
+            <p className="text-xs" style={{ color: '#8a5a20' }}>{item.moderation_reason}</p>
+            {item.moderation_categories?.length > 0 && (
               <div className="flex gap-1 mt-1 flex-wrap">
-                {review.moderation_categories.map(cat => (
+                {item.moderation_categories.map(cat => (
                   <span key={cat} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: '#f3e2df', color: '#9c3b33' }}>{cat}</span>
                 ))}
               </div>
@@ -72,13 +78,13 @@ function ReviewCard({ review, onApprove, onReject, isPending }) {
         </div>
       )}
 
-      {/* Review content */}
+      {/* Content */}
       <div>
-        {review.title && <p className="font-playfair italic text-sm mb-1" style={{ color: '#1a1815' }}>"{review.title}"</p>}
+        {isReview && item.title && <p className="font-playfair italic text-sm mb-1" style={{ color: '#1a1815' }}>"{item.title}"</p>}
         <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: '#5a534a' }}>
-          {expanded ? review.content : review.content?.slice(0, 200) + (review.content?.length > 200 ? '…' : '')}
+          {expanded ? item.content : item.content?.slice(0, 200) + (item.content?.length > 200 ? '…' : '')}
         </p>
-        {review.content?.length > 200 && (
+        {item.content?.length > 200 && (
           <button onClick={() => setExpanded(e => !e)} className="text-xs mt-1 flex items-center gap-1" style={{ color: '#bf7a35' }}>
             {expanded ? <><ChevronUp className="w-3 h-3" /> Show less</> : <><ChevronDown className="w-3 h-3" /> Show more</>}
           </button>
@@ -97,7 +103,7 @@ export default function ModerationQueue() {
     queryFn: () => base44.auth.me(),
   });
 
-  const { data: reviews = [], isLoading } = useQuery({
+  const { data: reviews = [], isLoading: reviewsLoading } = useQuery({
     queryKey: ['moderation-reviews', filter],
     queryFn: () => base44.entities.Review.filter(
       filter === 'all' ? {} : { moderation_status: filter },
@@ -106,11 +112,36 @@ export default function ModerationQueue() {
     ),
   });
 
-  const updateStatus = useMutation({
+  const { data: comments = [], isLoading: commentsLoading } = useQuery({
+    queryKey: ['moderation-comments', filter],
+    queryFn: () => base44.entities.Comment.filter(
+      filter === 'all' ? {} : { moderation_status: filter },
+      '-created_date',
+      100
+    ),
+  });
+
+  // Merge reviews and comments into one list sorted by date (newest first)
+  const items = [
+    ...reviews.map(r => ({ ...r, _type: 'review' })),
+    ...comments.map(c => ({ ...c, _type: 'comment' })),
+  ].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+
+  const isLoading = reviewsLoading || commentsLoading;
+
+  const updateReviewStatus = useMutation({
     mutationFn: ({ id, status }) => base44.entities.Review.update(id, { moderation_status: status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['moderation-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['item-reviews'] });
+    },
+  });
+
+  const updateCommentStatus = useMutation({
+    mutationFn: ({ id, status }) => base44.entities.Comment.update(id, { moderation_status: status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['moderation-comments'] });
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
     },
   });
 
@@ -172,22 +203,29 @@ export default function ModerationQueue() {
           <div className="space-y-3">
             {[1,2,3].map(i => <div key={i} className="h-28 rounded-xl animate-pulse" style={{ background: '#ece5d6' }} />)}
           </div>
-        ) : reviews.length === 0 ? (
+        ) : items.length === 0 ? (
           <div className="text-center py-16" style={{ color: '#8a7e6f' }}>
             <Check className="w-8 h-8 mx-auto mb-3 opacity-40" />
-            <p className="text-sm">No reviews in this category.</p>
+            <p className="text-sm">Nothing in this category.</p>
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-xs mb-4" style={{ color: '#8a7e6f' }}>{reviews.length} review{reviews.length !== 1 ? 's' : ''}</p>
+            <p className="text-xs mb-4" style={{ color: '#8a7e6f' }}>
+              {items.length} item{items.length !== 1 ? 's' : ''} · {reviews.length} review{reviews.length !== 1 ? 's' : ''} · {comments.length} comment{comments.length !== 1 ? 's' : ''}
+            </p>
             <AnimatePresence>
-              {reviews.map(review => (
-                <ReviewCard
-                  key={review.id}
-                  review={review}
-                  isPending={updateStatus.isPending}
-                  onApprove={(id) => updateStatus.mutate({ id, status: 'approved' })}
-                  onReject={(id) => updateStatus.mutate({ id, status: 'blocked' })}
+              {items.map(item => (
+                <ModCard
+                  key={`${item._type}-${item.id}`}
+                  item={item}
+                  type={item._type}
+                  isPending={updateReviewStatus.isPending || updateCommentStatus.isPending}
+                  onApprove={(id) => item._type === 'review'
+                    ? updateReviewStatus.mutate({ id, status: 'approved' })
+                    : updateCommentStatus.mutate({ id, status: 'approved' })}
+                  onReject={(id) => item._type === 'review'
+                    ? updateReviewStatus.mutate({ id, status: 'blocked' })
+                    : updateCommentStatus.mutate({ id, status: 'blocked' })}
                 />
               ))}
             </AnimatePresence>

@@ -37,25 +37,54 @@ function StarPicker({ rating, onRate, accent, muted }) {
 function CommentSection({ reviewId, v, currentUser }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
+  const [commentMod, setCommentMod] = useState(null); // null | 'blocked' | 'pending'
   const { authed, login } = useAuthed();
   const queryClient = useQueryClient();
 
-  const { data: comments = [] } = useQuery({
+  const { data: allComments = [] } = useQuery({
     queryKey: ['comments', reviewId],
     queryFn: () => base44.entities.Comment.filter({ review_id: reviewId }, 'created_date', 50),
     enabled: open,
   });
+  // Only show approved comments publicly (same rule as reviews)
+  const comments = allComments.filter(c => !c.moderation_status || c.moderation_status === 'approved');
 
   const addComment = useMutation({
-    mutationFn: (content) => base44.entities.Comment.create({
-      review_id: reviewId,
-      content,
-      author_name: displayName(currentUser) || 'Anonymous',
-      author_email: currentUser?.email || '',
-    }),
-    onSuccess: async () => {
+    mutationFn: async (content) => {
+      setCommentMod(null);
+      // Run the same AI moderation bot that reviews go through
+      let modResult = { isFlagged: false, confidence: 0, categories: [], reason: '', suggestedAction: 'allow' };
+      try {
+        const res = await base44.functions.invoke('moderateContent', { text: content });
+        modResult = res.data;
+      } catch (_) { /* AI failure → allow */ }
+
+      if (modResult.suggestedAction === 'block') {
+        throw new Error('BLOCKED');
+      }
+
+      const modStatus = modResult.suggestedAction === 'review' ? 'pending_review' : 'approved';
+
+      await base44.entities.Comment.create({
+        review_id: reviewId,
+        content,
+        author_name: displayName(currentUser) || 'Anonymous',
+        author_email: currentUser?.email || '',
+        moderation_status: modStatus,
+        moderation_categories: modResult.categories,
+        moderation_reason: modResult.reason,
+        moderation_confidence: modResult.confidence,
+      });
+
+      return modStatus;
+    },
+    onSuccess: async (modStatus) => {
       queryClient.invalidateQueries({ queryKey: ['comments', reviewId] });
       setText('');
+      if (modStatus === 'pending_review') {
+        setCommentMod('pending');
+        return;
+      }
       // Check community badges for review author
       const review = await base44.entities.Review.filter({ id: reviewId });
       const reviewerEmail = review[0]?.reviewer_email;
@@ -73,6 +102,9 @@ function CommentSection({ reviewId, v, currentUser }) {
         if (total >= 100) awardBadge(reviewerEmail, 'comments_100', queryClient);
         if (total >= 200) awardBadge(reviewerEmail, 'comments_200', queryClient);
       }
+    },
+    onError: (err) => {
+      if (err.message === 'BLOCKED') setCommentMod('blocked');
     },
   });
 
@@ -97,6 +129,16 @@ function CommentSection({ reviewId, v, currentUser }) {
             className="overflow-hidden"
           >
             <div className="mt-3 space-y-2">
+              {commentMod === 'blocked' && (
+                <div className="text-xs px-3 py-2 rounded-lg" style={{ background: 'rgba(220,50,50,0.1)', border: '1px solid rgba(220,50,50,0.25)', color: '#ff6b6b' }}>
+                  🚫 Your comment may not meet community guidelines. Please revise and try again.
+                </div>
+              )}
+              {commentMod === 'pending' && (
+                <div className="text-xs px-3 py-2 rounded-lg" style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)', color: '#fbbf24' }}>
+                  ⏳ Your comment is being checked and will appear once approved.
+                </div>
+              )}
               {comments.map(c => (
                 <div key={c.id} className="flex gap-2">
                   <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: `${v.accent}25`, color: v.accent }}>
