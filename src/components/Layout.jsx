@@ -43,6 +43,21 @@ export default function Layout() {
   });
   const messageUnread = msgUnreadData || 0;
 
+  // Pending moderation count for the Moderation nav badge (admins only, polled).
+  const { data: pendingReviews = [] } = useQuery({
+    queryKey: ['mod-pending-reviews'],
+    queryFn: () => base44.entities.Review.filter({ moderation_status: 'pending_review' }, '-created_date', 100),
+    enabled: currentUser?.role === 'admin',
+    refetchInterval: 30000,
+  });
+  const { data: pendingComments = [] } = useQuery({
+    queryKey: ['mod-pending-comments'],
+    queryFn: () => base44.entities.Comment.filter({ moderation_status: 'pending_review' }, '-created_date', 100),
+    enabled: currentUser?.role === 'admin',
+    refetchInterval: 30000,
+  });
+  const pendingModCount = (pendingReviews?.length || 0) + (pendingComments?.length || 0);
+
   // ── Time tracking ──────────────────────────────────────────────────────────
   const sessionStartRef = useRef(Date.now());
 
@@ -127,7 +142,7 @@ export default function Layout() {
         </Link>
         <nav className="hidden sm:flex items-center gap-0.5 ml-1 min-w-0 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
           {NAV_ITEMS.filter(item => item.path !== '/chat' || currentUser).map(item => navLink(item.path, item.labelKey, item.path === '/chat' ? messageUnread : 0))}
-          {isAdmin && ADMIN_ITEMS.map(item => navLink(item.path, item.labelKey))}
+          {isAdmin && ADMIN_ITEMS.map(item => navLink(item.path, item.labelKey, item.path === '/moderation' ? pendingModCount : 0))}
         </nav>
         <div className="ml-auto flex items-center gap-2 shrink-0">
           {currentUser && <NotificationBell />}
@@ -157,7 +172,7 @@ export default function Layout() {
       {/* Mobile nav strip — the links that don't fit in the thin top bar */}
       <nav className="sm:hidden flex items-center gap-0.5 px-4 py-1.5 overflow-x-auto" style={{ background: '#e6ddc9', borderBottom: '1px solid rgba(26,24,21,0.08)', scrollbarWidth: 'none' }}>
         {NAV_ITEMS.filter(item => item.path !== '/chat' || currentUser).map(item => navLink(item.path, item.labelKey))}
-        {isAdmin && ADMIN_ITEMS.map(item => navLink(item.path, item.labelKey))}
+        {isAdmin && ADMIN_ITEMS.map(item => navLink(item.path, item.labelKey, item.path === '/moderation' ? pendingModCount : 0))}
       </nav>
 
       <main className="flex-1 min-w-0">
