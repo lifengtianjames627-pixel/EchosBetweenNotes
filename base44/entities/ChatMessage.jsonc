@@ -6,7 +6,11 @@
       "data.participants": "{{user.email}}"
     },
     "create": {
-      "data.participants": "{{user.email}}"
+      "data.participants": {
+        "$in": [
+          "{{user.email}}"
+        ]
+      }
     },
     "update": {
       "data.sender_email": "{{user.email}}"
