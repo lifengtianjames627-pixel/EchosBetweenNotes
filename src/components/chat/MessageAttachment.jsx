@@ -15,14 +15,19 @@ export default function MessageAttachment({ V, url, name, kind }) {
   if (kind === 'pdf') {
     return (
       <div className="mt-1">
-        <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${V.border}`, background: '#faf8f2' }}>
-          <iframe
-            src={url}
-            title={name || 'PDF'}
-            className="w-full"
-            style={{ height: 220, border: 'none' }}
-          />
-        </div>
+        <object
+          data={url}
+          type="application/pdf"
+          className="w-full rounded-xl"
+          style={{ height: 220, border: `1px solid ${V.border}`, background: '#faf8f2' }}
+          aria-label={name || 'PDF'}
+        >
+          {/* Fallback shown when the browser can't embed the PDF inline */}
+          <div className="flex items-center gap-2 px-3 py-2" style={{ color: '#8a5a20' }}>
+            <FileText className="w-4 h-4 shrink-0" />
+            <span className="text-xs truncate max-w-[220px]">{name || 'Attachment'}</span>
+          </div>
+        </object>
         <a
           href={url}
           target="_blank"
