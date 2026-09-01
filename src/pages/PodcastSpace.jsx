@@ -8,6 +8,7 @@ import { PODCAST_CATEGORY_MAP } from '@/lib/podcastConfig';
 import AddPodcastModal from '@/components/AddPodcastModal';
 import { useAuthed } from '@/hooks/useAuthed';
 import { useLang } from '@/i18n/LanguageContext';
+import { openPrivateChat } from '@/shared/chat/openPrivateChat';
 
 export default function PodcastSpace() {
   const { categoryId } = useParams();
@@ -18,13 +19,15 @@ export default function PodcastSpace() {
   const { authed, login } = useAuthed();
   const category = PODCAST_CATEGORY_MAP[categoryId];
 
+  const { data: currentUser } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+
   const { data: episodes = [], isLoading } = useQuery({
     queryKey: ['podcasts'],
     queryFn: () => base44.entities.Podcast.list('-created_date', 300),
   });
 
   const addEpisode = useMutation({
-    mutationFn: (data) => base44.entities.Podcast.create(data),
+    mutationFn: (data) => base44.entities.Podcast.create({ ...data, host_email: currentUser?.email || '' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['podcasts'] });
       setAddOpen(false);
@@ -95,7 +98,18 @@ export default function PodcastSpace() {
                 </div>
                 <div className="flex-1 min-w-0 flex flex-col">
                   <p className="font-playfair text-base font-semibold leading-snug" style={{ color: '#1a1815' }}>{ep.title}</p>
-                  <p className="text-[11px] mt-0.5 uppercase tracking-wider truncate" style={{ color: '#bf7a35' }}>{ep.host_name}</p>
+                  {ep.host_email ? (
+                    <button
+                      onClick={() => ep.host_email !== currentUser?.email && openPrivateChat(ep.host_email, ep.host_name)}
+                      className="text-[11px] mt-0.5 uppercase tracking-wider truncate block hover:underline text-left"
+                      style={{ color: '#bf7a35' }}
+                      title="Message this host"
+                    >
+                      {ep.host_name}
+                    </button>
+                  ) : (
+                    <p className="text-[11px] mt-0.5 uppercase tracking-wider truncate" style={{ color: '#bf7a35' }}>{ep.host_name}</p>
+                  )}
                   {ep.description && <p className="text-xs mt-1.5 line-clamp-2" style={{ color: '#6b6358' }}>{ep.description}</p>}
                   <div className="flex items-center gap-3 mt-auto pt-2">
                     {ep.duration_minutes > 0 && (

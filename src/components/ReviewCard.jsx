@@ -4,6 +4,7 @@ import { Heart, User, ChevronDown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import CoverImage from '@/components/music/CoverImage';
 import { useReviewerProfile } from '@/components/ReviewerProfileProvider';
+import { openPrivateChat } from '@/shared/chat/openPrivateChat';
 
 // Paper review card — cream bg, thin warm border, near-black ink, ochre rating
 // number (no star component). Long reviews are clipped with a Read more toggle
@@ -58,12 +59,18 @@ export default function ReviewCard({ review, showAlbum = true }) {
           )}
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center gap-1.5 text-xs" style={{ color: '#8a7e6f' }}>
-              <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center shrink-0" style={{ background: '#e6ddc9' }}>
-                {profile?.picture_url
-                  ? <img src={profile.picture_url} alt="" className="w-full h-full object-cover" />
-                  : <User className="w-3 h-3" style={{ color: '#6b6358' }} />}
-              </div>
-              <span>{reviewerName}</span>
+              <button
+                onClick={() => openPrivateChat(review.reviewer_email, reviewerName)}
+                className="flex items-center gap-1.5 transition-opacity hover:opacity-70"
+                title="Message this reviewer"
+              >
+                <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center shrink-0" style={{ background: '#e6ddc9' }}>
+                  {profile?.picture_url
+                    ? <img src={profile.picture_url} alt="" className="w-full h-full object-cover" />
+                    : <User className="w-3 h-3" style={{ color: '#6b6358' }} />}
+                </div>
+                <span className="font-semibold hover:underline">{reviewerName}</span>
+              </button>
               {review.created_date && (
                 <>
                   <span>·</span>

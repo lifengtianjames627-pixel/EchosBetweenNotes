@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import ReviewActions from '@/components/ReviewActions';
 import CommentSection from '@/components/CommentSection';
+import { openPrivateChat } from '@/shared/chat/openPrivateChat';
 
 const SECTIONS = [
   ['band_style', 'Style'],
@@ -75,10 +76,16 @@ export default function ReviewDetailModal({ review, onClose }) {
 
         <div className="flex items-center justify-between mt-7 pt-4 text-xs" style={{ borderTop: '1px solid #e6ddc9', color: '#8a7e6f' }}>
           <span className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#e6ddc9' }}>
-              <User className="w-3 h-3" style={{ color: '#6b6358' }} />
-            </div>
-            {review.reviewer_name || 'Anonymous'}
+            <button
+              onClick={() => openPrivateChat(review.reviewer_email, review.reviewer_name)}
+              className="flex items-center gap-1.5 transition-opacity hover:opacity-70"
+              title="Message this reviewer"
+            >
+              <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#e6ddc9' }}>
+                <User className="w-3 h-3" style={{ color: '#6b6358' }} />
+              </div>
+              <span className="font-semibold hover:underline">{review.reviewer_name || 'Anonymous'}</span>
+            </button>
             {review.created_date && <> · {formatDistanceToNow(new Date(review.created_date), { addSuffix: true })}</>}
           </span>
         </div>

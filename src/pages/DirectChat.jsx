@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Search, MessageSquare, ShieldAlert, Clock, PanelLeftOpen } from 'lucide-react';
+import { ArrowLeft, Search, MessageSquare, ShieldAlert, Clock, PanelLeftOpen, UserPlus } from 'lucide-react';
 import ConversationSidebar from '@/components/chat/ConversationSidebar';
 import MessageComposer from '@/components/chat/MessageComposer';
 import MessageAttachment from '@/components/chat/MessageAttachment';
 import { useChat, makeChatId } from '@/lib/useChat';
 import { findContactInfo } from '@/lib/contactFilter';
+import { useFriendStatus } from '@/shared/chat/useFriendStatus';
+import { displayName } from '@/lib/displayName';
 import ReportButton from '@/components/soulmate/ReportButton';
 import PinnedPeople from '@/components/chat/PinnedPeople';
 import RecentConversations from '@/components/chat/RecentConversations';
@@ -27,6 +29,11 @@ const V = {
   muted: '#6b6358',
 };
 
+// Before two members become friends, each side can send only this many one-way
+// messages; after that the composer turns into an "add friend" prompt. Applies
+// equally to user↔user and user↔admin.
+const PRE_FRIEND_MESSAGE_LIMIT = 3;
+
 export default function DirectChat() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -38,12 +45,32 @@ export default function DirectChat() {
   const [search, setSearch] = useState('');
   const [warning, setWarning] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [friendSent, setFriendSent] = useState(false);
   const bottomRef = useRef(null);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
 
   const chatId = user?.email && peerEmail ? makeChatId(user.email, peerEmail) : null;
   const { messages, send } = useChat({ chatId, currentUser: user, limit: 200 });
+
+  const { isFriend, sentRequest } = useFriendStatus(user?.email, peerEmail);
+  const mySentCount = messages.filter(m => m.sender_email === user?.email).length;
+  const gateActive = !!peerEmail && !isFriend && mySentCount >= PRE_FRIEND_MESSAGE_LIMIT;
+  const remaining = Math.max(0, PRE_FRIEND_MESSAGE_LIMIT - mySentCount);
+
+  const sendFriendRequest = useMutation({
+    mutationFn: () => base44.entities.FriendRequest.create({
+      from_email: user.email,
+      from_name: displayName(user),
+      to_email: peerEmail,
+      to_name: peerName || '',
+      status: 'pending',
+    }),
+    onSuccess: () => {
+      setFriendSent(true);
+      queryClient.invalidateQueries({ queryKey: ['friend-status', user.email, peerEmail] });
+    },
+  });
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -298,14 +325,50 @@ export default function DirectChat() {
         )}
       </AnimatePresence>
 
-      {/* Composer — multi-line, emoji + image/PDF attachments, character count */}
-      <MessageComposer
-        V={V}
-        value={text}
-        onChange={(v) => { setText(v); if (warning) setWarning(null); }}
-        onSend={handleSend}
-        placeholder={t('chat.typeMessage')}
-      />
+      {/* Pre-friend gate: after 3 one-way messages the composer is replaced by
+          an "add friend" prompt — the conversation continues freely once
+          accepted. Same rule for user↔user and user↔admin. */}
+      {gateActive ? (
+        <div className="shrink-0 px-5 py-4">
+          <div className="rounded-2xl p-4 text-center space-y-2.5"
+            style={{ background: '#f6efe1', border: `1px solid ${V.border}` }}>
+            <p className="text-sm" style={{ color: '#5a534a' }}>
+              {t('chat.friendGate', { name: peerName || t('chat.them') })}
+            </p>
+            {sentRequest || friendSent ? (
+              <p className="text-sm font-semibold flex items-center justify-center gap-1.5" style={{ color: '#4d5f3f' }}>
+                <UserPlus className="w-4 h-4" /> {t('chat.requestSent')}
+              </p>
+            ) : (
+              <button
+                onClick={() => sendFriendRequest.mutate()}
+                disabled={sendFriendRequest.isPending}
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-semibold transition-colors hover:scale-[1.02]"
+                style={{ background: '#1a1815', color: '#faf8f2' }}>
+                <UserPlus className="w-4 h-4" />
+                {sendFriendRequest.isPending ? t('chat.sending') : t('chat.addFriend')}
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          {!isFriend && peerEmail && (
+            <div className="shrink-0 px-5 pt-2">
+              <p className="text-[11px] text-center" style={{ color: '#8a7e6f' }}>
+                {t('chat.preFriendHint', { n: remaining })}
+              </p>
+            </div>
+          )}
+          <MessageComposer
+            V={V}
+            value={text}
+            onChange={(v) => { setText(v); if (warning) setWarning(null); }}
+            onSend={handleSend}
+            placeholder={t('chat.typeMessage')}
+          />
+        </>
+      )}
       </div>
     </div>
   );

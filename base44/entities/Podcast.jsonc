@@ -10,6 +10,10 @@
       "type": "string",
       "description": "Host or creator name"
     },
+    "host_email": {
+      "type": "string",
+      "description": "Email of the member who submitted the episode \u2014 makes the host name clickable to open a private chat"
+    },
     "category": {
       "type": "string",
       "enum": [

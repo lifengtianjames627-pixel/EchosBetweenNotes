@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home as HomeIcon, Shield, LogOut, LogIn, MessageSquare, User, Users } from 'lucide-react';
-import MiniChat from '@/components/MiniChat';
 import NotificationBell from '@/components/NotificationBell';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { AnimatePresence } from 'framer-motion';
 import { useLang } from '@/i18n/LanguageContext';
 import LanguageButton from '@/components/LanguageButton';
 import SiteFooter from '@/components/SiteFooter';
@@ -20,19 +18,26 @@ const ADMIN_ITEMS = [{ path: '/moderation', icon: Shield, labelKey: 'nav.moderat
 
 export default function Layout() {
   const { t } = useLang();
+  const navigate = useNavigate();
   const location = useLocation();
-  const [miniChat, setMiniChat] = useState(null);
-
-  useEffect(() => {
-    const handler = (e) => setMiniChat(e.detail);
-    window.addEventListener('openMiniChat', handler);
-    return () => window.removeEventListener('openMiniChat', handler);
-  }, []);
 
   const { data: currentUser } = useQuery({
     queryKey: ['me'],
     queryFn: () => base44.auth.me(),
   });
+
+  // Tapping a member's avatar/name anywhere on the site dispatches this event;
+  // here we route it to the full private-chat page (with the pre-friend
+  // 3-message gate) instead of a transient popup.
+  useEffect(() => {
+    const handler = (e) => {
+      const { email, name } = e.detail || {};
+      if (!email || email === currentUser?.email) return;
+      navigate(`/chat?with=${encodeURIComponent(email)}&name=${encodeURIComponent(name || '')}`);
+    };
+    window.addEventListener('openMiniChat', handler);
+    return () => window.removeEventListener('openMiniChat', handler);
+  }, [currentUser?.email, navigate]);
 
   // Unread direct-message count for the Messages nav badge (polled).
   const { data: msgUnreadData } = useQuery({
@@ -182,12 +187,6 @@ export default function Layout() {
       </main>
 
       <SiteFooter />
-
-      <AnimatePresence>
-        {miniChat && currentUser && (
-          <MiniChat peer={miniChat} currentUser={currentUser} onClose={() => setMiniChat(null)} />
-        )}
-      </AnimatePresence>
 
       {isAdmin && (
         <Link to="/manage" title="Manage members"

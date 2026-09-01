@@ -7,6 +7,7 @@ import { awardBadge } from '@/lib/badgeUtils';
 import { publicName, initialOf } from '@/shared/identity';
 import { useAuthed } from '@/shared/identity';
 import { useContentModeration } from '@/shared/hooks/useContentModeration';
+import { openPrivateChat } from '@/shared/chat/openPrivateChat';
 
 // Extracted so both the album-detail modal and the review-reading modal can
 // share the same comment UI (with AI moderation + badge awards).
@@ -111,7 +112,13 @@ export default function CommentSection({ reviewId, v, currentUser }) {
                       {initialOf(c.author_name)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="text-xs font-semibold mr-1.5" style={{ color: v.text }}>{publicName(c.author_name)}</span>
+                      <button
+                        onClick={() => c.author_email && c.author_email !== currentUser?.email && openPrivateChat(c.author_email, publicName(c.author_name))}
+                        className="text-xs font-semibold mr-1.5 hover:underline"
+                        style={{ color: v.text, background: 'none', border: 'none', padding: 0, cursor: c.author_email && c.author_email !== currentUser?.email ? 'pointer' : 'default' }}
+                      >
+                        {publicName(c.author_name)}
+                      </button>
                       <span className="text-xs" style={{ color: v.muted }}>{c.content}</span>
                     </div>
                     {canDelete && (
