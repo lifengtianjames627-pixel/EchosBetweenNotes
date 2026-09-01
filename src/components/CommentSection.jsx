@@ -4,8 +4,8 @@ import { MessageSquare, ChevronDown, ChevronUp, Send, Trash2 } from 'lucide-reac
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { awardBadge } from '@/lib/badgeUtils';
-import { displayName } from '@/lib/displayName';
-import { useAuthed } from '@/hooks/useAuthed';
+import { publicName, initialOf } from '@/shared/identity';
+import { useAuthed } from '@/shared/identity';
 import { useContentModeration } from '@/shared/hooks/useContentModeration';
 
 // Extracted so both the album-detail modal and the review-reading modal can
@@ -35,7 +35,7 @@ export default function CommentSection({ reviewId, v, currentUser }) {
       await base44.entities.Comment.create({
         review_id: reviewId,
         content,
-        author_name: displayName(currentUser) || 'Anonymous',
+        author_name: publicName(currentUser),
         author_email: currentUser?.email || '',
         moderation_status: modStatus,
         moderation_categories: modResult.categories,
@@ -108,10 +108,10 @@ export default function CommentSection({ reviewId, v, currentUser }) {
                 return (
                   <div key={c.id} className="flex gap-2">
                     <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: `${v.accent}25`, color: v.accent }}>
-                      {(c.author_name || 'A')[0].toUpperCase()}
+                      {initialOf(c.author_name)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="text-xs font-semibold mr-1.5" style={{ color: v.text }}>{c.author_name || 'Anonymous'}</span>
+                      <span className="text-xs font-semibold mr-1.5" style={{ color: v.text }}>{publicName(c.author_name)}</span>
                       <span className="text-xs" style={{ color: v.muted }}>{c.content}</span>
                     </div>
                     {canDelete && (

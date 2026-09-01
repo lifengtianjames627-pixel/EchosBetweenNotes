@@ -1,32 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Download, Copy, Check } from 'lucide-react';
+// Per-genre share colors come from the unified genre config — one place defines
+// a genre's identity for both the paper UI and this dark share card.
+import { getShareTheme } from '@/shared/config/genres';
+import { publicName } from '@/shared/identity';
 
 const FONT = "'Inter','PingFang SC','Microsoft YaHei',sans-serif";
-
-// Per-genre color themes — each card gets its own personality instead of always purple.
-const GENRE_THEMES = {
-  rock: { accent: '#ef4444', secondary: '#f59e0b' },
-  pop: { accent: '#ec4899', secondary: '#a78bfa' },
-  hip_hop: { accent: '#f5c518', secondary: '#ef4444' },
-  r_and_b: { accent: '#b47fff', secondary: '#ec4899' },
-  jazz: { accent: '#d4a017', secondary: '#5c8ab5' },
-  classical: { accent: '#e8c468', secondary: '#8a7a60' },
-  electronic: { accent: '#4080ff', secondary: '#22d3ee' },
-  indie: { accent: '#8bc34a', secondary: '#d4a017' },
-  metal: { accent: '#e11d1d', secondary: '#888888' },
-  punk: { accent: '#ff2d55', secondary: '#f5c518' },
-  folk: { accent: '#a0784f', secondary: '#8bc34a' },
-  country: { accent: '#a0522d', secondary: '#d4a017' },
-  latin: { accent: '#ff7a00', secondary: '#ec4899' },
-  k_pop: { accent: '#ff5fae', secondary: '#4080ff' },
-  blues: { accent: '#5c8ab5', secondary: '#b47fff' },
-  grunge: { accent: '#8b7355', secondary: '#a0522d' },
-  funk: { accent: '#fbbf24', secondary: '#ec4899' },
-  acg: { accent: '#22d3ee', secondary: '#b47fff' },
-  other: { accent: '#a78bfa', secondary: '#60a5fa' },
-};
-const DEFAULT_THEME = GENRE_THEMES.other;
 
 function hexToRgba(hex, alpha) {
   const h = hex.replace('#', '');
@@ -137,7 +117,7 @@ async function renderCard(canvas, review, album) {
   const W = 420, PAD = 28, SCALE = 2;
   const contentW = W - PAD * 2;
   const ctx = canvas.getContext('2d');
-  const theme = GENRE_THEMES[album?.genre] || DEFAULT_THEME;
+  const theme = getShareTheme(album?.genre);
   const ACCENT = theme.accent;
   const SECONDARY = theme.secondary;
 
@@ -157,7 +137,8 @@ async function renderCard(canvas, review, album) {
   const excerptLines = wrapText(ctx, truncatedContent, contentW - 28);
 
   ctx.font = `700 13px ${FONT}`;
-  const name = ellipsize(ctx, '@' + (review.reviewer_name || 'Anonymous').replace(/\s+/g, '_').toLowerCase(), contentW - 32 - 10 - 10);
+  const authorName = publicName(review.reviewer_name);
+  const name = ellipsize(ctx, '@' + authorName.replace(/\s+/g, '_').toLowerCase(), contentW - 32 - 10 - 10);
 
   ctx.font = `italic 11px ${FONT}`;
   const reviewTitle = review.title ? ellipsize(ctx, `"${review.title}"`, contentW - 32 - 10 - 10) : null;
@@ -360,7 +341,7 @@ async function renderCard(canvas, review, album) {
   ctx.font = `800 13px ${FONT}`;
   ctx.fillStyle = ACCENT;
   ctx.textAlign = 'center';
-  ctx.fillText((review.reviewer_name || 'A')[0].toUpperCase(), avatarCx, avatarCy + 5);
+  ctx.fillText(authorName[0].toUpperCase(), avatarCx, avatarCy + 5);
   ctx.textAlign = 'left';
 
   // Reviewer name + title

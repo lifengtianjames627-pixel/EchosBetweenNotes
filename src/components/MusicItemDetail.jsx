@@ -6,7 +6,7 @@ import { X, Star, MessageSquare, ChevronDown, ChevronUp, Send, Youtube, Maximize
 import CivilityNotice from '@/components/CivilityNotice';
 import BadgeIcon from '@/components/BadgeIcon';
 import { awardBadge } from '@/lib/badgeUtils';
-import { displayName } from '@/lib/displayName';
+import { displayName, publicName } from '@/shared/identity';
 import TrackList from '@/components/TrackList';
 import SingleCoverMatch from '@/components/SingleCoverMatch';
 import ReviewActions from '@/components/ReviewActions';
@@ -16,7 +16,7 @@ import GenreDecoration from '@/components/GenreDecoration';
 import VirtualItemModal from '@/components/VirtualItemModal';
 import { Search } from 'lucide-react';
 import { loadDraft, saveDraft, clearDraft } from '@/lib/reviewDraft';
-import { useAuthed } from '@/hooks/useAuthed';
+import { useAuthed } from '@/shared/identity';
 import { useContentModeration } from '@/shared/hooks/useContentModeration';
 import CoverImage from '@/components/music/CoverImage';
 
@@ -407,7 +407,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
                         }}
                         title={review.reviewer_email !== currentUser?.email ? 'Start a chat' : undefined}
                       >
-                        {review.reviewer_name || 'Anonymous'}
+                        {publicName(review.reviewer_name)}
                       </button>
                       {review.title && <span className="text-xs ml-2 italic" style={{ color: v.accent }}>"{review.title}"</span>}
                       {/* Equipped badges — live, not the stale post-time snapshot */}
