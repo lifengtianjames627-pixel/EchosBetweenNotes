@@ -17,6 +17,7 @@ import VirtualItemModal from '@/components/VirtualItemModal';
 import { Search } from 'lucide-react';
 import { loadDraft, saveDraft, clearDraft } from '@/lib/reviewDraft';
 import { useAuthed } from '@/hooks/useAuthed';
+import { useContentModeration } from '@/shared/hooks/useContentModeration';
 import CoverImage from '@/components/music/CoverImage';
 
 function StarPicker({ rating, onRate, accent, muted }) {
@@ -40,25 +41,15 @@ const EMPTY_REVIEW_DATA = { rating: 0, title: '', content: '', band_style: '', b
 function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
   const draftScope = `album_${albumId}`;
   const [data, setData] = useState(() => loadDraft(draftScope) || EMPTY_REVIEW_DATA);
-  const [moderationMsg, setModerationMsg] = useState(null); // null | 'blocked' | 'pending'
+  const { moderate, status: moderationMsg, resetStatus: resetModeration } = useContentModeration();
   const queryClient = useQueryClient();
 
   useEffect(() => { saveDraft(draftScope, data); }, [data]);
 
   const createReview = useMutation({
     mutationFn: async (d) => {
-      // Run AI moderation on the review content
-      setModerationMsg(null);
       const textToCheck = [d.title, d.content, d.band_background, d.band_history, d.band_story].filter(Boolean).join('\n');
-      let modResult = { isFlagged: false, confidence: 0, categories: [], reason: '', suggestedAction: 'allow' };
-      try {
-        const res = await base44.functions.invoke('moderateContent', { text: textToCheck });
-        modResult = res.data;
-      } catch (_) { /* AI failure → allow */ }
-
-      if (modResult.suggestedAction === 'block') {
-        throw new Error('BLOCKED');
-      }
+      const modResult = await moderate(textToCheck);
 
       const modStatus = modResult.suggestedAction === 'review' ? 'pending_review' : 'approved';
 
@@ -101,13 +92,13 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
       setData(EMPTY_REVIEW_DATA);
       clearDraft(draftScope);
       if (modStatus === 'pending_review') {
-        setModerationMsg('pending');
+        // 'pending' status is set by the moderation hook
       } else {
         onSuccess?.();
       }
     },
-    onError: (err) => {
-      if (err.message === 'BLOCKED') setModerationMsg('blocked');
+    onError: () => {
+      // 'blocked' status is set by the moderation hook
     },
   });
 
@@ -117,7 +108,7 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
         <p className="text-2xl">🚫</p>
         <p className="text-sm font-semibold" style={{ color: '#ff6b6b' }}>Your content may not meet community guidelines.</p>
         <p className="text-xs" style={{ color: v.muted }}>Please revise your review and try again. Hate speech, harassment, and spam are not allowed.</p>
-        <button onClick={() => setModerationMsg(null)} className="text-xs px-4 py-1.5 rounded-full" style={{ border: `1px solid ${v.accent}40`, color: v.accent }}>Edit Review</button>
+        <button onClick={resetModeration} className="text-xs px-4 py-1.5 rounded-full" style={{ border: `1px solid ${v.accent}40`, color: v.accent }}>Edit Review</button>
       </div>
     );
   }

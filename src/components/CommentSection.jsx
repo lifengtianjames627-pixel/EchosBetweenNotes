@@ -6,16 +6,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { awardBadge } from '@/lib/badgeUtils';
 import { displayName } from '@/lib/displayName';
 import { useAuthed } from '@/hooks/useAuthed';
+import { useContentModeration } from '@/shared/hooks/useContentModeration';
 
 // Extracted so both the album-detail modal and the review-reading modal can
 // share the same comment UI (with AI moderation + badge awards).
 export default function CommentSection({ reviewId, v, currentUser }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
-  const [commentMod, setCommentMod] = useState(null); // null | 'blocked' | 'pending'
   const { authed, login } = useAuthed();
   const queryClient = useQueryClient();
   const isAdmin = currentUser?.role === 'admin';
+  const { moderate, status: commentMod } = useContentModeration();
 
   const { data: allComments = [] } = useQuery({
     queryKey: ['comments', reviewId],
@@ -27,17 +28,7 @@ export default function CommentSection({ reviewId, v, currentUser }) {
 
   const addComment = useMutation({
     mutationFn: async (content) => {
-      setCommentMod(null);
-      // Run the same AI moderation bot that reviews go through
-      let modResult = { isFlagged: false, confidence: 0, categories: [], reason: '', suggestedAction: 'allow' };
-      try {
-        const res = await base44.functions.invoke('moderateContent', { text: content });
-        modResult = res.data;
-      } catch (_) { /* AI failure → allow */ }
-
-      if (modResult.suggestedAction === 'block') {
-        throw new Error('BLOCKED');
-      }
+      const modResult = await moderate(content);
 
       const modStatus = modResult.suggestedAction === 'review' ? 'pending_review' : 'approved';
 
@@ -58,7 +49,6 @@ export default function CommentSection({ reviewId, v, currentUser }) {
       queryClient.invalidateQueries({ queryKey: ['comments', reviewId] });
       setText('');
       if (modStatus === 'pending_review') {
-        setCommentMod('pending');
         return;
       }
       // Check community badges for review author
@@ -77,8 +67,8 @@ export default function CommentSection({ reviewId, v, currentUser }) {
         if (total >= 200) awardBadge(reviewerEmail, 'comments_200', queryClient);
       }
     },
-    onError: (err) => {
-      if (err.message === 'BLOCKED') setCommentMod('blocked');
+    onError: () => {
+      // 'blocked' status is set by the moderation hook
     },
   });
 
