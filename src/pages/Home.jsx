@@ -5,6 +5,7 @@ import { PenLine, Headphones, Users } from 'lucide-react';
 import { useLang } from '@/i18n/LanguageContext';
 import HomeFeed from '@/components/HomeFeed';
 import MusicTastePrompt from '@/components/MusicTastePrompt';
+import PeopleAroundYou from '@/components/home/PeopleAroundYou';
 
 // Three entries — staggered like a sound wave (middle dips), each crowned with
 // a small, quiet musical motif instead of a plain hairline.
@@ -213,6 +214,7 @@ export default function Home() {
         </div>
       </div>
     </div>
+    <PeopleAroundYou />
     <HomeFeed />
     </>
   );
