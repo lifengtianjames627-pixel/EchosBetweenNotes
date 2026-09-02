@@ -12,7 +12,7 @@ import LocationPicker from './LocationPicker';
 // Two paths to a position: the device fix (accurate on phones with GPS) and
 // manual pin placement on a map — the only exact option on a laptop, where the
 // browser can merely estimate from Wi-Fi.
-export default function LocationShareBar({ V, located }) {
+export default function LocationShareBar({ V, located, locationSource, myLat, myLng }) {
   const { t } = useLang();
   const { status, accuracy, share, deny, clear, setManual } = useMyLocation();
   const [showConsent, setShowConsent] = useState(false);
@@ -27,7 +27,7 @@ export default function LocationShareBar({ V, located }) {
   const manual = user?.location_source === 'manual';
   const pickerCenter = typeof user?.location_lat === 'number'
     ? [user.location_lat, user.location_lng]
-    : null;
+    : (typeof myLat === 'number' && typeof myLng === 'number' ? [myLat, myLng] : null);
 
   // "Always allow" → silently refresh the fix on every visit, no re-asking.
   // A hand-placed pin is never overwritten by a coarse browser estimate.
@@ -58,10 +58,11 @@ export default function LocationShareBar({ V, located }) {
   );
 
   if (located) {
+    const isIp = locationSource === 'ip';
     return (
       <>
-        {/* Compact one-line status: the position is on, and the two things you can
-            do about it. Details live in the accuracy tooltip, not on screen. */}
+        {/* Compact one-line status: the position is on, and the things you can do
+            about it. An IP-derived spot is approximate — placing a pin refines it. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2 rounded-2xl mb-1.5"
           style={{ background: '#f6efe1', border: `1px solid ${V.border}` }}>
           <span
@@ -70,7 +71,7 @@ export default function LocationShareBar({ V, located }) {
             title={manual ? t('loc.manualSet') : (user?.location_accuracy_m ? t('loc.accuracy', { m: user.location_accuracy_m }) : '')}
           >
             <LocateFixed className="w-3.5 h-3.5 shrink-0" style={{ color: V.accent }} />
-            {t('loc.sortedShort')}
+            {isIp ? t('loc.approxNetwork') : t('loc.sortedShort')}
           </span>
           <div className="flex items-center gap-3 ml-auto">
             <button
@@ -78,7 +79,7 @@ export default function LocationShareBar({ V, located }) {
               className="flex items-center gap-1.5 text-[11px] font-semibold underline"
               style={{ color: V.accent }}
             >
-              <Crosshair className="w-3 h-3" /> {t('loc.adjust')}
+              <Crosshair className="w-3 h-3" /> {isIp ? t('loc.placePin') : t('loc.adjust')}
             </button>
             {/* Phones have a real GPS chip, so re-running the fix there genuinely
                 improves accuracy — offered only on touch devices. */}
@@ -92,12 +93,14 @@ export default function LocationShareBar({ V, located }) {
                 <Navigation className={`w-3 h-3 ${status === 'asking' ? 'animate-pulse' : ''}`} />
                 {status === 'asking'
                   ? (accuracy !== null ? t('loc.locating', { m: accuracy }) : t('loc.locatingStart'))
-                  : t('chat.gpsRefresh')}
+                  : (isIp ? t('loc.useGps') : t('chat.gpsRefresh'))}
               </button>
             )}
-            <button onClick={clear} className="text-[11px] shrink-0 underline" style={{ color: V.muted }}>
-              {t('loc.turnOff')}
-            </button>
+            {!isIp && (
+              <button onClick={clear} className="text-[11px] shrink-0 underline" style={{ color: V.muted }}>
+                {t('loc.turnOff')}
+              </button>
+            )}
           </div>
         </div>
         {pickerNode}

@@ -11,7 +11,7 @@ import { useLang } from '@/i18n/LanguageContext';
 
 // People currently active on the band board — closest first when the viewer has
 // shared their location, otherwise same city, and always inside their age bracket.
-export default function PeopleAround({ V, nearby, loading, city, matchedCity, located, myLat, myLng, isPinned, onTogglePin, onOpen }) {
+export default function PeopleAround({ V, nearby, loading, city, matchedCity, located, locationSource, myLat, myLng, isPinned, onTogglePin, onOpen }) {
   const [view, setView] = useState('list');
   const [wifiOpen, setWifiOpen] = useState(false);
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function PeopleAround({ V, nearby, loading, city, matchedCity, lo
 
   return (
     <ChatSection V={V} icon={MapPin} label={t('chat.around')} hint={hint} count={nearby.length}>
-      <LocationShareBar V={V} located={located} />
+      <LocationShareBar V={V} located={located} locationSource={locationSource} myLat={myLat} myLng={myLng} />
 
       {/* One short line by default — the full explanation is one tap away. */}
       <button

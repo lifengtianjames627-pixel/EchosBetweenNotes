@@ -29,6 +29,25 @@ async function networkHash(ip) {
   return Array.from(new Uint8Array(buf)).slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Coarse IP-based geolocation — auto-centres the map and enables distance
+// sorting without requiring GPS consent or a manual pin. City-level only;
+// the user can place a pin anytime to refine. Nothing is stored: the fix is
+// re-derived from the network address on every visit.
+async function ipGeocode(ip) {
+  if (!ip) return null;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 4000);
+    const res = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`, { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!res.ok) return null;
+    const d = await res.json();
+    if (!d || d.success === false) return null;
+    if (typeof d.latitude !== 'number' || typeof d.longitude !== 'number') return null;
+    return { lat: d.latitude, lng: d.longitude };
+  } catch { return null; }
+}
+
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -107,9 +126,14 @@ export default async function(req) {
       }
     }
 
-    const mine = (typeof user.location_lat === 'number' && typeof user.location_lng === 'number')
+    const storedLoc = (typeof user.location_lat === 'number' && typeof user.location_lng === 'number')
       ? { lat: user.location_lat, lng: user.location_lng }
       : null;
+    // No stored spot → fall back to a coarse city-level fix from the network
+    // address so the map and distance sorting work immediately, no pin needed.
+    const ipLoc = storedLoc ? null : await ipGeocode(ip);
+    const mine = storedLoc || ipLoc;
+    const locationSource = user.location_source || (ipLoc ? 'ip' : null);
 
     const onMyNetwork = (u) =>
       !!myNet && u.network_id === myNet && u.network_seen &&
@@ -184,6 +208,7 @@ export default async function(req) {
       my_city: myCity,
       matched_city: sameCity,
       located: !!mine,
+      location_source: locationSource,
       network_active: !!myNet,
       // Your own position comes back at full precision — it's your data,
       // and it centres the map exactly where you are.
