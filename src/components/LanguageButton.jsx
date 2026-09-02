@@ -11,8 +11,8 @@ export default function LanguageButton() {
 
   useEffect(() => {
     const close = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
   }, []);
 
   const current = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];

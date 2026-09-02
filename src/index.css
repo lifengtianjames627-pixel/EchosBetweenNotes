@@ -90,4 +90,11 @@
     @apply bg-background text-foreground;
     font-family: var(--font-inter);
   }
+  /* Touch responsiveness — removes the iOS 300ms tap delay and stops
+     double-tap zoom from swallowing quick taps on interactive elements.
+     -webkit-tap-highlight-color kills the grey flash on tap. */
+  button, a, [role="button"], input, select, textarea, label, summary {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
 }
