@@ -1,22 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, PenLine } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { GENRES } from '@/lib/genreConfig';
 import { useLang } from '@/i18n/LanguageContext';
 import { useGenreText } from '@/i18n/useGenreText';
+import { useAuthed } from '@/shared/identity';
 import ReviewLead from '@/components/reviews/ReviewLead';
 import ReviewFeed from '@/components/reviews/ReviewFeed';
 import GenreRail from '@/components/reviews/GenreRail';
+import StoryCard from '@/components/reviews/StoryCard';
+import StoryDetailModal from '@/components/reviews/StoryDetailModal';
+import StoryComposer from '@/components/reviews/StoryComposer';
+
+const APPROVED = r => !r.moderation_status || r.moderation_status === 'approved';
 
 export default function WrittenReviews() {
   const navigate = useNavigate();
   const { t } = useLang();
   const { localizedGenres } = useGenreText();
-  const { data: reviews = [] } = useQuery({ queryKey: ['public-reviews'], queryFn: () => base44.entities.Review.list('-created_date', 30) });
-  const visible = reviews.filter(item => !item.moderation_status || item.moderation_status === 'approved');
-  const open = id => navigate(`/album/${id}`);
+  const { authed, login } = useAuthed();
+  const [tab, setTab] = useState('albums');
+  const [openStory, setOpenStory] = useState(null);
+  const [composing, setComposing] = useState(false);
+
+  const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me(), enabled: authed });
+  const { data: reviews = [] } = useQuery({ queryKey: ['public-reviews'], queryFn: () => base44.entities.Review.list('-created_date', 60) });
+
+  const albumReviews = reviews.filter(r => (!r.kind || r.kind === 'album_review') && APPROVED(r));
+  const stories = reviews.filter(r => r.kind === 'journey_story' && APPROVED(r));
+  const roundups = reviews.filter(r => r.kind === 'genre_roundup' && APPROVED(r));
+
+  const openAlbum = id => navigate(`/album/${id}`);
+
+  const tabs = [
+    { id: 'albums', label: t('reviews.tab.albums'), count: albumReviews.length },
+    { id: 'stories', label: t('reviews.tab.stories'), count: stories.length },
+    { id: 'roundups', label: t('reviews.tab.roundups'), count: roundups.length },
+  ];
 
   return (
     <div className="min-h-screen" style={{ background: '#f3efe6' }}>
@@ -43,14 +65,65 @@ export default function WrittenReviews() {
 
       {/* Layer 3 — cream paper content sheet */}
       <div className="mx-auto max-w-5xl my-10 px-8 sm:px-12 py-10" style={{ background: '#faf8f2', border: '1px solid #e6ddc9', boxShadow: '0 2px 20px rgba(120,100,80,0.06)' }}>
-        <button onClick={() => navigate('/')} className="flex items-center gap-2 text-xs font-semibold" style={{ color: '#6b6358' }}>
-          <ArrowLeft className="h-4 w-4" /> {t('common.back')}
-        </button>
+        <div className="flex items-center justify-between">
+          <button onClick={() => navigate('/')} className="flex items-center gap-2 text-xs font-semibold" style={{ color: '#6b6358' }}>
+            <ArrowLeft className="h-4 w-4" /> {t('common.back')}
+          </button>
+          <button
+            onClick={() => (authed ? setComposing(true) : login())}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:-translate-y-0.5"
+            style={{ background: '#1a1815', color: '#faf8f2' }}
+          >
+            <PenLine className="w-3.5 h-3.5" /> {t('reviews.writeStory')}
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="mt-6 flex gap-2 flex-wrap">
+          {tabs.map(tb => (
+            <button key={tb.id} onClick={() => setTab(tb.id)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+              style={tab === tb.id
+                ? { background: '#f1ebdd', color: '#8a5a20', border: '1px solid #ddd0b6' }
+                : { background: '#faf8f2', color: '#6b6358', border: '1px solid #e0d8c8' }}>
+              {tb.label}
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(191,122,53,0.15)', color: '#8a5a20' }}>{tb.count}</span>
+            </button>
+          ))}
+        </div>
+
         <main className="mt-8">
-          <ReviewLead review={visible[0]} onOpen={open} />
-          <ReviewFeed reviews={visible.slice(1, 10)} onOpen={open} />
+          {tab === 'albums' && (
+            <>
+              <ReviewLead review={albumReviews[0]} onOpen={openAlbum} />
+              <ReviewFeed reviews={albumReviews.slice(1, 10)} onOpen={openAlbum} />
+            </>
+          )}
+
+          {tab === 'stories' && (
+            stories.length === 0 ? (
+              <p className="py-16 text-center text-sm" style={{ color: '#8a7e6f' }}>{t('story.empty')}</p>
+            ) : (
+              <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+                {stories.map(r => <StoryCard key={r.id} review={r} onOpen={setOpenStory} />)}
+              </div>
+            )
+          )}
+
+          {tab === 'roundups' && (
+            roundups.length === 0 ? (
+              <p className="py-16 text-center text-sm" style={{ color: '#8a7e6f' }}>{t('story.emptyRoundups')}</p>
+            ) : (
+              <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+                {roundups.map(r => <StoryCard key={r.id} review={r} onOpen={setOpenStory} />)}
+              </div>
+            )
+          )}
         </main>
       </div>
+
+      {openStory && <StoryDetailModal story={openStory} onClose={() => setOpenStory(null)} />}
+      {composing && <StoryComposer user={user} onClose={() => setComposing(false)} />}
     </div>
   );
 }

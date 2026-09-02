@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Shield, Check, X, Clock, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Shield, Check, X, Clock, AlertTriangle, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLang } from '@/i18n/LanguageContext';
 
 const STATUS_COLORS = {
   pending_review: { color: '#8a5a20', bg: '#f6efe1', label: 'Pending Review' },
@@ -97,6 +99,8 @@ function ModCard({ item, type, onApprove, onReject, isPending }) {
 export default function ModerationQueue() {
   const [filter, setFilter] = useState('pending_review');
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { t } = useLang();
 
   const { data: currentUser } = useQuery({
     queryKey: ['me'],
@@ -178,6 +182,13 @@ export default function ModerationQueue() {
             <h1 className="font-playfair italic text-2xl" style={{ color: '#1a1815' }}>Moderation Queue</h1>
             <p className="text-xs" style={{ color: '#6b6358' }}>Review flagged content before it goes public</p>
           </div>
+          <button
+            onClick={() => navigate('/moderation/stats')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #ddd0b6' }}
+          >
+            <BarChart3 className="w-3.5 h-3.5" /> {t('mod.stats')}
+          </button>
         </div>
 
         {/* Filter tabs */}

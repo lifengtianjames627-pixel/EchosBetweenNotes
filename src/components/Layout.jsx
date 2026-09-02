@@ -39,6 +39,13 @@ export default function Layout() {
     return () => window.removeEventListener('openMiniChat', handler);
   }, [currentUser?.email, navigate]);
 
+  // Fire-and-forget a unique-visitor ping once per app load so the admin
+  // analytics page has a daily count. Errors are swallowed — stats are a
+  // nice-to-have, never worth blocking the UI.
+  useEffect(() => {
+    base44.functions.invoke('trackVisit', {}).catch(() => {});
+  }, []);
+
   // Unread direct-message count for the Messages nav badge (polled).
   const { data: msgUnreadData } = useQuery({
     queryKey: ['messageUnread'],

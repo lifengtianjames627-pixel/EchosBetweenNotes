@@ -16,6 +16,7 @@ import GenreSpace from '@/pages/GenreSpace';
 import Profile from '@/pages/Profile';
 import About from '@/pages/About';
 import ModerationQueue from '@/pages/ModerationQueue';
+import Stats from '@/pages/Stats';
 import BandDashboard from '@/pages/BandDashboard';
 import DirectChat from '@/pages/DirectChat';
 import SoulmateBoard from '@/pages/SoulmateBoard';
@@ -66,6 +67,7 @@ const AuthenticatedApp = () => {
         <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
         <Route path="/u/:email" element={<RequireAuth><UserProfile /></RequireAuth>} />
         <Route path="/moderation" element={<RequireAdmin><ModerationQueue /></RequireAdmin>} />
+        <Route path="/moderation/stats" element={<RequireAdmin><Stats /></RequireAdmin>} />
         <Route path="/band-dashboard" element={<RequireAuth><BandDashboard /></RequireAuth>} />
         <Route path="/chat" element={<RequireAuth><DirectChat /></RequireAuth>} />
         <Route path="/soulmate" element={<RequireAuth><SoulmateBoard /></RequireAuth>} />
