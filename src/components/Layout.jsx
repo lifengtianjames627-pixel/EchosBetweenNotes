@@ -43,7 +43,7 @@ export default function Layout() {
   // analytics page has a daily count. Errors are swallowed — stats are a
   // nice-to-have, never worth blocking the UI.
   useEffect(() => {
-    base44.functions.invoke('trackVisit', {}).catch(() => {});
+    base44.functions.invoke('trackVisit', { timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }).catch(() => {});
   }, []);
 
   // Unread direct-message count for the Messages nav badge (polled).

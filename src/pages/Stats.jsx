@@ -34,12 +34,17 @@ export default function Stats() {
   // Build a continuous 30-day axis, filling 0 for days with no record yet.
   const days = useMemo(() => {
     const byDate = new Map((stats || []).map(s => [s.date, s.visitors || 0]));
+    // Match the visitor's own calendar day (the same timezone trackVisit uses),
+    // not UTC — otherwise a +08:00 day shows up under the previous UTC date.
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const fmt = new Intl.DateTimeFormat('en-CA', {
+      timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit',
+    });
     const arr = [];
     for (let i = 29; i >= 0; i--) {
       const d = new Date();
-      d.setHours(0, 0, 0, 0);
       d.setDate(d.getDate() - i);
-      const key = d.toISOString().slice(0, 10);
+      const key = fmt.format(d);
       arr.push({
         date: key,
         label: `${d.getMonth() + 1}/${d.getDate()}`,

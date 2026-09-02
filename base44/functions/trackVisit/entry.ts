@@ -11,7 +11,15 @@ export default async function(req) {
     const svc = base44.asServiceRole;
 
     const now = new Date();
-    const today = now.toISOString().slice(0, 10);
+    let body = {};
+    try { body = await req.json(); } catch { /* no body */ }
+    const tz = body?.timezone || 'UTC';
+    // Use the visitor's own calendar day (not UTC) so "today" matches what the
+    // Stats page computes in the browser — otherwise a +08:00 evening visit lands
+    // on yesterday's UTC bucket and never shows up as "today".
+    const today = new Intl.DateTimeFormat('en-CA', {
+      timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit',
+    }).format(now);
 
     let user = null;
     try { user = await base44.auth.me(); } catch { /* public visitor */ }
