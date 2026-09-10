@@ -34,7 +34,7 @@ export default async function(req) {
 
     // Join review → album genre so we can match against taste.
     const albumReviews = approved.filter(r => !r.kind || r.kind === 'album_review');
-    const ids = [...new Set(albumReviews.map(r => r.album_id).filter(id => Boolean(id && typeof id === 'string')))];
+    const ids = [...new Set(albumReviews.map(r => r.album_id).filter(id => /^[a-f\d]{24}$/i.test(id || '')))];
     const albums = ids.length ? await base44.asServiceRole.entities.Album.filter({ id: { $in: ids } }, '-created_date', ids.length) : [];
     const byId = new Map(albums.map(a => [a.id, a]));
     const enriched = albumReviews.filter(r => byId.has(r.album_id)).map(r => {
