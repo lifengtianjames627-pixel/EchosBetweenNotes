@@ -130,17 +130,14 @@
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Reviewer's equipped badge IDs at time of posting"
+      }
     },
     "likes_count": {
       "type": "number",
-      "description": "Number of likes",
       "default": 0
     },
     "dislikes_count": {
       "type": "number",
-      "description": "Number of dislikes",
       "default": 0
     },
     "band_style": {
@@ -175,6 +172,19 @@
     },
     "moderation_confidence": {
       "type": "number"
+    },
+    "edited_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last author edit, distinct from automatic updates and original publication time"
+    },
+    "edit_times": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "description": "Server timestamps for author edits; no retroactive marks on older records"
     }
   },
   "required": [

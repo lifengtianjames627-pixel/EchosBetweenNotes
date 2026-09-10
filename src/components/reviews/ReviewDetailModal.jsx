@@ -7,6 +7,7 @@ import { base44 } from '@/api/base44Client';
 import ReviewActions from '@/components/ReviewActions';
 import CommentSection from '@/components/CommentSection';
 import { openPrivateChat } from '@/shared/chat/openPrivateChat';
+import useCurrentReview from '@/shared/reviews/useCurrentReview';
 
 const SECTIONS = [
   ['band_style', 'Style'],
@@ -27,7 +28,8 @@ const V = {
 
 // Full reading view for one review — full text, working like/dislike/subscribe,
 // and a live comment thread. Same interactivity as the in-album review view.
-export default function ReviewDetailModal({ review, onClose }) {
+export default function ReviewDetailModal({ review: seed, onClose }) {
+  const review = useCurrentReview(seed);
   const { data: currentUser } = useQuery({
     queryKey: ['me'],
     queryFn: () => base44.auth.me(),

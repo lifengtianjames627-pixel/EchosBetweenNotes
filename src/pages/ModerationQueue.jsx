@@ -134,10 +134,9 @@ export default function ModerationQueue() {
   const isLoading = reviewsLoading || commentsLoading;
 
   const updateReviewStatus = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.Review.update(id, { moderation_status: status }),
+    mutationFn: ({ id, status }) => base44.functions.invoke('editReview', { action: 'moderate', id, status }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['moderation-reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['item-reviews'] });
+      queryClient.invalidateQueries({ predicate: q => /album|review|homeFeed/.test(String(q.queryKey[0])) });
     },
   });
 

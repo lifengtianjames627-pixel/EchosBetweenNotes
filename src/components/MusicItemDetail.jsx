@@ -78,17 +78,13 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
 
       // Only update avg rating for approved reviews
       if (modStatus === 'approved') {
-        const allRatings = [...(allReviews || []).filter(r => r.moderation_status !== 'blocked').map(r => r.rating), d.rating];
-        const newCount = allRatings.length;
-        const newAvg = Math.round((allRatings.reduce((s, r) => s + r, 0) / newCount) * 10) / 10;
-        await base44.entities.Album.update(albumId, { review_count: newCount, avg_rating: newAvg });
+        await base44.functions.invoke('editReview', { action: 'syncRating', album_id: albumId });
       }
 
       return modStatus;
     },
     onSuccess: (modStatus) => {
-      queryClient.invalidateQueries({ queryKey: ['item-reviews', albumId] });
-      queryClient.invalidateQueries({ queryKey: ['genre-albums'] });
+      queryClient.invalidateQueries({ predicate: q => /album|review|homeFeed/.test(String(q.queryKey[0])) });
       setData(EMPTY_REVIEW_DATA);
       clearDraft(draftScope);
       if (modStatus === 'pending_review') {
@@ -204,7 +200,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
   const deleteAlbum = useMutation({
     mutationFn: () => base44.entities.Album.delete(item.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['genre-albums'] });
+      queryClient.invalidateQueries({ predicate: q => /album|review|homeFeed/.test(String(q.queryKey[0])) });
       onClose();
     },
   });
@@ -214,7 +210,8 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
     queryFn: () => base44.entities.Review.filter({ album_id: item.id }, '-created_date', 100),
   });
   // Only show approved reviews publicly
-  const reviews = allReviewsRaw.filter(r => !r.moderation_status || r.moderation_status === 'approved');
+  const reviews = allReviewsRaw.filter(r => !r.moderation_status || r.moderation_status === 'approved' || r.created_by_id === currentUser?.id);
+  const ratedReviews = allReviewsRaw.filter(r => (!r.moderation_status || r.moderation_status === 'approved') && Number.isFinite(r.rating) && r.rating > 0);
 
   // Reviews store a snapshot of equipped badges at post time — fetch each reviewer's
   // CURRENT equipped badges live so unequipped badges disappear right away.
@@ -226,8 +223,8 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
   });
 
   // Compute live avg from actual reviews (true mean)
-  const avgRating = reviews.length
-    ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
+  const avgRating = ratedReviews.length
+    ? (ratedReviews.reduce((s, r) => s + r.rating, 0) / ratedReviews.length).toFixed(1)
     : null;
 
   return (
@@ -289,7 +286,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
                   ))}
                 </div>
                 <span className="text-sm font-bold" style={{ color: v.accent }}>{avgRating}</span>
-                <span className="text-xs" style={{ color: v.muted }}>({reviews.length})</span>
+                <span className="text-xs" style={{ color: v.muted }}>({ratedReviews.length})</span>
               </div>
             )}
           </div>

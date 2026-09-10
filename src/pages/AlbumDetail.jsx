@@ -16,6 +16,8 @@ import { useAuthed } from '@/hooks/useAuthed';
 import CoverImage from '@/components/music/CoverImage';
 import { trackGenre } from '@/lib/trackGenre';
 import { displayName } from '@/lib/displayName';
+import { useContentModeration } from '@/shared/hooks/useContentModeration';
+import { isApproved, refreshMusic } from '@/shared/reviews/catalog';
 
 export default function AlbumDetail() {
   const { id } = useParams();
@@ -24,6 +26,7 @@ export default function AlbumDetail() {
   const [reviewData, setReviewData] = useState({ rating: 0, title: '', content: '' });
   const [openReview, setOpenReview] = useState(null);
   const { authed, login } = useAuthed();
+  const { moderate } = useContentModeration();
 
   const { data: album, isLoading: loadingAlbum } = useQuery({
     queryKey: ['album', id],
@@ -39,7 +42,7 @@ export default function AlbumDetail() {
     if (album?.genre) trackGenre(album.genre);
   }, [album?.genre, id]);
 
-  const { data: reviews = [] } = useQuery({
+  const { data: rawReviews = [] } = useQuery({
     queryKey: ['album-reviews', id],
     queryFn: () => base44.entities.Review.filter({ album_id: id }, '-created_date', 50),
   });
@@ -49,8 +52,10 @@ export default function AlbumDetail() {
     queryFn: () => base44.auth.me(),
   });
 
+  const reviews = rawReviews.filter(r => isApproved(r) || r.created_by_id === currentUser?.id);
   const createReview = useMutation({
     mutationFn: async (data) => {
+      const mod = await moderate(`${data.title}\n${data.content}`);
       await base44.entities.Review.create({
         ...data,
         album_id: id,
@@ -58,18 +63,17 @@ export default function AlbumDetail() {
         album_artist: album.artist,
         album_cover_url: album.cover_url || '',
         reviewer_name: displayName(currentUser) || 'Anonymous',
+        reviewer_email: currentUser.email,
+        moderation_status: mod.suggestedAction === 'review' ? 'pending_review' : 'approved',
+        moderation_categories: mod.categories,
+        moderation_reason: mod.reason,
+        moderation_confidence: mod.confidence,
         likes_count: 0,
       });
-      const newCount = (album.review_count || 0) + 1;
-      const totalRating = (album.avg_rating || 0) * (album.review_count || 0) + data.rating;
-      await base44.entities.Album.update(id, {
-        review_count: newCount,
-        avg_rating: Math.round((totalRating / newCount) * 10) / 10,
-      });
+      await base44.functions.invoke('editReview', { action: 'syncRating', album_id: id });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['album-reviews', id] });
-      queryClient.invalidateQueries({ queryKey: ['album', id] });
+      refreshMusic(queryClient);
       setShowReviewForm(false);
       setReviewData({ rating: 0, title: '', content: '' });
     },
@@ -152,6 +156,7 @@ export default function AlbumDetail() {
                 <Label style={{ color: '#1a1815' }}>Review *</Label>
                 <Textarea value={reviewData.content} onChange={(e) => setReviewData({ ...reviewData, content: e.target.value })} rows={4} placeholder="Share your thoughts..." required />
               </div>
+              {createReview.error && <p role="alert" className="text-sm text-destructive">{createReview.error.message}</p>}
               <div className="flex gap-3">
                 <Button type="submit" className="rounded-none" disabled={!reviewData.rating || createReview.isPending} style={{ background: '#1a1815', color: '#faf8f2' }}>
                   {createReview.isPending ? 'Posting...' : 'Post Review'}
@@ -168,9 +173,9 @@ export default function AlbumDetail() {
           {reviews.length > 0 ? (
             <div className="space-y-3">
               {reviews.map((review) => (
-                <button key={review.id} onClick={() => setOpenReview(review)} className="block w-full text-left">
+                <div key={review.id} onClick={() => setOpenReview(review)} onKeyDown={e => { if (e.target === e.currentTarget && e.key === 'Enter') setOpenReview(review); }} role="button" tabIndex={0} className="block w-full text-left">
                   <ReviewCard review={review} showAlbum={false} />
-                </button>
+                </div>
               ))}
             </div>
           ) : (

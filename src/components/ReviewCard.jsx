@@ -5,12 +5,17 @@ import { formatDistanceToNow } from 'date-fns';
 import CoverImage from '@/components/music/CoverImage';
 import { useReviewerProfile } from '@/components/ReviewerProfileProvider';
 import { openPrivateChat } from '@/shared/chat/openPrivateChat';
+import ReviewEditControl from '@/components/reviews/ReviewEditControl';
+import { useLang } from '@/i18n/LanguageContext';
+import editCopy from '@/components/reviews/editCopy';
 
 // Paper review card — cream bg, thin warm border, near-black ink, ochre rating
 // number (no star component). Long reviews are clipped with a Read more toggle
 // so the full text can always be read in place.
 export default function ReviewCard({ review, showAlbum = true }) {
   const [expanded, setExpanded] = useState(false);
+  const { lang } = useLang();
+  const canLinkAlbum = showAlbum && !review.album_missing && !!review.album_id && (!review.kind || review.kind === 'album_review');
   const isLong = (review.content || '').length > 220;
   const profile = useReviewerProfile(review.reviewer_email);
   const reviewerName = profile?.name || review.reviewer_name || 'Anonymous';
@@ -18,7 +23,7 @@ export default function ReviewCard({ review, showAlbum = true }) {
   return (
     <div className="p-5 transition-colors" style={{ background: '#faf8f2', border: '1px solid #e6ddc9' }}>
       <div className="flex gap-4">
-        {showAlbum && (
+        {canLinkAlbum && (
           <Link to={`/album/${review.album_id}`} className="shrink-0">
             <div className="w-16 h-16 overflow-hidden" style={{ background: '#e6ddc9' }}>
               <CoverImage src={review.album_cover_url} alt={review.album_title || 'Album artwork'} className="w-full h-full object-cover" />
@@ -28,7 +33,7 @@ export default function ReviewCard({ review, showAlbum = true }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>
-              {showAlbum && (
+              {canLinkAlbum && (
                 <Link to={`/album/${review.album_id}`} className="text-sm font-semibold transition-colors hover:underline" style={{ color: '#1a1815' }}>
                   {review.album_title} — {review.album_artist}
                 </Link>
@@ -57,6 +62,8 @@ export default function ReviewCard({ review, showAlbum = true }) {
               Read full review <ChevronDown className="w-3 h-3" />
             </span>
           )}
+          {review.album_missing && <p className="mt-2 text-xs text-muted-foreground">{review.album_title} · {editCopy(lang).missing}</p>}
+          <ReviewEditControl review={review} />
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center gap-1.5 text-xs" style={{ color: '#8a7e6f' }}>
               <button

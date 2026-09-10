@@ -7,6 +7,7 @@ import { base44 } from '@/api/base44Client';
 import { useLang } from '@/i18n/LanguageContext';
 import LanguageButton from '@/components/LanguageButton';
 import SiteFooter from '@/components/SiteFooter';
+import MusicDataSync from '@/components/reviews/MusicDataSync';
 import { ReviewerProfileProvider } from '@/components/ReviewerProfileProvider';
 import { displayName } from '@/lib/displayName';
 
@@ -193,6 +194,7 @@ export default function Layout() {
         </ReviewerProfileProvider>
       </main>
 
+      <MusicDataSync />
       <SiteFooter />
 
       {isAdmin && (

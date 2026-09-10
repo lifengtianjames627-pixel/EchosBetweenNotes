@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Star, ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ReviewCard from '@/components/ReviewCard';
+import { withCurrentAlbums, isApproved } from '@/shared/reviews/catalog';
 import ProfileHero from '@/components/profile/ProfileHero';
 import StatStrip from '@/components/profile/StatStrip';
 import ProfileActions from '@/components/profile/ProfileActions';
@@ -26,7 +27,7 @@ export default function UserProfile() {
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['user-reviews', email],
-    queryFn: () => base44.entities.Review.filter({ reviewer_email: email }, '-created_date', 30),
+    queryFn: async () => withCurrentAlbums((await base44.entities.Review.filter({ reviewer_email: email }, '-created_date', 30)).filter(isApproved)),
     enabled: !!email,
   });
 

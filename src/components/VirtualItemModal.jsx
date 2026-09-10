@@ -4,6 +4,9 @@ import { base44 } from '@/api/base44Client';
 import { X, Star, Search } from 'lucide-react';
 import { loadDraft, saveDraft, clearDraft } from '@/lib/reviewDraft';
 import { displayName } from '@/lib/displayName';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import ReviewEditControl from '@/components/reviews/ReviewEditControl';
+import { refreshMusic } from '@/shared/reviews/catalog';
 
 // A "virtual" music item modal — used for tracks clicked inside an album (type='single')
 // or an album searched for from a single (type='album'). The underlying Album/Single
@@ -28,7 +31,10 @@ export default function VirtualItemModal({ v, initialTitle = '', initialArtist =
   const [searched, setSearched] = useState(!allowSearch);
   const [checking, setChecking] = useState(false);
   const [matched, setMatched] = useState(null); // real Album entity, once found or created
-  const [reviews, setReviews] = useState([]);
+  const queryClient = useQueryClient();
+  const { data: reviews = [] } = useQuery({ queryKey: ['virtual-reviews', matched?.id], enabled: !!matched?.id,
+    queryFn: async () => (await base44.entities.Review.filter({ album_id: matched.id }, '-created_date', 100)).filter(r => !r.moderation_status || r.moderation_status === 'approved' || r.created_by_id === currentUser?.id),
+  });
   const [showForm, setShowForm] = useState(false);
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState('');
@@ -65,10 +71,7 @@ export default function VirtualItemModal({ v, initialTitle = '', initialArtist =
       }
     } catch { /* ignore */ }
     setMatched(found);
-    if (found) {
-      const rs = await base44.entities.Review.filter({ album_id: found.id }, '-created_date', 100);
-      setReviews(rs.filter(r => !r.moderation_status || r.moderation_status === 'approved'));
-    }
+
     setChecking(false);
     setSearched(true);
   };
@@ -122,14 +125,9 @@ export default function VirtualItemModal({ v, initialTitle = '', initialArtist =
     });
 
     if (modStatus === 'approved') {
-      const newCount = (album.review_count || 0) + 1;
-      const newAvg = Math.round((((album.avg_rating || 0) * (album.review_count || 0)) + rating) / newCount * 10) / 10;
-      await base44.entities.Album.update(album.id, { review_count: newCount, avg_rating: newAvg });
-      setMatched({ ...album, review_count: newCount, avg_rating: newAvg });
-      // Add the new review straight to local state — refetching immediately after
-      // create can race the write and momentarily return the list without it.
-      setReviews(prev => [newReview, ...prev]);
+      await base44.functions.invoke('editReview', { action: 'syncRating', album_id: album.id });
     }
+    refreshMusic(queryClient);
     setRating(0);
     setContent('');
     setShowForm(false);
@@ -255,7 +253,8 @@ export default function VirtualItemModal({ v, initialTitle = '', initialArtist =
                           {[1,2,3,4,5].map(n => <Star key={n} className="w-3 h-3" style={{ color: n <= r.rating ? v.accent : v.muted }} fill={n <= r.rating ? 'currentColor' : 'none'} />)}
                           <span className="text-xs font-semibold ml-1" style={{ color: v.accent }}>{r.reviewer_name || 'Anonymous'}</span>
                         </div>
-                        <p className="text-sm" style={{ color: v.muted }}>{r.content}</p>
+                        <p className="text-sm whitespace-pre-wrap" style={{ color: v.muted }}>{r.content}</p>
+                        <ReviewEditControl review={r} />
                       </div>
                     ))}
                   </div>

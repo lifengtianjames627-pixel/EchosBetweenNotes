@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ReviewCard from '@/components/ReviewCard';
+import { withCurrentAlbums } from '@/shared/reviews/catalog';
 import { Link, useNavigate } from 'react-router-dom';
 import { Users, Star, UserPlus, Check, X, Music, Shield, MessageSquare, Search, UserCog } from 'lucide-react';
 import UserBadges from '@/components/UserBadges';
@@ -30,7 +31,7 @@ export default function Profile() {
 
   const { data: myReviews = [] } = useQuery({
     queryKey: ['my-reviews', user?.email],
-    queryFn: () => base44.entities.Review.filter({ created_by: user.email }, '-created_date', 50),
+    queryFn: async () => withCurrentAlbums(await base44.entities.Review.filter({ created_by_id: user.id }, '-created_date', 50), { keepMissing: true }),
     enabled: !!user,
   });
 

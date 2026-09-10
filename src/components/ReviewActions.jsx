@@ -6,6 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthed } from '@/hooks/useAuthed';
 import { displayName } from '@/lib/displayName';
+import ReviewEditControl from '@/components/reviews/ReviewEditControl';
 
 export default function ReviewActions({ review, v, currentUser }) {
   const queryClient = useQueryClient();
@@ -116,6 +117,7 @@ export default function ReviewActions({ review, v, currentUser }) {
 
   return (
     <div className="flex items-center gap-2 mt-3 flex-wrap">
+      <ReviewEditControl review={review} />
       {/* Like */}
       <button
         className={btnBase}

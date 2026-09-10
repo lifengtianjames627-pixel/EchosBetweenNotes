@@ -7,11 +7,14 @@ import { useGenreText } from '@/i18n/useGenreText';
 import { publicName, initialOf } from '@/shared/identity';
 import { openPrivateChat } from '@/shared/chat/openPrivateChat';
 import CoverImage from '@/components/music/CoverImage';
+import useCurrentReview from '@/shared/reviews/useCurrentReview';
+import ReviewEditControl from '@/components/reviews/ReviewEditControl';
 
 // Full reading view for a journey story or genre roundup — Bandcamp-Daily
 // style: a hero, an editorial intro, and (for roundups) a stacked list of
 // featured album picks each with cover art and a blurb.
-export default function StoryDetailModal({ story, onClose }) {
+export default function StoryDetailModal({ story: seed, onClose }) {
+  const story = useCurrentReview(seed);
   const { t } = useLang();
   const { localizedGenres } = useGenreText();
   const isRoundup = story?.kind === 'genre_roundup';
@@ -86,6 +89,7 @@ export default function StoryDetailModal({ story, onClose }) {
               <span className="text-xs font-semibold hover:underline" style={{ color: '#5a534a' }}>{author}</span>
             </button>
 
+            <ReviewEditControl review={story} />
             <div className="mt-5 text-sm leading-relaxed whitespace-pre-wrap" style={{ color: '#3a3530' }}>
               {story.content}
             </div>
