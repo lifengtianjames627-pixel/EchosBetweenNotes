@@ -22,7 +22,16 @@ export default async function(req) {
       if (!['approved', 'blocked'].includes(status)) return Response.json({ error: 'Invalid status' }, { status: 400 });
       patch = { moderation_status: status };
     } else {
-      if (action !== 'edit' || review.created_by_id !== user.id) return Response.json({ error: 'Forbidden' }, { status: 403 });
+      // ONLY the author can edit their review — strictly restricted to oneself, never anyone else (including non-author admins)
+      const isOwner = Boolean(
+        user && (
+          (review.created_by_id && user.id && review.created_by_id === user.id) ||
+          (review.reviewer_email && user.email && review.reviewer_email.toLowerCase() === user.email.toLowerCase())
+        )
+      );
+      if (action !== 'edit' || !isOwner) {
+        return Response.json({ error: 'Forbidden: only the author can modify this review' }, { status: 403 });
+      }
       if ((expected_edit || null) !== (review.edited_at || null)) return Response.json({ error: 'conflict' }, { status: 409 });
       if (!changes || typeof changes.content !== 'string' || !changes.content.trim()) return Response.json({ error: 'Review text is required' }, { status: 400 });
       const albumReview = !review.kind || review.kind === 'album_review';
@@ -54,7 +63,7 @@ export default async function(req) {
       const timestamp = new Date().toISOString();
       Object.assign(patch, { edited_at: timestamp, edit_times: [...(review.edit_times || []), timestamp], moderation_status: mod.suggestedAction === 'review' ? 'pending_review' : 'approved', moderation_categories: mod.categories || [], moderation_reason: mod.reason || '', moderation_confidence: mod.confidence || 0 });
     }
-    const saved = await base44.entities.Review.update(id, patch);
+    const saved = await svc.entities.Review.update(id, patch);
     await syncReviewRating(svc, review.album_id);
     return Response.json({ review: saved });
   } catch (error) {

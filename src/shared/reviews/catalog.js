@@ -5,7 +5,7 @@ export const isApproved = r => !r.moderation_status || r.moderation_status === '
 // Resolve only the referenced IDs, not the latest N albums. Missing parents
 // are excluded from public discovery; written stories remain independent.
 export async function withCurrentAlbums(reviews, { keepMissing = false } = {}) {
-  const ids = [...new Set(reviews.filter(isAlbumReview).map(r => r.album_id).filter(id => /^[a-f\d]{24}$/i.test(id || '')))];
+  const ids = [...new Set(reviews.filter(isAlbumReview).map(r => r.album_id).filter(id => Boolean(id && typeof id === 'string')))];
   const albums = [];
   for (let i = 0; i < ids.length; i += 100) {
     albums.push(...await base44.entities.Album.filter({ id: { $in: ids.slice(i, i + 100) } }, '-created_date', 100));

@@ -1,5 +1,5 @@
 export async function syncReviewRating(svc, albumId) {
-  if (!/^[a-f\d]{24}$/i.test(albumId || '')) return;
+  if (!albumId || typeof albumId !== 'string') return;
   const albums = await svc.entities.Album.filter({ id: albumId });
   if (!albums.length) return;
   let count = 0, total = 0, offset = 0;

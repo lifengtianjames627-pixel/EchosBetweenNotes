@@ -117,7 +117,7 @@ export default function ReviewActions({ review, v, currentUser }) {
 
   return (
     <div className="flex items-center gap-2 mt-3 flex-wrap">
-      <ReviewEditControl review={review} />
+      <ReviewEditControl review={review} user={currentUser} />
       {/* Like */}
       <button
         className={btnBase}
