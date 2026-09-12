@@ -14,6 +14,7 @@ import StoryCard from '@/components/reviews/StoryCard';
 import StoryDetailModal from '@/components/reviews/StoryDetailModal';
 import StoryComposer from '@/components/reviews/StoryComposer';
 import { withCurrentAlbums } from '@/shared/reviews/catalog';
+import FeedQueryState from '@/components/reviews/FeedQueryState';
 
 const APPROVED = r => !r.moderation_status || r.moderation_status === 'approved';
 
@@ -27,7 +28,7 @@ export default function WrittenReviews() {
   const [composing, setComposing] = useState(false);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me(), enabled: authed });
-  const { data: reviews = [] } = useQuery({ queryKey: ['public-reviews'], queryFn: async () => withCurrentAlbums(await base44.entities.Review.list('-created_date', 60)) });
+  const { data: reviews = [], isLoading, isError, refetch } = useQuery({ queryKey: ['public-reviews'], queryFn: async () => withCurrentAlbums(await base44.entities.Review.list('-created_date', 60)) });
 
   const albumReviews = reviews.filter(r => (!r.kind || r.kind === 'album_review') && APPROVED(r));
   const stories = reviews.filter(r => r.kind === 'journey_story' && APPROVED(r));
@@ -94,6 +95,7 @@ export default function WrittenReviews() {
         </div>
 
         <main className="mt-8">
+          {isLoading ? <FeedQueryState loading /> : isError ? <FeedQueryState retry={refetch} /> : <>
           {tab === 'albums' && (
             <>
               <ReviewLead review={albumReviews[0]} onOpen={openAlbum} />
@@ -120,6 +122,7 @@ export default function WrittenReviews() {
               </div>
             )
           )}
+          </>}
         </main>
       </div>
 

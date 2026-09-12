@@ -104,7 +104,9 @@ export default async function(req) {
         aiBlurb = res.blurb || '';
         const reasonMap = {};
         (res.picks || []).forEach(p => { if (p && p.id) reasonMap[p.id] = p.reason; });
-        forYou = forYou.filter(r => reasonMap[r.id]).map(r => ({ ...r, _reason: reasonMap[r.id] }));
+        // AI adds explanations; a missing explanation must not erase valid recommendations.
+        const explained = forYou.filter(r => reasonMap[r.id]);
+        forYou = (explained.length ? explained : forYou.slice(0, 4)).map(r => ({ ...r, _reason: reasonMap[r.id] || null }));
       }
     }
 
