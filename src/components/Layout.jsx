@@ -149,7 +149,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#f3efe6' }}>
       {/* Top navigation — Bandcamp-style thin bar, no sidebar */}
-      <header className="sticky top-0 z-30 flex items-center gap-3 px-5 h-14" style={{ background: 'rgba(243,239,230,0.92)', borderBottom: '1px solid rgba(26,24,21,0.1)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}>
+      <header className="sticky top-0 z-[280] flex items-center gap-3 px-5 h-14" style={{ background: 'rgba(243,239,230,0.92)', borderBottom: '1px solid rgba(26,24,21,0.1)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}>
         <Link to="/" className="font-playfair italic text-sm sm:text-lg whitespace-nowrap shrink-0" style={{ color: '#1a1815', letterSpacing: '-0.01em' }}>
           Echo Between Notes
         </Link>

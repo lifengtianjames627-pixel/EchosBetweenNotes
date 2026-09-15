@@ -103,7 +103,11 @@ export default function AlbumDetail() {
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              {album.genre && <GenreBadge genre={album.genre} />}
+              {album.genre && (
+                <Link to={`/genre/${album.genre}`} title="Open this genre's space" className="transition-opacity hover:opacity-75">
+                  <GenreBadge genre={album.genre} />
+                </Link>
+              )}
               {album.release_year && (
                 <span className="flex items-center gap-1 text-xs" style={{ color: '#8a7e6f' }}>
                   <Calendar className="w-3 h-3" /> {album.release_year}

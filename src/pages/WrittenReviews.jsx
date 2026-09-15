@@ -15,6 +15,8 @@ import StoryDetailModal from '@/components/reviews/StoryDetailModal';
 import StoryComposer from '@/components/reviews/StoryComposer';
 import { withCurrentAlbums } from '@/shared/reviews/catalog';
 import FeedQueryState from '@/components/reviews/FeedQueryState';
+import PopularAlbums from '@/components/reviews/PopularAlbums';
+import boardCopy from '@/components/reviews/boardCopy';
 
 const APPROVED = r => !r.moderation_status || r.moderation_status === 'approved';
 
@@ -28,6 +30,12 @@ export default function WrittenReviews() {
   const [composing, setComposing] = useState(false);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me(), enabled: authed });
+  const copy = boardCopy(useLang().lang);
+  // Curated board: admin-liked picks, popularity ranking, newest last.
+  const { data: board } = useQuery({
+    queryKey: ['reviews-board'],
+    queryFn: () => base44.functions.invoke('reviewsBoard', {}).then(r => r.data),
+  });
   const { data: reviews = [], isLoading, isError, refetch } = useQuery({ queryKey: ['public-reviews'], queryFn: async () => withCurrentAlbums(await base44.entities.Review.list('-created_date', 60)) });
 
   const albumReviews = reviews.filter(r => (!r.kind || r.kind === 'album_review') && APPROVED(r));
@@ -98,8 +106,23 @@ export default function WrittenReviews() {
           {isLoading ? <FeedQueryState loading /> : isError ? <FeedQueryState retry={refetch} /> : <>
           {tab === 'albums' && (
             <>
-              <ReviewLead review={albumReviews[0]} onOpen={openAlbum} />
-              <ReviewFeed reviews={albumReviews.slice(1, 10)} onOpen={openAlbum} />
+              {/* 1 — Editors' picks: the reviews an admin has liked */}
+              {(board?.editorsPicks?.length > 0) && (
+                <>
+                  <ReviewLead review={board.editorsPicks[0]} onOpen={openAlbum} />
+                  {board.editorsPicks.length > 1 && (
+                    <ReviewFeed reviews={board.editorsPicks.slice(1, 10)} onOpen={openAlbum} title={copy.picks} hint={copy.picksHint} />
+                  )}
+                </>
+              )}
+
+              {/* 2 — Popular albums by views (0.3) + review likes (0.7) */}
+              <PopularAlbums albums={board?.popularAlbums || []} />
+
+              {/* 3 — Newest reviews last */}
+              <div className="mt-14">
+                <ReviewFeed reviews={board?.recentReviews || albumReviews.slice(0, 9)} onOpen={openAlbum} title={copy.recent} />
+              </div>
             </>
           )}
 

@@ -6,6 +6,8 @@ import CoverImage from '@/components/music/CoverImage';
 import { useReviewerProfile } from '@/components/ReviewerProfileProvider';
 import { openPrivateChat } from '@/shared/chat/openPrivateChat';
 import ReviewEditControl from '@/components/reviews/ReviewEditControl';
+import TranslateButton from '@/components/reviews/TranslateButton';
+import boardCopy from '@/components/reviews/boardCopy';
 import { useLang } from '@/i18n/LanguageContext';
 import editCopy from '@/components/reviews/editCopy';
 
@@ -14,7 +16,9 @@ import editCopy from '@/components/reviews/editCopy';
 // so the full text can always be read in place.
 export default function ReviewCard({ review, showAlbum = true }) {
   const [expanded, setExpanded] = useState(false);
+  const [translated, setTranslated] = useState(null);
   const { lang } = useLang();
+  const copy = boardCopy(lang);
   const canLinkAlbum = showAlbum && !review.album_missing && !!review.album_id && (!review.kind || review.kind === 'album_review');
   const isLong = (review.content || '').length > 220;
   const profile = useReviewerProfile(review.reviewer_email);
@@ -48,8 +52,12 @@ export default function ReviewCard({ review, showAlbum = true }) {
             className={`text-sm mt-2 whitespace-pre-wrap ${expanded || !isLong ? '' : 'line-clamp-3'}`}
             style={{ color: '#5a534a' }}
           >
-            {review.content}
+            {translated || review.content}
           </p>
+          <div className="mt-2 flex items-center gap-2 flex-wrap">
+            <TranslateButton text={review.content} onResult={setTranslated} />
+            {translated && <span className="text-[11px]" style={{ color: '#8a7e6f' }}>{copy.machine}</span>}
+          </div>
           {isLong && !expanded && (
             <span
               role="button"

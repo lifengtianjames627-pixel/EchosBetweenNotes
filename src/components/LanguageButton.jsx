@@ -28,7 +28,7 @@ export default function LanguageButton() {
         <Globe className="w-3.5 h-3.5" /> {current.flag} <span className="hidden sm:inline">{current.label}</span>
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-2 py-1.5 z-50 min-w-[160px]"
+        <div className="fixed right-3 top-16 py-1.5 z-[300] min-w-[170px] max-h-[70vh] overflow-y-auto"
           style={{ background: '#faf8f2', border: '1px solid #e0d9c8', boxShadow: '0 8px 30px rgba(120,100,80,0.14)' }}>
           {LANGUAGES.map(l => (
             <button

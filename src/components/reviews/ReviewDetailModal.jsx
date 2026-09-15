@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -8,6 +8,9 @@ import ReviewActions from '@/components/ReviewActions';
 import CommentSection from '@/components/CommentSection';
 import { openPrivateChat } from '@/shared/chat/openPrivateChat';
 import useCurrentReview from '@/shared/reviews/useCurrentReview';
+import TranslateButton from '@/components/reviews/TranslateButton';
+import boardCopy from '@/components/reviews/boardCopy';
+import { useLang } from '@/i18n/LanguageContext';
 
 const SECTIONS = [
   ['band_style', 'Style'],
@@ -30,6 +33,9 @@ const V = {
 // and a live comment thread. Same interactivity as the in-album review view.
 export default function ReviewDetailModal({ review: seed, onClose }) {
   const review = useCurrentReview(seed);
+  const [translated, setTranslated] = useState(null);
+  const { lang } = useLang();
+  const copy = boardCopy(lang);
   const { data: currentUser } = useQuery({
     queryKey: ['me'],
     queryFn: () => base44.auth.me(),
@@ -62,8 +68,12 @@ export default function ReviewDetailModal({ review: seed, onClose }) {
         </div>
 
         <p className="mt-5 text-sm leading-relaxed whitespace-pre-wrap" style={{ color: '#3d3831' }}>
-          {review.content}
+          {translated || review.content}
         </p>
+        <div className="mt-3 flex items-center gap-2 flex-wrap">
+          <TranslateButton text={review.content} onResult={setTranslated} />
+          {translated && <span className="text-[11px]" style={{ color: '#8a7e6f' }}>{copy.machine}</span>}
+        </div>
 
         {SECTIONS.some(([k]) => review[k]) && (
           <div className="mt-6 pt-5 space-y-4" style={{ borderTop: '1px solid #e6ddc9' }}>
