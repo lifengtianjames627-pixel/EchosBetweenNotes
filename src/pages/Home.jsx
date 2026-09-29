@@ -143,6 +143,8 @@ function FlowingTitle() {
   );
 }
 
+import VinylDisc from '@/components/home/VinylDisc';
+
 export default function Home() {
   const navigate = useNavigate();
   const { t } = useLang();
@@ -174,6 +176,8 @@ export default function Home() {
           <FloatNote kind={n.kind} />
         </span>
       ))}
+
+      <VinylDisc />
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-24 min-h-[calc(100vh-3.5rem)]">
