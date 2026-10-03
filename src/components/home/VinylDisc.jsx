@@ -22,13 +22,20 @@ export default function VinylDisc() {
         {/* Light sheen sweeping across the grooves */}
         <div className="absolute inset-0 rounded-full"
           style={{ background: 'conic-gradient(from 20deg, transparent 0 12%, rgba(255,248,235,0.14) 18%, transparent 26% 55%, rgba(255,248,235,0.1) 62%, transparent 70%)' }} />
-        {/* Paper-toned centre label */}
-        <div className="absolute rounded-full flex items-center justify-center"
-          style={{ inset: '34%', background: 'radial-gradient(circle, #d9a565 0%, #bf7a35 100%)', boxShadow: 'inset 0 0 0 3px rgba(26,24,21,0.5)' }}>
-          <span className="font-playfair italic text-center leading-tight" style={{ color: '#1a1815', fontSize: 'clamp(10px, 1.4vw, 20px)' }}>
-            Echo<br />Between Notes
+        {/* A softened paper label that echoes the site palette rather than becoming a separate colour block. */}
+        <div className="absolute rounded-full"
+          style={{
+            inset: '34%',
+            background: 'repeating-radial-gradient(circle, rgba(255,255,255,0.12) 0 1px, transparent 1px 5px), radial-gradient(circle, #efe8d8 0%, #d9ccaf 68%, #b7a483 100%)',
+            boxShadow: 'inset 0 0 0 2px rgba(67,55,39,0.32), 0 0 0 7px rgba(243,239,230,0.12)',
+          }}>
+          <div className="absolute inset-[22%] rounded-full" style={{ border: '1px solid rgba(67,55,39,0.32)' }} />
+          <div className="absolute inset-[39%] rounded-full" style={{ background: '#292620', boxShadow: '0 0 0 5px rgba(243,239,230,0.24), inset 0 0 0 1px rgba(255,255,255,0.17)' }}>
+            <div className="absolute rounded-full" style={{ inset: '33%', background: '#f3efe6', boxShadow: '0 0 0 2px rgba(67,55,39,0.22)' }} />
+          </div>
+          <span className="absolute font-playfair italic text-center leading-tight" style={{ top: '14%', left: '18%', right: '18%', color: '#625641', fontSize: 'clamp(8px, 0.85vw, 13px)', letterSpacing: '0.08em' }}>
+            ECHO BETWEEN NOTES
           </span>
-          <div className="absolute rounded-full" style={{ width: '9%', height: '9%', background: '#f3efe6' }} />
         </div>
       </div>
     </div>
