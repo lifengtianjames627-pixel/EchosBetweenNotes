@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,14 +15,13 @@ import ReviewDetailModal from '@/components/reviews/ReviewDetailModal';
 import { useAuthed } from '@/hooks/useAuthed';
 import CoverImage from '@/components/music/CoverImage';
 import { trackGenre } from '@/lib/trackGenre';
-import { displayName } from '@/lib/displayName';
 import { useContentModeration } from '@/shared/hooks/useContentModeration';
-import { refreshMusic } from '@/features/reviews/queries/musicCache';
+import usePublishAlbumReview from '@/features/reviews/queries/usePublishAlbumReview';
+import PublishFeedback from '@/features/reviews/components/PublishFeedback';
 import useAlbumReviewData from '@/features/reviews/queries/useAlbumReviewData';
 
 export default function AlbumDetail() {
   const { id } = useParams();
-  const queryClient = useQueryClient();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewData, setReviewData] = useState({ rating: 0, title: '', content: '' });
   const [openReview, setOpenReview] = useState(null);
@@ -39,27 +38,9 @@ export default function AlbumDetail() {
   useEffect(() => {
     if (album?.genre) trackGenre(album.genre);
   }, [album?.genre, id]);
-  const createReview = useMutation({
-    mutationFn: async (data) => {
-      const mod = await moderate(`${data.title}\n${data.content}`);
-      await base44.entities.Review.create({
-        ...data,
-        album_id: id,
-        album_title: album.title,
-        album_artist: album.artist,
-        album_cover_url: album.cover_url || '',
-        reviewer_name: displayName(currentUser) || 'Anonymous',
-        reviewer_email: currentUser.email,
-        moderation_status: mod.suggestedAction === 'review' ? 'pending_review' : 'approved',
-        moderation_categories: mod.categories,
-        moderation_reason: mod.reason,
-        moderation_confidence: mod.confidence,
-        likes_count: 0,
-      });
-      await base44.functions.invoke('editReview', { action: 'syncRating', album_id: id });
-    },
+  const createReview = usePublishAlbumReview({
+    album, user: currentUser, moderate,
     onSuccess: () => {
-      refreshMusic(queryClient);
       setShowReviewForm(false);
       setReviewData({ rating: 0, title: '', content: '' });
     },
@@ -146,7 +127,7 @@ export default function AlbumDetail() {
                 <Label style={{ color: '#1a1815' }}>Review *</Label>
                 <Textarea value={reviewData.content} onChange={(e) => setReviewData({ ...reviewData, content: e.target.value })} rows={4} placeholder="Share your thoughts..." required />
               </div>
-              {createReview.error && <p role="alert" className="text-sm text-destructive">{createReview.error.message}</p>}
+              <PublishFeedback pending={createReview.isPending} error={createReview.error} />
               <div className="flex gap-3">
                 <Button type="submit" className="rounded-none" disabled={!reviewData.rating || createReview.isPending} style={{ background: '#1a1815', color: '#faf8f2' }}>
                   {createReview.isPending ? 'Posting...' : 'Post Review'}

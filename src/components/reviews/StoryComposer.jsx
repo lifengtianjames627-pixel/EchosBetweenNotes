@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Compass, ListMusic, Plus, Trash2, Send } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import usePublishStoryReview from '@/features/reviews/queries/usePublishStoryReview';
+import PublishFeedback from '@/features/reviews/components/PublishFeedback';
 import { GENRES } from '@/lib/genreConfig';
 import { useLang } from '@/i18n/LanguageContext';
 import { useGenreText } from '@/i18n/useGenreText';
-import { publicName } from '@/shared/identity';
 import { useContentModeration } from '@/shared/hooks/useContentModeration';
 
 // Compose a journey story or a genre roundup. Reuses the same Review entity
@@ -15,8 +14,7 @@ import { useContentModeration } from '@/shared/hooks/useContentModeration';
 export default function StoryComposer({ user, onClose }) {
   const { t } = useLang();
   const { localizedGenres } = useGenreText();
-  const queryClient = useQueryClient();
-  const { moderate, status: modStatus } = useContentModeration();
+  const { moderate } = useContentModeration();
 
   const [kind, setKind] = useState('journey_story');
   const [title, setTitle] = useState('');
@@ -27,35 +25,9 @@ export default function StoryComposer({ user, onClose }) {
 
   const isRoundup = kind === 'genre_roundup';
 
-  const submit = useMutation({
-    mutationFn: async () => {
-      const mod = await moderate(`${title}\n${content}\n${albums.map(a => a.blurb).join('\n')}`);
-      const status = mod.suggestedAction === 'review' ? 'pending_review' : 'approved';
-      const payload = {
-        kind,
-        title: title.trim(),
-        content: content.trim(),
-        genre: genre || undefined,
-        hero_image_url: heroImage.trim() || undefined,
-        reviewer_name: publicName(user),
-        reviewer_email: user?.email || '',
-        moderation_status: status,
-        moderation_categories: mod.categories,
-        moderation_reason: mod.reason,
-        moderation_confidence: mod.confidence,
-      };
-      if (isRoundup) {
-        payload.featured_albums = albums
-          .filter(a => a.title.trim())
-          .map(a => ({ title: a.title.trim(), artist: a.artist.trim(), cover_url: a.cover_url.trim(), blurb: a.blurb.trim() }));
-      }
-      return base44.entities.Review.create(payload);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['public-reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['moderation-reviews'] });
-      onClose();
-    },
+  const submit = usePublishStoryReview({
+    draft: { kind, title, genre, heroImage, content, albums },
+    user, moderate, onSuccess: onClose,
   });
 
   const canSubmit = title.trim() && content.trim() && (!isRoundup || albums.some(a => a.title.trim()));
@@ -162,17 +134,7 @@ export default function StoryComposer({ user, onClose }) {
               </div>
             )}
 
-            {/* Moderation feedback */}
-            {modStatus === 'blocked' && (
-              <div className="text-xs px-3 py-2 rounded-lg" style={{ background: 'rgba(220,50,50,0.1)', border: '1px solid rgba(220,50,50,0.25)', color: '#9c3b33' }}>
-                🚫 {t('story.publish')} — content may not meet community guidelines.
-              </div>
-            )}
-            {modStatus === 'pending' && (
-              <div className="text-xs px-3 py-2 rounded-lg" style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)', color: '#8a5a20' }}>
-                ⏳ Checking…
-              </div>
-            )}
+            <PublishFeedback pending={submit.isPending} error={submit.error} />
           </div>
 
           {/* Footer */}
