@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import Motif from '@/components/home/HomeMotif';
+import HomeBackdrop from '@/components/home/HomeBackdrop';
+import HomeTitle from '@/components/home/HomeTitle';
 import { PenLine, Headphones, Users } from 'lucide-react';
 import { useLang } from '@/i18n/LanguageContext';
 import HomeFeed from '@/components/HomeFeed';
@@ -15,135 +17,7 @@ const OPTIONS = [
   { path: '/soulmate', icon: Users,     labelKey: 'home.soulmate',  descKey: 'home.soulmateDesc',  motif: 'slur',  lift: 'sm:-mt-2' },
 ];
 
-// Three distinct musical visuals — one per card — so they never read as
-// the same icon recolored. Staff fragment, sound wave, tied-note slur.
-function Motif({ kind }) {
-  const ink = '#bf7a35';
-  const op = 0.8;
-  if (kind === 'staff') return ( // printed staff with two beamed notes
-    <svg width="66" height="38" viewBox="0 0 66 38" fill="none">
-      {[10, 16, 22, 28, 34].map(y => (
-        <line key={y} x1="2" y1={y} x2="64" y2={y} stroke={ink} strokeWidth="0.7" opacity="0.4" />
-      ))}
-      <ellipse cx="20" cy="25" rx="4" ry="3" transform="rotate(-20 20 25)" fill={ink} opacity={op} />
-      <ellipse cx="44" cy="22" rx="4" ry="3" transform="rotate(-20 44 22)" fill={ink} opacity={op} />
-      <path d="M23.5 25 V 9 M47.5 22 V 6" stroke={ink} strokeWidth="1.2" opacity={op} />
-      <path d="M23.3 8.6 H 47.3" stroke={ink} strokeWidth="2.2" strokeLinecap="round" opacity={op} />
-    </svg>
-  );
-  if (kind === 'wave') return ( // symmetric sound-wave bars
-    <svg width="60" height="30" viewBox="0 0 60 30" fill="none">
-      {[[6, 9, 21], [14, 5, 25], [22, 11, 19], [30, 3, 27], [38, 8, 22], [46, 12, 18], [54, 6, 24]].map(([x, y1, y2], i) => (
-        <line key={i} x1={x} y1={y1} x2={x} y2={y2} stroke={ink} strokeWidth="2" strokeLinecap="round" opacity={op} />
-      ))}
-    </svg>
-  );
-  if (kind === 'slur') return ( // two notes joined by a slur arc
-    <svg width="46" height="40" viewBox="0 0 46 40" fill="none">
-      <ellipse cx="9" cy="32" rx="5" ry="3.8" transform="rotate(-20 9 32)" fill={ink} opacity={op} />
-      <ellipse cx="34" cy="28" rx="5" ry="3.8" transform="rotate(-20 34 28)" fill={ink} opacity={op} />
-      <path d="M13.7 32 V 14 M38.7 28 V 10" stroke={ink} strokeWidth="1.4" opacity={op} />
-      <path d="M12 12 Q 25 3 39 7" stroke={ink} strokeWidth="1.3" fill="none" opacity={op} />
-    </svg>
-  );
-  if (kind === 'note') return ( // single eighth note (for scattered decor)
-    <svg width="20" height="34" viewBox="0 0 20 34" fill="none">
-      <ellipse cx="6" cy="28" rx="5" ry="3.8" transform="rotate(-20 6 28)" fill={ink} opacity={op} />
-      <path d="M10.7 28 V 6" stroke={ink} strokeWidth="1.4" opacity={op} />
-      <path d="M10.7 6 C 17 8 18.5 14 15 18" stroke={ink} strokeWidth="1.4" fill="none" strokeLinecap="round" opacity={op} />
-    </svg>
-  );
-  return null;
-}
 
-// Faint five-line staff behind the hero — the "music paper" texture. Barely
-// there, so it reads as paper grain rather than a graphic.
-function StaffLines() {
-  return (
-    <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
-      {[20, 35, 50, 65, 80].map(y => (
-        <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#bf7a35" strokeWidth="0.18" opacity="0.1" vectorEffect="non-scaling-stroke" />
-      ))}
-    </svg>
-  );
-}
-
-// A small treble clef to the left of the title — engraved style.
-function Clef() {
-  const ink = '#bf7a35';
-  return (
-    <svg width="30" height="60" viewBox="0 0 30 60" fill="none" stroke={ink} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.55">
-      <path d="M15 6 C 9 9 6 16 6 23 C 6 31 13 34 16 30 C 19 26 17 21 13 22 C 10 23 10 28 14 30 C 20 33 25 38 25 46 C 25 53 19 57 13 57 C 9 57 7 54 8 51 C 9 48 13 48 14 51 C 15 54 12 55 10 54" />
-      <path d="M15 6 V 52" />
-      <circle cx="15" cy="55" r="2.4" fill={ink} stroke="none" opacity="0.7" />
-    </svg>
-  );
-}
-
-// Tiny scattered notes instead of stars — same faint decoration role.
-const NOTES = [
-  { top: '15%', left: '8%', kind: 'staff' }, { top: '24%', right: '12%', kind: 'wave' },
-  { top: '64%', left: '14%', kind: 'slur' }, { top: '72%', right: '8%', kind: 'note' },
-  { top: '46%', left: '52%', kind: 'wave' },
-];
-function FloatNote({ kind }) {
-  return (
-    <span className="block opacity-[0.12]" style={{ transform: 'scale(0.6)', transformOrigin: 'center' }}>
-      <Motif kind={kind} />
-    </span>
-  );
-}
-
-// Title letters flow through the staff like notes riding a wave — each
-// shifted along a gentle sine so the line stays balanced but never rigid.
-const TITLE_TEXT = 'Echo Between Notes';
-const TITLE_OFFSETS = TITLE_TEXT.split('').map((_, i) => Math.round(Math.sin(i / 2.1) * 13));
-// Five-line staff as a travelling sine wave — the group pans so the wave
-// appears to flutter left→right like a flag. Wave spans 0–300 with period 100
-// so the visible 0–200 region stays filled and the loop is seamless.
-function WavyStaff() {
-  const lines = [10, 27.5, 45, 62.5, 80];
-  const wave = (y) => {
-    let d = `M 0 ${y}`;
-    for (let x = 0; x <= 200; x += 4) {
-      d += ` L ${x} ${(y + Math.sin((x / 100) * 2 * Math.PI) * 12).toFixed(2)}`;
-    }
-    return d;
-  };
-  return (
-    <motion.svg
-      className="w-[200%] h-full"
-      preserveAspectRatio="none"
-      viewBox="0 0 200 100"
-      aria-hidden
-      animate={{ x: ['-50%', '0%'] }}
-      transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
-    >
-      {lines.map(y => (
-        <path key={y} d={wave(y)} stroke="#bf7a35" strokeWidth="1" fill="none" opacity="0.6" vectorEffect="non-scaling-stroke" />
-      ))}
-    </motion.svg>
-  );
-}
-
-function FlowingTitle() {
-  return (
-    <h1 className="relative z-10 font-playfair italic leading-none text-center" style={{ fontSize: 'clamp(2.6rem, 8vw, 6rem)', color: '#1a1815', letterSpacing: '-0.01em' }}>
-      {TITLE_TEXT.split('').map((ch, i) => (
-        <motion.span
-          key={i}
-          style={{ display: 'inline-block' }}
-          animate={{ y: [TITLE_OFFSETS[i] - 5, TITLE_OFFSETS[i] + 5, TITLE_OFFSETS[i] - 5] }}
-          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut', delay: i * 0.1 }}
-        >
-          {ch === ' ' ? '\u00A0' : ch}
-        </motion.span>
-      ))}
-    </h1>
-  );
-}
-
-import VinylDisc from '@/components/home/VinylDisc';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -153,42 +27,11 @@ export default function Home() {
     <>
     <MusicTastePrompt />
     <div className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden">
-      {/* Layer 1 — blurred ambient music scene (the "world" behind the paper) */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1800&q=80"
-          alt=""
-          aria-hidden
-          className="w-full h-full object-cover"
-          style={{ filter: 'blur(30px) saturate(0.6) brightness(1.04)', transform: 'scale(1.12)' }}
-        />
-        <div className="absolute inset-0" style={{ background: 'rgba(243,239,230,0.8)' }} />
-      </div>
-
-      {/* Faint staff lines across the upper page */}
-      <div className="absolute inset-x-0 top-[8%] h-[42%] z-0 pointer-events-none">
-        <StaffLines />
-      </div>
-
-      {/* Scattered faint notes */}
-      {NOTES.map((n, i) => (
-        <span key={i} className="absolute z-0 pointer-events-none" style={{ ...n }}>
-          <FloatNote kind={n.kind} />
-        </span>
-      ))}
-
-      <VinylDisc />
+      <HomeBackdrop />
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-24 min-h-[calc(100vh-3.5rem)]">
-        <div className="relative inline-flex items-end gap-4">
-          {/* Five staff lines running through the title — same ochre as the clef */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-            <WavyStaff />
-          </div>
-          <span className="hidden sm:block mb-2 relative z-10"><Clef /></span>
-          <FlowingTitle />
-        </div>
+        <HomeTitle />
         <div className="flex items-center gap-3 mt-5">
           <span className="h-px w-12" style={{ background: '#bf7a35', opacity: 0.6 }} />
           <span className="block"><Motif kind="note" /></span>
