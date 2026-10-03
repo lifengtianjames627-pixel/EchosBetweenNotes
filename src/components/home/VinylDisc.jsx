@@ -33,9 +33,6 @@ export default function VinylDisc() {
           <div className="absolute inset-[39%] rounded-full" style={{ background: '#292620', boxShadow: '0 0 0 5px rgba(243,239,230,0.24), inset 0 0 0 1px rgba(255,255,255,0.17)' }}>
             <div className="absolute rounded-full" style={{ inset: '33%', background: '#f3efe6', boxShadow: '0 0 0 2px rgba(67,55,39,0.22)' }} />
           </div>
-          <span className="absolute font-playfair italic text-center leading-tight" style={{ top: '14%', left: '18%', right: '18%', color: '#625641', fontSize: 'clamp(8px, 0.85vw, 13px)', letterSpacing: '0.08em' }}>
-            ECHO BETWEEN NOTES
-          </span>
         </div>
       </div>
     </div>
