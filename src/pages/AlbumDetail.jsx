@@ -17,7 +17,8 @@ import CoverImage from '@/components/music/CoverImage';
 import { trackGenre } from '@/lib/trackGenre';
 import { displayName } from '@/lib/displayName';
 import { useContentModeration } from '@/shared/hooks/useContentModeration';
-import { isApproved, refreshMusic } from '@/shared/reviews/catalog';
+import { refreshMusic } from '@/features/reviews/queries/musicCache';
+import useAlbumReviewData from '@/features/reviews/queries/useAlbumReviewData';
 
 export default function AlbumDetail() {
   const { id } = useParams();
@@ -28,31 +29,16 @@ export default function AlbumDetail() {
   const { authed, login } = useAuthed();
   const { moderate } = useContentModeration();
 
-  const { data: album, isLoading: loadingAlbum } = useQuery({
-    queryKey: ['album', id],
-    queryFn: async () => {
-      const albums = await base44.entities.Album.filter({ id });
-      return albums[0];
-    },
-  });
-
-  // Count this album's genre toward the listener's taste profile (drives the
-  // home "For You" feed). Self-gates for guests.
-  useEffect(() => {
-    if (album?.genre) trackGenre(album.genre);
-  }, [album?.genre, id]);
-
-  const { data: rawReviews = [] } = useQuery({
-    queryKey: ['album-reviews', id],
-    queryFn: () => base44.entities.Review.filter({ album_id: id }, '-created_date', 50),
-  });
-
   const { data: currentUser } = useQuery({
     queryKey: ['me'],
     queryFn: () => base44.auth.me(),
   });
+  const { album, loadingAlbum, reviews } = useAlbumReviewData(id, currentUser);
 
-  const reviews = rawReviews.filter(r => isApproved(r) || r.created_by_id === currentUser?.id);
+  // Preserve taste tracking when the current album's genre changes.
+  useEffect(() => {
+    if (album?.genre) trackGenre(album.genre);
+  }, [album?.genre, id]);
   const createReview = useMutation({
     mutationFn: async (data) => {
       const mod = await moderate(`${data.title}\n${data.content}`);
