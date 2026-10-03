@@ -1,7 +1,7 @@
 import { base44 } from '@/api/base44Client';
 
-export const isAlbumReview = r => !r.kind || r.kind === 'album_review';
-export const isApproved = r => !r.moderation_status || r.moderation_status === 'approved';
+import { isAlbumReview } from '@/features/reviews/model/reviewRules';
+export { isAlbumReview, isApproved } from '@/features/reviews/model/reviewRules';
 // Resolve only the referenced IDs, not the latest N albums. Missing parents
 // are excluded from public discovery; written stories remain independent.
 export async function withCurrentAlbums(reviews, { keepMissing = false } = {}) {
@@ -18,7 +18,5 @@ export async function withCurrentAlbums(reviews, { keepMissing = false } = {}) {
     return [{ ...r, album_missing: false, album_title: a.title, album_artist: a.artist, album_cover_url: a.cover_url || '' }];
   });
 }
-export const isMusicQuery = q => /album|review|homeFeed|podcast/i.test(String(q.queryKey[0]));
-export function refreshMusic(client) {
-  return client.invalidateQueries({ predicate: isMusicQuery });
-}
+// Preserve the shared entry point for existing callers during gradual migration.
+export { isMusicQuery, refreshMusic } from '@/features/reviews/queries/musicCache';

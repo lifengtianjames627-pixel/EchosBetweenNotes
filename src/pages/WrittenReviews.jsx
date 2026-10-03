@@ -13,12 +13,10 @@ import GenreRail from '@/components/reviews/GenreRail';
 import StoryCard from '@/components/reviews/StoryCard';
 import StoryDetailModal from '@/components/reviews/StoryDetailModal';
 import StoryComposer from '@/components/reviews/StoryComposer';
-import { withCurrentAlbums } from '@/shared/reviews/catalog';
+import useReviewsBoard from '@/features/reviews/queries/useReviewsBoard';
 import FeedQueryState from '@/components/reviews/FeedQueryState';
 import PopularAlbums from '@/components/reviews/PopularAlbums';
 import boardCopy from '@/components/reviews/boardCopy';
-
-const APPROVED = r => !r.moderation_status || r.moderation_status === 'approved';
 
 export default function WrittenReviews() {
   const navigate = useNavigate();
@@ -31,16 +29,7 @@ export default function WrittenReviews() {
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me(), enabled: authed });
   const copy = boardCopy(useLang().lang);
-  // Curated board: admin-liked picks, popularity ranking, newest last.
-  const { data: board } = useQuery({
-    queryKey: ['reviews-board'],
-    queryFn: () => base44.functions.invoke('reviewsBoard', {}).then(r => r.data),
-  });
-  const { data: reviews = [], isLoading, isError, refetch } = useQuery({ queryKey: ['public-reviews'], queryFn: async () => withCurrentAlbums(await base44.entities.Review.list('-created_date', 60)) });
-
-  const albumReviews = reviews.filter(r => (!r.kind || r.kind === 'album_review') && APPROVED(r));
-  const stories = reviews.filter(r => r.kind === 'journey_story' && APPROVED(r));
-  const roundups = reviews.filter(r => r.kind === 'genre_roundup' && APPROVED(r));
+  const { board, albumReviews, stories, roundups, isLoading, isError, refetch } = useReviewsBoard();
 
   const openAlbum = id => navigate(`/album/${id}`);
 
