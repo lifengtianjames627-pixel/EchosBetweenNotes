@@ -5,37 +5,70 @@
     "read": {
       "$or": [
         {
-          "data.moderation_status": {
-            "$nin": [
-              "pending_review",
-              "blocked"
-            ]
-          }
-        },
-        {
           "created_by_id": "{{user.id}}"
         },
         {
           "user_condition": {
             "role": "admin"
           }
+        },
+        {
+          "$and": [
+            {
+              "data.author_age_group": {
+                "$in": [
+                  "minor",
+                  "adult"
+                ]
+              }
+            },
+            {
+              "data.author_age_group": "{{user.data.age_group}}"
+            },
+            {
+              "data.status": "active"
+            },
+            {
+              "data.moderation_status": {
+                "$in": [
+                  "approved",
+                  "",
+                  null
+                ]
+              }
+            }
+          ]
         }
       ]
     },
     "create": {
-      "created_by_id": "{{user.id}}"
-    },
-    "update": {
-      "$or": [
+      "$and": [
         {
           "created_by_id": "{{user.id}}"
         },
         {
-          "user_condition": {
-            "role": "admin"
+          "data.author_email": "{{user.email}}"
+        },
+        {
+          "data.author_age_group": {
+            "$in": [
+              "minor",
+              "adult"
+            ]
           }
+        },
+        {
+          "data.author_age_group": "{{user.data.age_group}}"
+        },
+        {
+          "data.moderation_status": "pending_review"
         }
       ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "delete": {
       "$or": [
@@ -131,7 +164,7 @@
         "minor",
         "adult"
       ],
-      "description": "Age bracket of the author \u2014 posts are only visible within the same bracket"
+      "description": "Self-declared age bracket; discovery requires the same valid bracket"
     },
     "status": {
       "type": "string",
@@ -148,7 +181,7 @@
         "pending_review",
         "blocked"
       ],
-      "default": "approved"
+      "default": "pending_review"
     },
     "moderation_reason": {
       "type": "string"
