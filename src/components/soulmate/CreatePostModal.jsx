@@ -5,7 +5,8 @@ import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { findContactInfo } from '@/lib/contactFilter';
 import SafetyNotice from '@/components/soulmate/SafetyNotice';
-import { displayName } from '@/lib/displayName';
+import { useLang } from '@/i18n/LanguageContext';
+import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
 
 export const INSTRUMENTS = [
   'Vocals', 'Guitar', 'Lead Guitar', 'Bass', 'Drums', 'Keys',
@@ -57,6 +58,9 @@ function Chip({ active, children, onClick }) {
 
 export default function CreatePostModal({ currentUser, onClose }) {
   const queryClient = useQueryClient();
+  const { lang } = useLang();
+  const copy = recruitCopy(lang);
+  const [submitted, setSubmitted] = useState(false);
   const [data, setData] = useState(EMPTY);
   const [tagInput, setTagInput] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -89,43 +93,28 @@ export default function CreatePostModal({ currentUser, onClose }) {
         throw new Error(`CONTACT:${contact.join(', ')}`);
       }
 
-      // Same AI moderation the reviews go through.
-      let action = 'allow';
-      try {
-        const res = await base44.functions.invoke('moderateContent', { text: allText });
-        action = res.data?.suggestedAction || 'allow';
-      } catch (_) { /* AI failure → allow */ }
-      if (action === 'block') throw new Error('MODERATION');
-
-      await base44.entities.RecruitPost.create({
-        ...data,
-        author_email: currentUser.email,
-        author_name: displayName(currentUser),
-        author_age_group: currentUser.age_group,
-        status: 'active',
-        moderation_status: action === 'review' ? 'pending_review' : 'approved',
-        report_count: 0,
-      });
-      return action;
+      const response = await base44.functions.invoke('publishRecruitPost', { draft: data, agreed });
+      return response.data.action;
     },
     onSuccess: (action) => {
       queryClient.invalidateQueries({ queryKey: ['recruit-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['chat-directory'] });
+      queryClient.invalidateQueries({ queryKey: ['moderation-recruit'] });
+      setSubmitted(true);
       if (action === 'review') {
-        setBlockedMsg('Your post was sent for a quick review and will appear once approved.');
+        setBlockedMsg(copy.pending);
       } else {
         onClose();
       }
     },
     onError: (err) => {
-      if (err.message.startsWith('CONTACT:')) {
-        setBlockedMsg(`Please remove your ${err.message.slice(8)} — all contact happens through in-app chat, which keeps a record we can act on.`);
-      } else if (err.message === 'MODERATION') {
-        setBlockedMsg('This post may not meet community guidelines. Please revise it and try again.');
-      }
+      const code = err.response?.data?.error || err.message;
+      setBlockedMsg(code === 'CONTACT' || code.startsWith('CONTACT:') ? copy.contact
+        : code === 'MODERATION' ? copy.blocked : code === 'AGE_REQUIRED' ? copy.ageHint : copy.failed);
     },
   });
 
-  const canSubmit = data.title.trim() && agreed && !uploading && !create.isPending;
+  const canSubmit = data.title.trim() && agreed && !uploading && !create.isPending && !submitted;
 
   return (
     <motion.div

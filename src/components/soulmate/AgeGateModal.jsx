@@ -3,16 +3,23 @@ import { motion } from 'framer-motion';
 import { ShieldCheck, Users } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLang } from '@/i18n/LanguageContext';
+import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
 
 // Adults and minors must never be matched with each other by this board, so every
 // user declares a bracket once and only ever sees posts from their own bracket.
 export default function AgeGateModal() {
   const queryClient = useQueryClient();
   const [choice, setChoice] = useState(null);
+  const { lang } = useLang();
+  const copy = recruitCopy(lang);
 
   const save = useMutation({
     mutationFn: (age_group) => base44.auth.updateMe({ age_group }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['me'] }),
+    onSuccess: async (user) => {
+      queryClient.setQueryData(['me'], user);
+      await Promise.all(['me', 'recruit-posts', 'chat-directory'].map(key => queryClient.invalidateQueries({ queryKey: [key] })));
+    },
   });
 
   return (
@@ -26,6 +33,7 @@ export default function AgeGateModal() {
         initial={{ opacity: 0, y: 30, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', damping: 22, stiffness: 250 }}
+        role="dialog" aria-modal="true" aria-labelledby="recruit-age-title"
         className="w-full max-w-md rounded-3xl p-7 text-center"
         style={{ background: 'rgba(10,13,32,0.98)', border: '1px solid rgba(124,111,255,0.3)', boxShadow: '0 0 60px rgba(124,111,255,0.18)' }}
       >
@@ -34,16 +42,15 @@ export default function AgeGateModal() {
           <Users className="w-6 h-6" style={{ color: '#a5b4fc', filter: 'drop-shadow(0 0 8px rgba(124,111,255,0.5))' }} />
         </div>
 
-        <p className="font-playfair italic text-2xl mb-3" style={{ color: '#e8e9ff' }}>One thing first</p>
-        <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(150,165,215,0.72)' }}>
-          Band-forming posts are only shown to people in the same age bracket, so students and adults never
-          get matched with each other. Choose yours — you'll only ever see, and be seen by, that group.
+        <p id="recruit-age-title" className="font-playfair italic text-2xl mb-3" style={{ color: '#e8e9ff' }}>{copy.ageTitle}</p>
+        <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(150,165,215,0.95)' }}>
+          {copy.ageHint}
         </p>
 
         <div className="space-y-2.5">
           {[
-            { id: 'minor', label: "I'm under 18", desc: 'You will only see posts from other under-18 users.' },
-            { id: 'adult', label: "I'm 18 or older", desc: 'You will only see posts from other adults.' },
+            { id: 'minor', label: copy.minor, desc: copy.minorHint },
+            { id: 'adult', label: copy.adult, desc: copy.adultHint },
           ].map(o => (
             <button
               key={o.id}
@@ -55,7 +62,7 @@ export default function AgeGateModal() {
               }
             >
               <p className="text-sm font-semibold" style={{ color: choice === o.id ? '#c4baff' : 'rgba(210,220,250,0.85)' }}>{o.label}</p>
-              <p className="text-[11px] mt-0.5" style={{ color: 'rgba(140,155,210,0.6)' }}>{o.desc}</p>
+              <p className="text-[11px] mt-0.5" style={{ color: 'rgba(140,155,210,0.95)' }}>{o.desc}</p>
             </button>
           ))}
         </div>
@@ -71,11 +78,12 @@ export default function AgeGateModal() {
             opacity: !choice || save.isPending ? 0.5 : 1,
           }}
         >
-          {save.isPending ? 'Saving…' : 'Continue'}
+          {save.isPending ? copy.saving : copy.continue}
         </button>
 
-        <p className="flex items-center justify-center gap-1.5 text-[10px] mt-4" style={{ color: 'rgba(140,155,210,0.45)' }}>
-          <ShieldCheck className="w-3 h-3" /> This choice is kept on your account and can't be changed here.
+        {save.error && <p role="alert" className="mt-3 text-sm text-destructive">{copy.failed}</p>}
+        <p className="flex items-center justify-center gap-1.5 text-[10px] mt-4" style={{ color: 'rgba(140,155,210,0.95)' }}>
+          <ShieldCheck className="w-3 h-3" /> {copy.ageSaved}
         </p>
       </motion.div>
     </motion.div>

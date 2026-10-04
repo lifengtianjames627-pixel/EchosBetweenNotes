@@ -8,16 +8,17 @@ import PeerRow from './PeerRow';
 import LocationShareBar from './LocationShareBar';
 import NearbyMap from './NearbyMap';
 import { useLang } from '@/i18n/LanguageContext';
+import AgeDiscoveryNotice from '@/features/soulmate/components/AgeDiscoveryNotice';
 
 // People currently active on the band board — closest first when the viewer has
 // shared their location, otherwise same city, and always inside their age bracket.
-export default function PeopleAround({ V, nearby, loading, city, matchedCity, located, locationSource, myLat, myLng, isPinned, onTogglePin, onOpen }) {
+export default function PeopleAround({ V, nearby, loading, ageRequired, city, matchedCity, located, locationSource, myLat, myLng, isPinned, onTogglePin, onOpen }) {
   const [view, setView] = useState('list');
   const [wifiOpen, setWifiOpen] = useState(false);
   const navigate = useNavigate();
   const { t } = useLang();
   const hint = located ? t('chat.closestFirst') : matchedCity && city ? t('chat.inCity', { c: city }) : t('chat.onBoard');
-  const canMap = located && typeof myLat === 'number' && typeof myLng === 'number';
+  const canMap = !ageRequired && located && typeof myLat === 'number' && typeof myLng === 'number';
   const people = nearby.map((p, i) => ({ ...p, color: peerColor(i) }));
 
   return (
@@ -58,7 +59,7 @@ export default function PeopleAround({ V, nearby, loading, city, matchedCity, lo
         <div className="space-y-1.5">
           {[0, 1].map(i => <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: '#ece5d6' }} />)}
         </div>
-      ) : canMap && view === 'map' ? (
+      ) : ageRequired ? <AgeDiscoveryNotice /> : canMap && view === 'map' ? (
         <NearbyMap
           V={V}
           center={[myLat, myLng]}

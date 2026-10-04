@@ -213,6 +213,7 @@ export default function DirectChat() {
               V={V}
               nearby={directory?.nearby || []}
               loading={directoryLoading}
+              ageRequired={directory?.age_required}
               city={directory?.my_city}
               matchedCity={directory?.matched_city}
               located={directory?.located}

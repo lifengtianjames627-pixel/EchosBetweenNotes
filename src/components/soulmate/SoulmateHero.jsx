@@ -14,7 +14,7 @@ export default function SoulmateHero({ t, kinds, kind, setKind, instruments, rol
           className="absolute inset-0 h-full w-full object-cover"
         />
         {/* warm paper scrim — photo fades into the page like a journal spread */}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(247,243,236,0.96) 0%, rgba(247,243,236,0.78) 42%, rgba(247,243,236,0.3) 76%, rgba(247,243,236,0.08) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, hsl(var(--background) / 0.96) 0%, hsl(var(--background) / 0.88) 60%, hsl(var(--background) / 0.72) 100%)' }} />
         <div className="relative max-w-2xl p-6 sm:p-9 flex flex-col justify-end min-h-[340px]">
           <p className="text-[10px] uppercase tracking-[0.28em] font-bold" style={{ color: '#bf7a35' }}>Local music community</p>
           <h1 className="mt-3 font-playfair text-4xl italic leading-none sm:text-5xl" style={{ color: '#1a1815' }}>{t('home.soulmate')}</h1>

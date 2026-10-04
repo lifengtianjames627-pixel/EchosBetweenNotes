@@ -9,6 +9,7 @@ import { publicName } from '@/shared/identity';
 import { openPrivateChat } from '@/shared/chat/openPrivateChat';
 import { peerColor } from '@/components/chat/peerColors';
 import useChatDirectory from '@/features/location/queries/useChatDirectory';
+import AgeDiscoveryNotice from '@/features/soulmate/components/AgeDiscoveryNotice';
 
 // A compact "People Around You" strip for the home page. Reuses the same
 // chatDirectory data the Messages page does — same-Wi-Fi, shared-location and
@@ -87,7 +88,7 @@ export default function PeopleAroundYou() {
               <div key={i} className="h-16 rounded-xl animate-pulse" style={{ background: '#ece5d6' }} />
             ))}
           </div>
-        ) : nearby.length === 0 ? (
+        ) : data?.age_required ? <AgeDiscoveryNotice /> : nearby.length === 0 ? (
           <div className="rounded-xl p-5 text-center"
             style={{ background: '#f5f2ea', border: '1px dashed #e0d8c8' }}>
             <p className="text-xs leading-relaxed" style={{ color: '#6b6358' }}>{t('home.peopleAroundEmpty')}</p>

@@ -8,22 +8,21 @@ import CreatePostModal, { INSTRUMENTS } from '@/components/soulmate/CreatePostMo
 import AgeGateModal from '@/components/soulmate/AgeGateModal';
 import SoulmateHero from '@/components/soulmate/SoulmateHero';
 import { useLang } from '@/i18n/LanguageContext';
+import useRecruitPosts from '@/features/soulmate/queries/useRecruitPosts';
+import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
 
 const KINDS = [{ id: 'all', labelKey: 'sm.kind.all' }, { id: 'band', labelKey: 'sm.kind.band' }, { id: 'musician', labelKey: 'sm.kind.musician' }];
 
 export default function SoulmateBoard() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const copy = recruitCopy(lang);
   const [kind, setKind] = useState('all');
   const [role, setRole] = useState(null);
   const [search, setSearch] = useState('');
   const [creating, setCreating] = useState(false);
 
   const { data: currentUser } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
-  const { data: allPosts = [], isLoading } = useQuery({
-    queryKey: ['recruit-posts'],
-    queryFn: () => base44.entities.RecruitPost.filter({ status: 'active' }, '-created_date', 200),
-    enabled: !!currentUser?.age_group,
-  });
+  const { data: allPosts = [], isLoading, error, refetch } = useRecruitPosts(currentUser);
 
   const posts = allPosts
     .filter(p => p.author_age_group === currentUser?.age_group)
@@ -34,7 +33,7 @@ export default function SoulmateBoard() {
       .filter(Boolean)
       .some(v => String(v).toLowerCase().includes(search.toLowerCase())));
 
-  if (currentUser && !currentUser.age_group) return <AgeGateModal />;
+  if (currentUser && !['minor', 'adult'].includes(currentUser.age_group)) return <AgeGateModal />;
 
   return (
     <div className="min-h-screen" style={{ background: '#f3efe6' }}>
@@ -52,7 +51,7 @@ export default function SoulmateBoard() {
           onCreate={() => setCreating(true)}
         />
 
-        {isLoading ? (
+        {error ? <div role="alert" className="py-12 text-center text-destructive"><p>{copy.failed}</p><button className="mt-3 underline" onClick={() => refetch()}>{copy.retry}</button></div> : isLoading ? (
           <div className="flex items-center justify-center gap-2 py-24 text-sm" style={{ color: '#8a7e6f' }}>
             <Loader2 className="h-4 w-4 animate-spin" /> {t('sm.loading')}
           </div>

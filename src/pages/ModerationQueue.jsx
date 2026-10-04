@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Shield, Check, X, Clock, AlertTriangle, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLang } from '@/i18n/LanguageContext';
+import RecruitModerationPanel from '@/features/soulmate/components/RecruitModerationPanel';
 
 const STATUS_COLORS = {
   pending_review: { color: '#8a5a20', bg: '#f6efe1', label: 'Pending Review' },
@@ -241,6 +242,7 @@ export default function ModerationQueue() {
             </AnimatePresence>
           </div>
         )}
+        <RecruitModerationPanel filter={filter} />
       </div>
     </div>
   );
