@@ -10,13 +10,13 @@ const contactPatterns = [
 export function recruitmentDraft(input) {
   if (!input || !['band', 'musician'].includes(input.kind)) return null;
   const draft = { kind: input.kind };
-  for (const key of ['title', 'band_name', 'poster_url', 'city', 'school', 'influences', 'description']) {
+  for (const key of ['title', 'band_name', 'poster_asset_id', 'city', 'school', 'influences', 'description']) {
     if (input[key] != null && typeof input[key] !== 'string') return null;
     draft[key] = (input[key] || '').trim();
     if (draft[key].length > (key === 'description' ? 8000 : 2000)) return null;
   }
   if (!draft.title || draft.title.length > 200) return null;
-  if (draft.poster_url && !/^https:\/\//i.test(draft.poster_url)) return null;
+  if (input.poster_url || (draft.poster_asset_id && !/^[a-f0-9]{24}$/i.test(draft.poster_asset_id))) return null;
   draft.commitment = input.commitment || 'casual';
   if (!['casual', 'regular', 'serious'].includes(draft.commitment)) return null;
   for (const key of ['looking_for', 'i_play', 'genre_tags']) {

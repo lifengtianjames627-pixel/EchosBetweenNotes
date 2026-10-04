@@ -14,10 +14,18 @@ import { displayName } from '@/lib/displayName';
 import { awardBadge } from '@/lib/badgeUtils';
 import { earnedFromReviews } from '@/lib/badgeProgress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useLang } from '@/i18n/LanguageContext';
+import privacyCopy from '@/features/soulmate/i18n/privacyCopy';
+import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
+import AgeDiscoveryNotice from '@/features/soulmate/components/AgeDiscoveryNotice';
 
 export default function Profile() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { lang } = useLang();
+  const copy = privacyCopy(lang), shared = recruitCopy(lang);
+  const [searchError, setSearchError] = useState(false);
+  const [ageRequired, setAgeRequired] = useState(false);
   const [friendEmail, setFriendEmail] = useState('');
   const [friendMsg, setFriendMsg] = useState('');
   const [showAddFriend, setShowAddFriend] = useState(false);
@@ -81,15 +89,27 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    if (searchQuery.trim().length < 2) { setSearchResults([]); return; }
+    let active = true;
+    setSearchResults([]); setSearchError(false); setAgeRequired(false);
+    if (searchQuery.trim().length < 2 || selectedFriend) { setSearching(false); return; }
     setSearching(true);
     const timeout = setTimeout(() => {
       base44.functions.invoke('searchUsers', { query: searchQuery.trim() })
-        .then(res => setSearchResults(res.data?.results || []))
-        .finally(() => setSearching(false));
+        .then(res => { if (active) { setSearchResults(res.data?.results || []); setAgeRequired(!!res.data?.age_required); } })
+        .catch(() => { if (active) setSearchError(true); })
+        .finally(() => { if (active) setSearching(false); });
     }, 350);
-    return () => clearTimeout(timeout);
-  }, [searchQuery]);
+    return () => { active = false; clearTimeout(timeout); };
+  }, [searchQuery, selectedFriend, user?.age_group]);
+
+  const selectFriend = useMutation({
+    mutationFn: async id => {
+      const { data } = await base44.functions.invoke('publicProfile', { user_id: id });
+      if (!data.found) throw new Error(copy.profileUnavailable);
+      return data;
+    },
+    onSuccess: data => { setSelectedFriend(data); setFriendEmail(data.email); setSearchQuery(data.full_name); },
+  });
 
   const sendFriendRequest = useMutation({
     mutationFn: () => base44.entities.FriendRequest.create({
@@ -306,7 +326,9 @@ export default function Profile() {
                   style={{ background: '#ffffff', border: '1px solid #e0d8c8', color: '#1a1815' }}
                   value={searchQuery}
                   onChange={e => { setSearchQuery(e.target.value); setSelectedFriend(null); setFriendEmail(''); }}
-                  placeholder="Search by name or email…" />
+                  placeholder={copy.search} />
+                {ageRequired && <AgeDiscoveryNotice />}
+                {(searchError || selectFriend.error) && <p role="alert" className="text-xs text-destructive">{shared.failed}</p>}
                 {(searching || searchResults.length > 0) && searchQuery.trim().length >= 2 && !selectedFriend && (
                   <div className="absolute left-0 right-0 mt-1.5 rounded-xl overflow-hidden max-h-48 overflow-y-auto z-10"
                     style={{ background: '#faf8f2', border: '1px solid #e0d8c8' }}>
@@ -314,8 +336,8 @@ export default function Profile() {
                       <p className="text-xs px-4 py-3" style={{ color: '#8a7e6f' }}>Searching…</p>
                     ) : searchResults.length > 0 ? (
                       searchResults.map(u => (
-                        <button key={u.email} type="button"
-                          onClick={() => { setSelectedFriend(u); setFriendEmail(u.email); setSearchQuery(u.full_name || 'Anonymous'); }}
+                        <button key={u.id} type="button" disabled={selectFriend.isPending}
+                          onClick={() => selectFriend.mutate(u.id)}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-black/5">
                           <div className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
                             style={{ background: '#efe4d0', color: '#8a5a20' }}>

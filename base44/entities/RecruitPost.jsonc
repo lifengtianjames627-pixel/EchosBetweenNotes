@@ -17,8 +17,8 @@
             {
               "data.author_age_group": {
                 "$in": [
-                  "minor",
-                  "adult"
+                  "under_15",
+                  "age_15_plus"
                 ]
               }
             },
@@ -52,8 +52,8 @@
         {
           "data.author_age_group": {
             "$in": [
-              "minor",
-              "adult"
+              "under_15",
+              "age_15_plus"
             ]
           }
         },
@@ -90,53 +90,48 @@
         "band",
         "musician"
       ],
-      "default": "band",
-      "description": "band = a band looking for members, musician = a player looking for a band"
+      "default": "band"
     },
     "title": {
-      "type": "string",
-      "description": "Headline of the post"
+      "type": "string"
     },
     "band_name": {
-      "type": "string",
-      "description": "Band name (for kind=band)"
+      "type": "string"
     },
     "poster_url": {
       "type": "string",
-      "description": "Recruitment poster image URL"
+      "description": "Legacy public URL. Not used for new uploads or rendered as a public image."
+    },
+    "poster_asset_id": {
+      "type": "string",
+      "description": "Private RecruitPosterAsset reference. Never store a file URI or signed URL on a shared post."
     },
     "city": {
-      "type": "string",
-      "description": "City or area"
+      "type": "string"
     },
     "school": {
-      "type": "string",
-      "description": "School name (optional)"
+      "type": "string"
     },
     "looking_for": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Instruments/roles wanted"
+      }
     },
     "i_play": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Instruments the author plays"
+      }
     },
     "genre_tags": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Genre/style tags"
+      }
     },
     "influences": {
-      "type": "string",
-      "description": "Bands/artists that influence them"
+      "type": "string"
     },
     "commitment": {
       "type": "string",
@@ -145,12 +140,10 @@
         "regular",
         "serious"
       ],
-      "default": "casual",
-      "description": "How serious the commitment is"
+      "default": "casual"
     },
     "description": {
-      "type": "string",
-      "description": "Free-form details"
+      "type": "string"
     },
     "author_email": {
       "type": "string"
@@ -161,10 +154,12 @@
     "author_age_group": {
       "type": "string",
       "enum": [
+        "under_15",
+        "age_15_plus",
         "minor",
         "adult"
       ],
-      "description": "Self-declared age bracket; discovery requires the same valid bracket"
+      "description": "Only under_15 and age_15_plus are eligible for new discovery. Legacy values are not automatically remapped."
     },
     "status": {
       "type": "string",

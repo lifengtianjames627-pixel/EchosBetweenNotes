@@ -9,36 +9,43 @@ import { withCurrentAlbums, isApproved } from '@/shared/reviews/catalog';
 import ProfileHero from '@/components/profile/ProfileHero';
 import StatStrip from '@/components/profile/StatStrip';
 import ProfileActions from '@/components/profile/ProfileActions';
+import { useLang } from '@/i18n/LanguageContext';
+import privacyCopy from '@/features/soulmate/i18n/privacyCopy';
+import AgeDiscoveryNotice from '@/features/soulmate/components/AgeDiscoveryNotice';
 
 // Another member's profile — reached by tapping their avatar on the map.
 // Friend request and the one-message introduction live here, so a tap on the
 // map never drops you straight into a chat window.
 export default function UserProfile() {
   const { email: raw } = useParams();
-  const email = decodeURIComponent(raw || '');
+  const identifier = raw || '';
+  const { lang } = useLang();
+  const copy = privacyCopy(lang);
 
   const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
 
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ['public-profile', email],
-    queryFn: () => base44.functions.invoke('publicProfile', { email }).then(r => r.data),
-    enabled: !!email,
+  const { data: profile, isLoading, error: profileError } = useQuery({
+    queryKey: ['public-profile', me?.id, me?.age_group, identifier],
+    queryFn: () => base44.functions.invoke('publicProfile', identifier.includes('@') ? { email: identifier } : { user_id: identifier }).then(r => r.data),
+    enabled: !!identifier && !!me?.id, retry: false,
   });
+  // No secondary content or actions are requested before the server authorizes the profile.
+  const email = profile?.found ? profile.email : '';
 
   const { data: reviews = [] } = useQuery({
-    queryKey: ['user-reviews', email],
+    queryKey: ['user-reviews', me?.id, me?.age_group, email],
     queryFn: async () => withCurrentAlbums((await base44.entities.Review.filter({ reviewer_email: email }, '-created_date', 30)).filter(isApproved)),
     enabled: !!email,
   });
 
   const { data: bands = [] } = useQuery({
-    queryKey: ['user-bands', email],
+    queryKey: ['user-bands', me?.id, me?.age_group, email],
     queryFn: () => base44.entities.BandMember.filter({ user_email: email }),
     enabled: !!email,
   });
 
   const { data: badges = [] } = useQuery({
-    queryKey: ['user-badges', email],
+    queryKey: ['user-badges', me?.id, me?.age_group, email],
     queryFn: () => base44.entities.UserBadge.filter({ user_email: email }),
     enabled: !!email,
   });
@@ -65,10 +72,10 @@ export default function UserProfile() {
           <ArrowLeft className="w-3.5 h-3.5" /> Back
         </Link>
 
-        {isLoading ? (
+        {isLoading || !me ? (
           <div className="h-44 animate-pulse" style={{ background: '#ece5d6', borderRadius: 12 }} />
-        ) : profile?.found === false ? (
-          <p className="text-sm py-16 text-center" style={{ color: '#8a7e6f' }}>This member could not be found.</p>
+        ) : profile?.age_required ? <AgeDiscoveryNotice /> : profileError || !profile?.found ? (
+          <p role="status" className="text-sm py-16 text-center text-muted-foreground">{copy.profileUnavailable}</p>
         ) : (
           <>
             <ProfileHero

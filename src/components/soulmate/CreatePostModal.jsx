@@ -7,6 +7,7 @@ import { findContactInfo } from '@/lib/contactFilter';
 import SafetyNotice from '@/components/soulmate/SafetyNotice';
 import { useLang } from '@/i18n/LanguageContext';
 import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
+import PrivatePosterUpload from '@/features/soulmate/components/PrivatePosterUpload';
 
 export const INSTRUMENTS = [
   'Vocals', 'Guitar', 'Lead Guitar', 'Bass', 'Drums', 'Keys',
@@ -23,7 +24,7 @@ const EMPTY = {
   kind: 'band',
   title: '',
   band_name: '',
-  poster_url: '',
+  poster_asset_id: '',
   city: '',
   school: '',
   looking_for: [],
@@ -73,13 +74,7 @@ export default function CreatePostModal({ currentUser, onClose }) {
     [field]: d[field].includes(value) ? d[field].filter(v => v !== value) : [...d[field], value],
   }));
 
-  const handleUpload = async (file) => {
-    if (!file) return;
-    setUploading(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    set({ poster_url: file_url });
-    setUploading(false);
-  };
+
 
   const create = useMutation({
     mutationFn: async () => {
@@ -166,38 +161,7 @@ export default function CreatePostModal({ currentUser, onClose }) {
             ))}
           </div>
 
-          {/* Poster upload */}
-          <div>
-            <label className="text-[10px] uppercase tracking-widest font-bold block mb-1.5" style={{ color: 'rgba(124,111,255,0.7)' }}>
-              Poster image <span className="normal-case font-normal opacity-60">(optional)</span>
-            </label>
-            {data.poster_url ? (
-              <div className="relative rounded-2xl overflow-hidden">
-                <img src={data.poster_url} alt="poster" className="w-full aspect-[4/3] object-cover" />
-                <button
-                  type="button"
-                  onClick={() => set({ poster_url: '' })}
-                  className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center"
-                  style={{ background: 'rgba(8,10,28,0.85)', color: '#fca5a5', border: '1px solid rgba(248,113,113,0.35)' }}
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : (
-              <label
-                className="flex flex-col items-center justify-center gap-2 py-7 rounded-2xl cursor-pointer"
-                style={{ background: 'rgba(124,111,255,0.06)', border: '1px dashed rgba(124,111,255,0.3)' }}
-              >
-                {uploading
-                  ? <Loader2 className="w-5 h-5 animate-spin" style={{ color: '#a5b4fc' }} />
-                  : <Upload className="w-5 h-5" style={{ color: '#a5b4fc' }} />}
-                <span className="text-[11px]" style={{ color: 'rgba(150,165,215,0.65)' }}>
-                  {uploading ? 'Uploading…' : 'Upload your recruitment poster'}
-                </span>
-                <input type="file" accept="image/*" className="hidden" onChange={e => handleUpload(e.target.files?.[0])} />
-              </label>
-            )}
-          </div>
+          <PrivatePosterUpload onChange={poster_asset_id => set({ poster_asset_id })} onUploading={setUploading} disabled={create.isPending || submitted} />
 
           {data.kind === 'band' && (
             <input

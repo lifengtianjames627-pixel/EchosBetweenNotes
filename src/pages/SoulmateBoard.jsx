@@ -33,7 +33,7 @@ export default function SoulmateBoard() {
       .filter(Boolean)
       .some(v => String(v).toLowerCase().includes(search.toLowerCase())));
 
-  if (currentUser && !['minor', 'adult'].includes(currentUser.age_group)) return <AgeGateModal />;
+  if (currentUser && !['under_15', 'age_15_plus'].includes(currentUser.age_group)) return <AgeGateModal />;
 
   return (
     <div className="min-h-screen" style={{ background: '#f3efe6' }}>

@@ -84,7 +84,7 @@ export default function NearbyMap({ V, center, people, onOpen }) {
               key={p.email}
               position={[p.plat, p.plng]}
               icon={avatarIcon(p)}
-              eventHandlers={{ click: () => onOpen(p.email, p.name) }}
+              eventHandlers={{ click: () => onOpen(p.id || p.email, p.name) }}
             >
               <Tooltip>
                 {p.name || 'Anonymous'}

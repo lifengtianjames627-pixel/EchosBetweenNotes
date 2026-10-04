@@ -1,4 +1,5 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
+import { safeMemberName } from '../../shared/memberAccess.ts';
 
 // Live profile resolver for review/post authors. Content stores the author's
 // email (reviewer_email, author_email, …) as the durable binding key; the
@@ -24,7 +25,7 @@ export default async function(req) {
     const results = {};
     for (const u of matches) {
       results[u.email] = {
-        name: u.display_name || u.full_name || u.email,
+        name: safeMemberName(u),
         picture_url: u.profile_picture_url || '',
       };
     }

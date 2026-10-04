@@ -1,6 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
 import { validLocation, storedLocation, networkAllowed } from '../../shared/locationPolicy.ts';
 import { ageGroupOf, sameAgeGroup, publicRecruitment, publicRecruitmentQuery } from '../../shared/recruitmentPolicy.ts';
+import { safeMemberName } from '../../shared/memberAccess.ts';
 
 // Builds the Messages landing lists for the signed-in user:
 //  - conversations: one row per person they've already talked to, newest first
@@ -174,6 +175,7 @@ export default async function(req) {
       const online = !!lastActive && (now - new Date(lastActive).getTime()) < ONLINE_WINDOW_MS;
 
       nearby.push({
+        id: u.id,
         lat: coarse?.lat ?? null,
         lng: coarse?.lng ?? null,
         online,
@@ -181,7 +183,7 @@ export default async function(req) {
         location_updated: theirs ? (u.location_updated || null) : null,
         email: u.email,
         picture_url: u.profile_picture_url || '',
-        name: u.display_name || u.full_name || post?.author_name || '',
+        name: safeMemberName(u),
         city: post?.city || '',
         school: post?.school || '',
         kind: post?.kind || null,

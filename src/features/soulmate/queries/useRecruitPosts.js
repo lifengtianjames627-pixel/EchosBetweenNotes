@@ -7,6 +7,6 @@ export default function useRecruitPosts(user) {
       status: 'active', author_age_group: user.age_group,
       moderation_status: { $in: ['approved', '', null] },
     }, '-created_date', 200),
-    enabled: !!user?.id && ['minor', 'adult'].includes(user.age_group),
+    enabled: !!user?.id && ['under_15', 'age_15_plus'].includes(user.age_group),
   });
 }

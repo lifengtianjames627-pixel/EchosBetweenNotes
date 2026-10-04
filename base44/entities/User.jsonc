@@ -12,56 +12,51 @@
     },
     "display_name": {
       "type": "string",
-      "description": "Member-chosen display name. Shown across the app in place of the platform full_name when set."
+      "description": "Member-chosen display name."
     },
     "equipped_badges": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "Up to 4 equipped badge IDs shown on reviews and profile"
+      "description": "Up to 4 equipped badge IDs"
     },
     "profile_picture_url": {
-      "type": "string",
-      "description": "Uploaded profile picture URL (stored file)"
+      "type": "string"
     },
     "age_group": {
       "type": "string",
       "enum": [
+        "under_15",
+        "age_15_plus",
         "minor",
         "adult"
       ],
-      "description": "Self-declared age bracket. Band-forming posts are only visible within the same bracket so adults and minors never match with each other."
+      "description": "Current self-declared groups: under_15 (younger than 15), age_15_plus (15 and older). Legacy minor/adult values are not valid for discovery and require a new selection. This is not identity verification or legal adulthood."
     },
     "music_preferences": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Music styles selected during profile setup"
+      }
     },
     "biography": {
-      "type": "string",
-      "description": "Short member biography"
+      "type": "string"
     },
     "location_network_allowed": {
       "type": "boolean",
-      "default": false,
-      "description": "Whether the member allows network-based nearby discovery"
+      "default": false
     },
     "has_band": {
       "type": "boolean",
-      "default": false,
-      "description": "Whether the member is currently in a band"
+      "default": false
     },
     "band_name": {
-      "type": "string",
-      "description": "Current band name when applicable"
+      "type": "string"
     },
     "profile_completed": {
       "type": "boolean",
-      "default": false,
-      "description": "Whether the first-time profile setup was completed"
+      "default": false
     },
     "total_browsing_minutes": {
       "type": "number",
@@ -90,7 +85,7 @@
     },
     "messages_last_seen": {
       "type": "object",
-      "description": "Per-peer last-seen map { peerEmail: ISOString }. A conversation's unread count is messages from that peer after their timestamp. (Legacy: a single ISO string = global last-seen, still honoured.)"
+      "description": "Per-peer last-seen map; legacy single timestamps remain supported by the directory."
     }
   },
   "required": [

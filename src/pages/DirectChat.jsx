@@ -18,6 +18,9 @@ import PeopleAround from '@/components/chat/PeopleAround';
 import { usePins } from '@/components/chat/usePins';
 import { useLang } from '@/i18n/LanguageContext';
 import useChatDirectory from '@/features/location/queries/useChatDirectory';
+import privacyCopy from '@/features/soulmate/i18n/privacyCopy';
+import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
+import AgeDiscoveryNotice from '@/features/soulmate/components/AgeDiscoveryNotice';
 
 // Paper palette — same language as Written Reviews. Shared with the chat
 // subcomponents through the `V` prop.
@@ -38,7 +41,8 @@ const PRE_FRIEND_MESSAGE_LIMIT = 3;
 export default function DirectChat() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const copy = privacyCopy(lang), shared = recruitCopy(lang);
   const params = new URLSearchParams(window.location.search);
   const peerEmail = params.get('with');
   const peerName = params.get('name') || '';
@@ -113,17 +117,19 @@ export default function DirectChat() {
     return true;
   };
 
-  const { data: searchResults = [] } = useQuery({
-    queryKey: ['user-search', search],
-    queryFn: () => base44.entities.User.list(),
-    enabled: search.length >= 1,
-    select: (users) => {
-      const q = search.toLowerCase();
-      return users
-        .filter(u => u.email !== user?.email)
-        .filter(u => u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q))
-        .slice(0, 8);
+  const searchQuery = useQuery({
+    queryKey: ['user-search', user?.id, user?.age_group, search],
+    queryFn: () => base44.functions.invoke('searchUsers', { query: search.trim() }).then(r => r.data),
+    enabled: !!user?.id && search.trim().length >= 2,
+  });
+  const searchResults = searchQuery.data?.results || [];
+  const openSearchResult = useMutation({
+    mutationFn: async id => {
+      const { data } = await base44.functions.invoke('publicProfile', { user_id: id });
+      if (!data.found) throw new Error(copy.profileUnavailable);
+      return data;
     },
+    onSuccess: profile => openChat(profile.email, profile.full_name),
   });
 
   const { pins, isPinned, toggle } = usePins(user);
@@ -155,27 +161,29 @@ export default function DirectChat() {
                 autoFocus
                 className="w-full pl-10 pr-4 py-3 rounded-2xl text-sm outline-none"
                 style={{ background: '#ffffff', border: `1px solid ${V.border}`, color: V.text }}
-                placeholder={t('chat.searchPlaceholder')}
+                placeholder={copy.search}
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
             {/* Results */}
-            {search.length >= 1 && (
+            {(searchQuery.error || openSearchResult.error) && <p role="alert" className="mt-2 text-sm text-destructive">{shared.failed}</p>}
+            {search.trim().length >= 2 && (
               <div className="mt-3 space-y-1">
-                {searchResults.length === 0 ? (
+                {searchQuery.data?.age_required ? <AgeDiscoveryNotice /> : searchQuery.isFetching ? <p className="text-sm text-muted-foreground">{shared.saving}</p> : searchResults.length === 0 ? (
                   <p className="text-sm text-center py-6" style={{ color: V.muted }}>{t('chat.noUsers')}</p>
                 ) : (
                   searchResults.map(u => (
                     <button
                       key={u.id}
-                      onClick={() => openChat(u.email, u.full_name || '')}
+                      disabled={openSearchResult.isPending}
+                      onClick={() => openSearchResult.mutate(u.id)}
                       className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-colors"
                       style={{ background: V.card, border: `1px solid ${V.border}` }}
                     >
                       <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
                         style={{ background: '#f1ebdd', color: '#8a5a20' }}>
-                        {(u.full_name || u.email || '?')[0].toUpperCase()}
+                        {(u.full_name || '?')[0].toUpperCase()}
                       </div>
                       <div className="min-w-0">
                         <p className="font-semibold text-sm truncate" style={{ color: V.text }}>{u.full_name || 'Anonymous'}</p>

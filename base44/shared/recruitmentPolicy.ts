@@ -1,5 +1,5 @@
 export function ageGroupOf(user) {
-  return ['minor', 'adult'].includes(user?.age_group) ? user.age_group : null;
+  return ['under_15', 'age_15_plus'].includes(user?.age_group) ? user.age_group : null;
 }
 export function sameAgeGroup(viewer, peer) {
   const group = ageGroupOf(viewer);

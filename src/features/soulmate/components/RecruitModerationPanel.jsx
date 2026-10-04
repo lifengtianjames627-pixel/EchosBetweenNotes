@@ -16,7 +16,7 @@ export default function RecruitModerationPanel({ filter }) {
       client.setQueriesData({ queryKey: ['recruit-posts'] }, old => old?.filter(post => post.id !== id));
       const email = updated.author_email || posts.data?.find(post => post.id === id)?.author_email;
       client.setQueriesData({ queryKey: ['chat-directory'] }, old => old ? { ...old, nearby: (old.nearby || []).filter(peer => peer.email !== email) } : old);
-      await Promise.all(['moderation-recruit', 'recruit-posts', 'chat-directory'].map(key => client.invalidateQueries({ queryKey: [key] })));
+      await Promise.all(['moderation-recruit', 'recruit-posts', 'chat-directory', 'recruit-poster'].map(key => client.invalidateQueries({ queryKey: [key] })));
     },
   });
   return <section className="mt-10 space-y-3" aria-label={copy.recruitment}>

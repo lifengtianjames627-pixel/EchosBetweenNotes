@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { MapPin, GraduationCap, Guitar, MessageSquare, Users } from 'lucide-react';
 import ReportButton from '@/components/soulmate/ReportButton';
 import { useLang } from '@/i18n/LanguageContext';
+import PrivatePosterImage from '@/features/soulmate/components/PrivatePosterImage';
 
 // Paper recruitment poster card. Location in ochre (the cross-cultural accent),
 // square photo (no rounded / no scrim), black print contact button.
@@ -27,9 +28,9 @@ export default function PosterCard({ post, currentUser, index = 0 }) {
       style={{ background: '#faf8f2', border: '1px solid #e6ddc9' }}
     >
       {/* Poster image — square, no rounded, no scrim */}
-      {post.poster_url ? (
+      {post.poster_asset_id ? (
         <div className="relative aspect-[4/3] overflow-hidden shrink-0">
-          <img src={post.poster_url} alt={post.title} className="w-full h-full object-cover" />
+          <PrivatePosterImage post={post} className="w-full h-full object-cover" />
           <span
             className="absolute top-3 left-3 text-[10px] uppercase tracking-widest font-bold px-2.5 py-1"
             style={{ background: '#faf8f2', color: '#bf7a35', border: '1px solid #e6ddc9' }}

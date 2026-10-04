@@ -37,7 +37,7 @@ export default function Manage() {
           {!isLoading && users.map(u => (
             <button
               key={u.id}
-              onClick={() => navigate(`/u/${encodeURIComponent(u.email)}`)}
+              onClick={() => navigate(`/u/${encodeURIComponent(u.id)}`)}
               className="w-full flex items-center gap-4 px-4 py-3 text-left transition-colors hover:bg-[#f1ebdd]"
               style={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 10 }}
             >

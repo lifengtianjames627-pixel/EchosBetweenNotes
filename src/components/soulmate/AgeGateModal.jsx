@@ -5,9 +5,9 @@ import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLang } from '@/i18n/LanguageContext';
 import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
+import privacyCopy from '@/features/soulmate/i18n/privacyCopy';
 
-// Adults and minors must never be matched with each other by this board, so every
-// user declares a bracket once and only ever sees posts from their own bracket.
+// Legacy 18-year age bands are not reinterpreted: members choose the new 15-year band.
 export default function AgeGateModal() {
   const queryClient = useQueryClient();
   const [choice, setChoice] = useState(null);
@@ -18,7 +18,7 @@ export default function AgeGateModal() {
     mutationFn: (age_group) => base44.auth.updateMe({ age_group }),
     onSuccess: async (user) => {
       queryClient.setQueryData(['me'], user);
-      await Promise.all(['me', 'recruit-posts', 'chat-directory'].map(key => queryClient.invalidateQueries({ queryKey: [key] })));
+      await Promise.all(['me', 'recruit-posts', 'chat-directory', 'public-profile', 'user-search', 'recruit-poster'].map(key => queryClient.invalidateQueries({ queryKey: [key] })));
     },
   });
 
@@ -44,13 +44,13 @@ export default function AgeGateModal() {
 
         <p id="recruit-age-title" className="font-playfair italic text-2xl mb-3" style={{ color: '#e8e9ff' }}>{copy.ageTitle}</p>
         <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(150,165,215,0.95)' }}>
-          {copy.ageHint}
+          {privacyCopy(lang).reselect} {copy.ageHint}
         </p>
 
         <div className="space-y-2.5">
           {[
-            { id: 'minor', label: copy.minor, desc: copy.minorHint },
-            { id: 'adult', label: copy.adult, desc: copy.adultHint },
+            { id: 'under_15', label: copy.minor, desc: copy.minorHint },
+            { id: 'age_15_plus', label: copy.adult, desc: copy.adultHint },
           ].map(o => (
             <button
               key={o.id}
