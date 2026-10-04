@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ThumbsUp, ThumbsDown, Bell, BellOff } from 'lucide-react';
-import { awardBadge } from '@/lib/badgeUtils';
+import useReviewVoting from '@/features/reviews/queries/useReviewVoting';
+import voteCopy from '@/features/reviews/model/voteCopy';
+import { useLang } from '@/i18n/LanguageContext';
 import { notify } from '@/lib/notify';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -10,16 +12,9 @@ import ReviewEditControl from '@/components/reviews/ReviewEditControl';
 
 export default function ReviewActions({ review, v, currentUser }) {
   const queryClient = useQueryClient();
-  const [optimisticVote, setOptimisticVote] = useState(null); // 'like' | 'dislike' | null = no change
-  const { authed, login } = useAuthed();
-
-  // Fetch current user's vote on this review
-  const { data: myVotes = [] } = useQuery({
-    queryKey: ['my-vote', review.id, currentUser?.email],
-    queryFn: () => base44.entities.ReviewVote.filter({ review_id: review.id, voter_email: currentUser.email }),
-    enabled: !!currentUser?.email,
-  });
-  const myVote = optimisticVote !== null ? optimisticVote : (myVotes[0]?.vote || null);
+  const { login } = useAuthed();
+  const { lang } = useLang();
+  const { voteMutation, voteLoading, myVote, likesCount, dislikesCount } = useReviewVoting({ review, currentUser });
 
   // Fetch subscription status
   const { data: mySubs = [] } = useQuery({
@@ -31,55 +26,6 @@ export default function ReviewActions({ review, v, currentUser }) {
 
   const [optimisticSub, setOptimisticSub] = useState(null); // null = use real data
   const effectiveSub = optimisticSub !== null ? optimisticSub : isSubscribed;
-
-  const [likesCount, setLikesCount] = useState(review.likes_count || 0);
-  const [dislikesCount, setDislikesCount] = useState(review.dislikes_count || 0);
-
-  const voteMutation = useMutation({
-    mutationFn: async (voteType) => {
-      if (!currentUser?.email) return;
-
-      const prevVote = myVotes[0];
-      const isSame = prevVote?.vote === voteType;
-
-      // Optimistic UI
-      setOptimisticVote(isSame ? 'none' : voteType);
-      const likeDelta = voteType === 'like' ? (isSame ? -1 : 1) : (prevVote?.vote === 'like' ? -1 : 0);
-      const dislikeDelta = voteType === 'dislike' ? (isSame ? -1 : 1) : (prevVote?.vote === 'dislike' ? -1 : 0);
-      const newLikes = Math.max(0, likesCount + likeDelta);
-      const newDislikes = Math.max(0, dislikesCount + dislikeDelta);
-      setLikesCount(newLikes);
-      setDislikesCount(newDislikes);
-
-      if (prevVote) {
-        await base44.entities.ReviewVote.delete(prevVote.id);
-      }
-      if (!isSame) {
-        await base44.entities.ReviewVote.create({ review_id: review.id, voter_email: currentUser.email, vote: voteType });
-      }
-      await base44.entities.Review.update(review.id, { likes_count: newLikes, dislikes_count: newDislikes });
-      // Check quality badges for reviewer
-      if (review.reviewer_email && voteType === 'like' && !isSame) {
-        const allReviews = await base44.entities.Review.filter({ reviewer_email: review.reviewer_email });
-        const totalLikes = allReviews.reduce((s, r) => s + (r.likes_count || 0), 0) + likeDelta;
-        if (totalLikes >= 100) awardBadge(review.reviewer_email, 'likes_100', queryClient);
-        if (totalLikes >= 300) awardBadge(review.reviewer_email, 'likes_300', queryClient);
-        if (totalLikes >= 500) awardBadge(review.reviewer_email, 'likes_500', queryClient);
-        notify({
-          owner_email: review.reviewer_email,
-          type: 'like',
-          title: `${displayName(currentUser)} liked your review`,
-          body: review.album_title ? `On "${review.album_title}"` : '',
-          link: `/album/${review.album_id}`,
-          actor_name: displayName(currentUser),
-        });
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-vote', review.id, currentUser?.email] });
-      setOptimisticVote(null);
-    },
-  });
 
   const subMutation = useMutation({
     mutationFn: async () => {
@@ -118,10 +64,11 @@ export default function ReviewActions({ review, v, currentUser }) {
   return (
     <div className="flex items-center gap-2 mt-3 flex-wrap">
       <ReviewEditControl review={review} user={currentUser} />
+      {voteMutation.isError && <p role="alert" className="basis-full text-xs text-destructive">{voteCopy(lang)}</p>}
       {/* Like */}
       <button
         className={btnBase}
-        disabled={voteMutation.isPending}
+        disabled={voteMutation.isPending || voteLoading}
         onClick={() => canVote ? voteMutation.mutate('like') : login()}
         title={canVote ? 'Like' : 'Login to vote'}
         style={{
@@ -138,7 +85,7 @@ export default function ReviewActions({ review, v, currentUser }) {
       {/* Dislike */}
       <button
         className={btnBase}
-        disabled={voteMutation.isPending}
+        disabled={voteMutation.isPending || voteLoading}
         onClick={() => canVote ? voteMutation.mutate('dislike') : login()}
         title={canVote ? 'Dislike' : 'Login to vote'}
         style={{
