@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
 import { validLocation, storedLocation, networkAllowed } from '../../shared/locationPolicy.ts';
+import { ageGroupOf, sameAgeGroup, publicRecruitment, publicRecruitmentQuery } from '../../shared/recruitmentPolicy.ts';
 
 // Builds the Messages landing lists for the signed-in user:
 //  - conversations: one row per person they've already talked to, newest first
@@ -74,7 +75,8 @@ export default async function(req) {
     // remember it on their record so friends on the same network find each other.
     const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim()
       || req.headers.get('cf-connecting-ip') || '';
-    const allowNetwork = networkAllowed(user);
+    const ageGroup = ageGroupOf(user);
+    const allowNetwork = !!ageGroup && networkAllowed(user);
     const myNet = allowNetwork && ip ? await networkHash(ip) : null;
     const now = Date.now();
     // Heartbeat: every visit refreshes last_active, which is what makes someone
@@ -86,7 +88,7 @@ export default async function(req) {
 
     const [messages, posts, users] = await Promise.all([
       svc.entities.ChatMessage.list('-created_date', 500),
-      svc.entities.RecruitPost.filter({ status: 'active' }, '-created_date', 200),
+      ageGroup ? svc.entities.RecruitPost.filter(publicRecruitmentQuery(ageGroup), '-created_date', 200) : Promise.resolve([]),
       svc.entities.User.list(),
     ]);
 
@@ -124,12 +126,11 @@ export default async function(req) {
 
     const myPosts = posts.filter(p => p.author_email === user.email);
     const myCity = myPosts.find(p => p.city)?.city || '';
-    const ageGroup = user.age_group || myPosts[0]?.author_age_group || null;
 
-    // Newest non-blocked post per author, for board info on each person.
+    // Only publicly approved, same-bracket posts can supply discovery metadata.
     const postByEmail = new Map();
     for (const p of posts) {
-      if (p.author_email && p.moderation_status !== 'blocked' && !postByEmail.has(p.author_email)) {
+      if (p.author_email && publicRecruitment(p) && p.author_age_group === ageGroup && !postByEmail.has(p.author_email)) {
         postByEmail.set(p.author_email, p);
       }
     }
@@ -147,9 +148,8 @@ export default async function(req) {
     let nearby = [];
     for (const u of users) {
       if (!u.email || u.email === user.email) continue;
+      if (!sameAgeGroup(user, u)) continue;
       const post = postByEmail.get(u.email) || null;
-      const theirGroup = u.age_group || post?.author_age_group || null;
-      if (ageGroup && theirGroup && theirGroup !== ageGroup) continue;
 
       const net = onMyNetwork(u);
       const theirs = storedLocation(u);
@@ -206,6 +206,7 @@ export default async function(req) {
 
     return Response.json({
       conversations: conversations.slice(0, 25),
+      age_required: !ageGroup,
       nearby,
       my_city: myCity,
       matched_city: sameCity,
