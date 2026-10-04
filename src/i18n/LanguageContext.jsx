@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { SECTION_TRANSLATIONS } from '@/i18n/sectionTranslations';
+import { LOCATION_TRANSLATIONS } from '@/features/location/i18n/locationTranslations';
 
 // System-wide UI language. Persisted locally, defaults to English.
 // It only affects interface chrome — never user-generated content.
@@ -15,8 +16,8 @@ export function LanguageProvider({ children }) {
   }, []);
 
   const t = useCallback((key, vars) => {
-    let str = TRANSLATIONS[lang]?.[key] ?? SECTION_TRANSLATIONS[lang]?.[key]
-      ?? TRANSLATIONS.en[key] ?? SECTION_TRANSLATIONS.en[key] ?? key;
+    let str = LOCATION_TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS[lang]?.[key] ?? SECTION_TRANSLATIONS[lang]?.[key]
+      ?? LOCATION_TRANSLATIONS.en[key] ?? TRANSLATIONS.en[key] ?? SECTION_TRANSLATIONS.en[key] ?? key;
     if (vars) for (const [k, v] of Object.entries(vars)) str = str.replaceAll(`{${k}}`, v);
     return str;
   }, [lang]);

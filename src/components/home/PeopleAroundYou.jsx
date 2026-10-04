@@ -8,6 +8,7 @@ import { useAuthed } from '@/shared/identity';
 import { publicName } from '@/shared/identity';
 import { openPrivateChat } from '@/shared/chat/openPrivateChat';
 import { peerColor } from '@/components/chat/peerColors';
+import useChatDirectory from '@/features/location/queries/useChatDirectory';
 
 // A compact "People Around You" strip for the home page. Reuses the same
 // chatDirectory data the Messages page does — same-Wi-Fi, shared-location and
@@ -24,11 +25,7 @@ export default function PeopleAroundYou() {
     enabled: authed,
   });
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['chat-directory'],
-    queryFn: () => base44.functions.invoke('chatDirectory', {}).then(r => r.data || {}),
-    enabled: !!user?.email,
-  });
+  const { data, isLoading } = useChatDirectory(authed ? user : null);
 
   const nearby = (data?.nearby || []).slice(0, 6);
 

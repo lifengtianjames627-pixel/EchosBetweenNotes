@@ -1,4 +1,5 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
+import { validLocation, storedLocation, networkAllowed } from '../../shared/locationPolicy.ts';
 
 // Builds the Messages landing lists for the signed-in user:
 //  - conversations: one row per person they've already talked to, newest first
@@ -29,10 +30,8 @@ async function networkHash(ip) {
   return Array.from(new Uint8Array(buf)).slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Coarse IP-based geolocation — auto-centres the map and enables distance
-// sorting without requiring GPS consent or a manual pin. City-level only;
-// the user can place a pin anytime to refine. Nothing is stored: the fix is
-// re-derived from the network address on every visit.
+// Optional city-level network estimate, only after separate network opt-in.
+// This lookup discloses the public IP to ipwho.is; see the location agreement.
 async function ipGeocode(ip) {
   if (!ip) return null;
   try {
@@ -54,6 +53,14 @@ export default async function(req) {
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
+    const body = await req.json();
+    if (body.session_location != null && !validLocation(body.session_location)) {
+      return Response.json({ error: 'Invalid session location' }, { status: 400 });
+    }
+    // Visit-only coordinates are used for this response, never written to User.
+    const sessionLoc = user.location_consent === 'session' && body.session_location
+      ? { lat: Math.round(body.session_location.lat * 1000) / 1000, lng: Math.round(body.session_location.lng * 1000) / 1000 }
+      : null;
     const svc = base44.asServiceRole;
 
     // Per-peer "last seen" map drives per-conversation unread counts. A legacy
@@ -67,13 +74,14 @@ export default async function(req) {
     // remember it on their record so friends on the same network find each other.
     const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim()
       || req.headers.get('cf-connecting-ip') || '';
-    const myNet = ip ? await networkHash(ip) : null;
+    const allowNetwork = networkAllowed(user);
+    const myNet = allowNetwork && ip ? await networkHash(ip) : null;
     const now = Date.now();
     // Heartbeat: every visit refreshes last_active, which is what makes someone
     // "online" for everyone else (and what their last-known position is dated by).
     await svc.entities.User.update(user.id, {
       last_active: new Date(now).toISOString(),
-      ...(myNet ? { network_id: myNet, network_seen: new Date(now).toISOString() } : {}),
+      ...(myNet ? { network_id: myNet, network_seen: new Date(now).toISOString() } : { network_id: null, network_seen: null }),
     });
 
     const [messages, posts, users] = await Promise.all([
@@ -126,17 +134,14 @@ export default async function(req) {
       }
     }
 
-    const storedLoc = (typeof user.location_lat === 'number' && typeof user.location_lng === 'number')
-      ? { lat: user.location_lat, lng: user.location_lng }
-      : null;
-    // No stored spot → fall back to a coarse city-level fix from the network
-    // address so the map and distance sorting work immediately, no pin needed.
-    const ipLoc = storedLoc ? null : await ipGeocode(ip);
-    const mine = storedLoc || ipLoc;
-    const locationSource = user.location_source || (ipLoc ? 'ip' : null);
+    const storedLoc = storedLocation(user);
+    const ipLoc = !storedLoc && !sessionLoc && allowNetwork ? await ipGeocode(ip) : null;
+    const mine = sessionLoc || storedLoc || ipLoc;
+    const locationSource = sessionLoc ? (body.session_location.source === 'manual' ? 'manual' : 'device')
+      : storedLoc ? (user.location_source === 'manual' ? 'manual' : 'device') : ipLoc ? 'ip' : null;
 
     const onMyNetwork = (u) =>
-      !!myNet && u.network_id === myNet && u.network_seen &&
+      !!myNet && networkAllowed(u) && u.network_id === myNet && u.network_seen &&
       (now - new Date(u.network_seen).getTime()) < NETWORK_WINDOW_MS;
 
     let nearby = [];
@@ -147,27 +152,24 @@ export default async function(req) {
       if (ageGroup && theirGroup && theirGroup !== ageGroup) continue;
 
       const net = onMyNetwork(u);
-      const theirs = (typeof u.location_lat === 'number' && typeof u.location_lng === 'number')
-        ? { lat: u.location_lat, lng: u.location_lng }
-        : null;
+      const theirs = storedLocation(u);
 
       // Reachable = same Wi-Fi, or has a shared location, or is on the board.
       if (!net && !theirs && !post) continue;
 
       let km = null;
       if (mine && theirs) km = distanceKm(mine.lat, mine.lng, theirs.lat, theirs.lng);
-      if (net && km === null) km = 0; // same Wi-Fi ≈ same place
+      // Sharing a network does not establish a physical distance.
 
-      // Other people's pins are coarsened to ~100 m — precise enough to find the
-      // neighbourhood, never an exact address. Same-network people without their
-      // own coordinates are placed at the viewer's spot (same Wi-Fi).
-      const src = theirs || (net ? mine : null);
+      // Only consented saved positions become approximate ~1 km pins.
+      // Never invent a peer's location from a matching public network address.
+      const src = theirs;
       const coarse = src && (mine || net)
-        ? { lat: Math.round(src.lat * 1000) / 1000, lng: Math.round(src.lng * 1000) / 1000 }
+        ? { lat: Math.round(src.lat * 100) / 100, lng: Math.round(src.lng * 100) / 100 }
         : null;
 
-      // Online = heartbeat within the last 5 minutes. When offline we still show
-      // the position they had when last seen, marked as such.
+      // Online = heartbeat within the last 5 minutes. Only consented saved
+      // positions remain visible when a member is offline.
       const lastActive = u.last_active || u.network_seen || null;
       const online = !!lastActive && (now - new Date(lastActive).getTime()) < ONLINE_WINDOW_MS;
 
@@ -176,7 +178,7 @@ export default async function(req) {
         lng: coarse?.lng ?? null,
         online,
         last_active: lastActive,
-        location_updated: u.location_updated || null,
+        location_updated: theirs ? (u.location_updated || null) : null,
         email: u.email,
         picture_url: u.profile_picture_url || '',
         name: u.display_name || u.full_name || post?.author_name || '',
@@ -210,8 +212,7 @@ export default async function(req) {
       located: !!mine,
       location_source: locationSource,
       network_active: !!myNet,
-      // Your own position comes back at full precision — it's your data,
-      // and it centres the map exactly where you are.
+      // The viewer's consented, approximate position centres their own map.
       my_lat: mine ? mine.lat : null,
       my_lng: mine ? mine.lng : null,
       located_count: nearby.filter(n => n.distance_km !== null).length,

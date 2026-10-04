@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { AnimatePresence } from 'framer-motion';
+
 import { Navigation, LocateFixed, ShieldCheck, AlertTriangle, Crosshair } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useMyLocation } from './useMyLocation';
@@ -9,22 +9,23 @@ import LocationConsentModal from './LocationConsentModal';
 import LocationPicker from './LocationPicker';
 
 // Distance-sorting control for "People around you".
-// Two paths to a position: the device fix (accurate on phones with GPS) and
-// manual pin placement on a map — the only exact option on a laptop, where the
-// browser can merely estimate from Wi-Fi.
+// Device estimates and manual approximate pins both require explicit consent.
 export default function LocationShareBar({ V, located, locationSource, myLat, myLng }) {
   const { t } = useLang();
   const { status, accuracy, share, deny, clear, setManual } = useMyLocation();
   const [showConsent, setShowConsent] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
+  const [consent, setConsent] = useState('session');
+  const busy = status === 'saving' || status === 'asking';
+  const requestLocation = source => { if (!busy) setShowConsent(source); };
   const autoTried = useRef(false);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
-  // Touch device ⇒ almost certainly a phone/tablet with a GPS chip.
+  // Coarse pointers get the existing device-location shortcut; this does not prove GPS hardware.
   const hasGps = typeof window !== 'undefined'
     && window.matchMedia?.('(pointer: coarse)').matches
     && !!navigator.geolocation;
-  const manual = user?.location_source === 'manual';
+  const manual = user?.location_source === 'manual' || locationSource === 'manual';
   const pickerCenter = typeof user?.location_lat === 'number'
     ? [user.location_lat, user.location_lng]
     : (typeof myLat === 'number' && typeof myLng === 'number' ? [myLat, myLng] : null);
@@ -32,30 +33,29 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
   // "Always allow" → silently refresh the fix on every visit, no re-asking.
   // A hand-placed pin is never overwritten by a coarse browser estimate.
   useEffect(() => {
-    if (user?.location_consent === 'always' && !manual && !located && status === 'idle' && !autoTried.current) {
+    if (user?.location_consent === 'always' && !manual && located === false && status === 'idle' && !autoTried.current) {
       autoTried.current = true;
       share('always');
     }
   }, [user, manual, located, status, share]);
 
-  const choose = (choice) => {
+  const choose = async choice => {
+    if (choice === 'denied') { if (await deny()) setShowConsent(false); return; }
+    setConsent(choice);
+    const source = showConsent;
     setShowConsent(false);
-    if (choice === 'denied') deny();
+    if (source === 'manual') setShowPicker(true);
     else share(choice);
   };
 
-  const pickerNode = (
-    <AnimatePresence>
-      {showPicker && (
-        <LocationPicker
-          V={V}
-          initialCenter={pickerCenter}
-          onConfirm={(pin) => { setShowPicker(false); setManual(pin); }}
-          onClose={() => setShowPicker(false)}
-        />
-      )}
-    </AnimatePresence>
-  );
+  const pickerNode = <>
+    {status === 'error' && !showConsent && !showPicker && <p role="alert" className="text-xs text-destructive">{t('location.failed')}</p>}
+    {status === 'saving' && <p role="status" className="text-xs text-muted-foreground">{t('location.saving')}</p>}
+    {(status === 'asking' || (user?.location_network_allowed && !located)) && <button onClick={clear} disabled={status === 'saving'} className="text-xs underline text-muted-foreground disabled:opacity-40">{t('loc.turnOff')}</button>}
+    {showConsent && <LocationConsentModal onChoose={choose} onClose={() => setShowConsent(false)} busy={status === 'saving'} error={status === 'error'} />}
+    {showPicker && <LocationPicker V={V} initialCenter={pickerCenter} busy={status === 'saving'} error={status === 'error'}
+      onConfirm={async pin => { if (await setManual(pin, consent)) setShowPicker(false); }} onClose={() => setShowPicker(false)} />}
+  </>;
 
   if (located) {
     const isIp = locationSource === 'ip';
@@ -75,7 +75,7 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
           </span>
           <div className="flex items-center gap-3 ml-auto">
             <button
-              onClick={() => setShowPicker(true)}
+              onClick={() => requestLocation('manual')}
               className="flex items-center gap-1.5 text-[11px] font-semibold underline"
               style={{ color: V.accent }}
             >
@@ -85,8 +85,8 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
                 improves accuracy — offered only on touch devices. */}
             {hasGps && (
               <button
-                onClick={() => share(user?.location_consent === 'always' ? 'always' : 'session')}
-                disabled={status === 'asking'}
+                onClick={() => requestLocation('device')}
+                disabled={busy}
                 className="flex items-center gap-1.5 text-[11px] font-semibold underline"
                 style={{ color: V.accent, opacity: status === 'asking' ? 0.6 : 1 }}
               >
@@ -96,11 +96,9 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
                   : (isIp ? t('loc.useGps') : t('chat.gpsRefresh'))}
               </button>
             )}
-            {!isIp && (
-              <button onClick={clear} className="text-[11px] shrink-0 underline" style={{ color: V.muted }}>
-                {t('loc.turnOff')}
-              </button>
-            )}
+            <button onClick={clear} disabled={status === 'saving'} className="text-[11px] shrink-0 underline disabled:opacity-40" style={{ color: V.muted }}>
+              {t('loc.turnOff')}
+            </button>
           </div>
         </div>
         {pickerNode}
@@ -120,12 +118,12 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
             </p>
             <div className="flex flex-wrap items-center gap-3 mt-2">
               <button
-                onClick={() => share(user?.location_consent === 'always' ? 'always' : 'session')}
+                onClick={() => requestLocation('device')}
                 className="text-xs font-semibold underline" style={{ color: V.accent }}>
                 {t('loc.retry')}
               </button>
               <button
-                onClick={() => setShowPicker(true)}
+                onClick={() => requestLocation('manual')}
                 className="flex items-center gap-1.5 text-xs font-semibold underline" style={{ color: V.accent }}>
                 <Crosshair className="w-3 h-3" /> {t('loc.manual')}
               </button>
@@ -135,12 +133,12 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
           <>
             <p className="text-[11px] leading-relaxed" style={{ color: V.muted }}>
               {t('loc.deniedChoice')}{' '}
-              <button onClick={() => setShowConsent(true)} className="underline font-semibold" style={{ color: V.accent }}>
+              <button onClick={() => requestLocation('device')} className="underline font-semibold" style={{ color: V.accent }}>
                 {t('loc.change')}
               </button>
             </p>
             <button
-              onClick={() => setShowPicker(true)}
+              onClick={() => requestLocation('manual')}
               className="flex items-center gap-1.5 text-[11px] font-semibold mt-2 underline" style={{ color: V.accent }}>
               <Crosshair className="w-3 h-3" /> {t('loc.manual')}
             </button>
@@ -148,8 +146,8 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
         ) : (
           <>
             <button
-              onClick={() => setShowConsent(true)}
-              disabled={status === 'asking'}
+              onClick={() => requestLocation('device')}
+              disabled={busy}
               className="flex items-center gap-2 text-xs font-semibold"
               style={{ color: V.accent, opacity: status === 'asking' ? 0.6 : 1 }}
             >
@@ -159,7 +157,7 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
                 : t('loc.use')}
             </button>
             <button
-              onClick={() => setShowPicker(true)}
+              onClick={() => requestLocation('manual')}
               className="flex items-center gap-1.5 text-[11px] font-semibold mt-2 underline"
               style={{ color: V.accent }}
             >

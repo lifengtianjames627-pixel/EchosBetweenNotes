@@ -17,6 +17,7 @@ import RecentConversations from '@/components/chat/RecentConversations';
 import PeopleAround from '@/components/chat/PeopleAround';
 import { usePins } from '@/components/chat/usePins';
 import { useLang } from '@/i18n/LanguageContext';
+import useChatDirectory from '@/features/location/queries/useChatDirectory';
 
 // Paper palette — same language as Written Reviews. Shared with the chat
 // subcomponents through the `V` prop.
@@ -127,12 +128,7 @@ export default function DirectChat() {
 
   const { pins, isPinned, toggle } = usePins(user);
 
-  const { data: directory, isLoading: directoryLoading } = useQuery({
-    queryKey: ['chat-directory'],
-    queryFn: async () => (await base44.functions.invoke('chatDirectory', {})).data,
-    enabled: !!user,
-    refetchInterval: 60000, // keeps online/offline dots fresh
-  });
+  const { data: directory, isLoading: directoryLoading } = useChatDirectory(user, 60000);
 
   const openChat = (email, name) =>
     navigate(`/chat?with=${encodeURIComponent(email)}&name=${encodeURIComponent(name || '')}`);
