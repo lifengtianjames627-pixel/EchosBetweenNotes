@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home as HomeIcon, Shield, LogOut, LogIn, MessageSquare, User, Users } from 'lucide-react';
+import { Home as HomeIcon, Shield, LogOut, LogIn, MessageSquare, Users } from 'lucide-react';
 import NotificationBell from '@/components/NotificationBell';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
