@@ -9,7 +9,7 @@ import { openPrivateChat } from '@/shared/chat/openPrivateChat';
 export default function ReviewLead({ review, onOpen }) {
   const profile = useReviewerProfile(review?.reviewer_email);
   if (!review) return null;
-  const reviewerName = profile?.name || review.reviewer_name || 'Chordmates listener';
+  const reviewerName = profile?.name || review.reviewer_name || 'echoesbetweennotes listener';
   return (
     <button onClick={() => onOpen(review.album_id)} className="group flex flex-col sm:flex-row gap-6 text-left mb-10 pb-10 w-full" style={{ borderBottom: '1px solid #e6ddc9' }}>
       <div className="sm:w-56 shrink-0">

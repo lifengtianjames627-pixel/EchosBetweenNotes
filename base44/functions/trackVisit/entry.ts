@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
+import { stableIdentityInput } from '../../shared/stableIdentityInput.ts';
 
 // Counts one unique visitor per calendar day. Called once per app load from
 // the site Layout. Logged-in visitors are deduped by their user id; guests by
@@ -31,7 +32,7 @@ export default async function(req) {
     if (user && user.id) {
       key = 'u:' + user.id;
     } else {
-      const data = new TextEncoder().encode('chordmates-visit|' + ip);
+      const data = stableIdentityInput('visit', ip);
       const buf = await crypto.subtle.digest('SHA-256', data);
       key = 'g:' + Array.from(new Uint8Array(buf)).slice(0, 8)
         .map(b => b.toString(16).padStart(2, '0')).join('');

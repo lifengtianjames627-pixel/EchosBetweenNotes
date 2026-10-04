@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home as HomeIcon } from 'lucide-react';
 
 // A sheet-music styled genre switcher: five staff lines run across the strip,
 // each genre sits on the staff as a note (alternating pitch so the row reads

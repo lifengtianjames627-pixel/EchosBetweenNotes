@@ -1,5 +1,5 @@
 {
-  "name": "Chordmates",
+  "name": "echoesbetweennotes",
   "site": {
     "installCommand": "npm install",
     "buildCommand": "npm run build",

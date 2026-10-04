@@ -6,7 +6,7 @@ export const BADGES = [
   // ── Welcome ────────────────────────────────────────────────────────────────
   {
     id: 'critic_welcome', category: 'Welcome', tier: 1,
-    name: 'Reader\'s Card', desc: 'Joined the Chordmates reading room',
+    name: 'Reader\'s Card', desc: 'Joined the echoesbetweennotes reading room',
     icon: 'BookMarked', color: '#8a6f4a',
   },
 

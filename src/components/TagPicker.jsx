@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus } from 'lucide-react';
+import { X } from 'lucide-react';
 
 // Predefined tag options organized by category
 export const TAG_OPTIONS = [

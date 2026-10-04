@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { displayName } from '@/lib/displayName';
 import { useReviewerProfileRefresh } from '@/components/ReviewerProfileProvider';
 import { Loader2, X } from 'lucide-react';
 

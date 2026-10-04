@@ -2,6 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
 import { validLocation, storedLocation, networkAllowed } from '../../shared/locationPolicy.ts';
 import { publicRecruitment, publicRecruitmentQuery } from '../../shared/recruitmentPolicy.ts';
 import { safeMemberName } from '../../shared/memberAccess.ts';
+import { stableIdentityInput } from '../../shared/stableIdentityInput.ts';
 
 // Builds the Messages landing lists for the signed-in user:
 //  - conversations: one row per person they've already talked to, newest first
@@ -27,7 +28,7 @@ function distanceKm(aLat, aLng, bLat, bLng) {
 
 // The raw IP is never stored — only a short one-way hash used for equality.
 async function networkHash(ip) {
-  const data = new TextEncoder().encode('chordmates-net|' + ip);
+  const data = stableIdentityInput('net', ip);
   const buf = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(buf)).slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join('');
 }

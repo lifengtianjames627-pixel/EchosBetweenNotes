@@ -304,7 +304,7 @@ export default function CreatePostModal({ currentUser, onClose }) {
             </div>
             <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(150,165,215,0.75)' }}>
               I won't post phone numbers, WeChat/QQ IDs or other handles, I won't ask anyone for money, and I
-              understand Chordmates only shows this post and passes messages — it doesn't verify anyone or take
+              understand echoesbetweennotes only shows this post and passes messages — it doesn't verify anyone or take
               part in anything offline. If I'm under 18, I'll tell a parent or guardian before meeting anyone.
             </p>
           </button>

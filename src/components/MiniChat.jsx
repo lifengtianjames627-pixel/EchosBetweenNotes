@@ -54,7 +54,7 @@ export default function MiniChat({ peer, currentUser, onClose }) {
     if (!content) return;
     const contact = findContactInfo(content);
     if (contact.length > 0) {
-      setWarning(`Keep it in Chordmates — remove your ${contact.join(', ')}.`);
+      setWarning(`Keep it in echoesbetweennotes — remove your ${contact.join(', ')}.`);
       return;
     }
     setWarning(null);
