@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
-import { ageGroupOf } from '../../shared/recruitmentPolicy.ts';
 import { moderateRecruitment } from '../../shared/recruitmentModeration.ts';
 import { recruitmentDraft, recruitmentText, containsRecruitmentContact } from '../../shared/recruitmentDraft.ts';
 
@@ -8,8 +7,6 @@ export default async function(req) {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    const age = ageGroupOf(user);
-    if (!age) return Response.json({ error: 'AGE_REQUIRED' }, { status: 403 });
     const body = await req.json();
     const draft = recruitmentDraft(body.draft);
     if (!draft || body.agreed !== true) return Response.json({ error: 'INVALID_DRAFT' }, { status: 400 });
@@ -31,7 +28,7 @@ export default async function(req) {
     const name = user.display_name || user.full_name || 'Anonymous';
     let post = await base44.entities.RecruitPost.create({
       ...draft, author_email: user.email, author_name: name.includes('@') ? 'Anonymous' : name,
-      author_age_group: age, status: 'active', moderation_status: 'pending_review',
+      status: 'active', moderation_status: 'pending_review',
       moderation_reason: reason, report_count: 0,
     });
     if (action === 'allow') {

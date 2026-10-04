@@ -9,7 +9,7 @@ export default function PrivatePosterImage({ post, className }) {
   const copy = privacyCopy(lang), shared = recruitCopy(lang);
   const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
   const image = useQuery({
-    queryKey: ['recruit-poster', me?.id, me?.age_group, post.id, post.moderation_status],
+    queryKey: ['recruit-poster', me?.id, 'open-discovery', post.id, post.moderation_status],
     queryFn: async () => (await base44.functions.invoke('getRecruitPoster', { post_id: post.id })).data,
     enabled: !!me?.id && !!post.poster_asset_id, staleTime: 0, gcTime: 0,
     refetchInterval: 45000, refetchOnWindowFocus: 'always', retry: false,

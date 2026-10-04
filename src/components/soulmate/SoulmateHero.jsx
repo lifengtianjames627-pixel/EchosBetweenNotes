@@ -71,7 +71,7 @@ export default function SoulmateHero({ t, kinds, kind, setKind, instruments, rol
           </div>
         </div>
 
-        <SafetyNotice compact />
+        <SafetyNotice />
       </div>
 
       <p className="mt-8 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold" style={{ color: '#bf7a35' }}>

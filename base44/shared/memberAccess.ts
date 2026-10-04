@@ -1,6 +1,5 @@
-import { sameAgeGroup } from './recruitmentPolicy.ts';
 export function canViewMember(viewer, target) {
-  return !!target && (viewer.id === target.id || viewer.role === 'admin' || sameAgeGroup(viewer, target));
+  return !!viewer?.id && !!target;
 }
 export function safeMemberName(user) {
   const name = (user?.display_name || user?.full_name || '').trim();

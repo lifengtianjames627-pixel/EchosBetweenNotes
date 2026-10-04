@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
-import { ageGroupOf } from '../../shared/recruitmentPolicy.ts';
 import { canViewMember, safeMemberName, findMember } from '../../shared/memberAccess.ts';
 
 // Public-facing profile card for ANOTHER member. The User entity blocks
@@ -15,7 +14,6 @@ export default async function(req) {
 
     const body = await req.json();
     if (!body.user_id && !body.email) return Response.json({ error: 'Member identifier required' }, { status: 400 });
-    if (!ageGroupOf(user) && user.role !== 'admin' && body.user_id !== user.id && body.email !== user.email) return Response.json({ found: false, age_required: true });
     const target = await findMember(base44, body);
     if (!canViewMember(user, target)) return Response.json({ found: false });
 

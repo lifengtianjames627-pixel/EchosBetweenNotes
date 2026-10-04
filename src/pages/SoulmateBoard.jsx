@@ -5,7 +5,6 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import PosterCard from '@/components/soulmate/PosterCard';
 import CreatePostModal, { INSTRUMENTS } from '@/components/soulmate/CreatePostModal';
-import AgeGateModal from '@/components/soulmate/AgeGateModal';
 import SoulmateHero from '@/components/soulmate/SoulmateHero';
 import { useLang } from '@/i18n/LanguageContext';
 import useRecruitPosts from '@/features/soulmate/queries/useRecruitPosts';
@@ -25,15 +24,12 @@ export default function SoulmateBoard() {
   const { data: allPosts = [], isLoading, error, refetch } = useRecruitPosts(currentUser);
 
   const posts = allPosts
-    .filter(p => p.author_age_group === currentUser?.age_group)
     .filter(p => !p.moderation_status || p.moderation_status === 'approved')
     .filter(p => kind === 'all' || p.kind === kind)
     .filter(p => !role || p.looking_for?.includes(role) || p.i_play?.includes(role))
     .filter(p => !search.trim() || [p.title, p.band_name, p.city, p.school, p.influences, p.description, ...(p.genre_tags || [])]
       .filter(Boolean)
       .some(v => String(v).toLowerCase().includes(search.toLowerCase())));
-
-  if (currentUser && !['under_15', 'age_15_plus'].includes(currentUser.age_group)) return <AgeGateModal />;
 
   return (
     <div className="min-h-screen" style={{ background: '#f3efe6' }}>

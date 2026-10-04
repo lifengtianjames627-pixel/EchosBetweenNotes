@@ -15,15 +15,9 @@
         {
           "$and": [
             {
-              "data.author_age_group": {
-                "$in": [
-                  "under_15",
-                  "age_15_plus"
-                ]
+              "user_condition": {
+                "role": "user"
               }
-            },
-            {
-              "data.author_age_group": "{{user.data.age_group}}"
             },
             {
               "data.status": "active"
@@ -44,21 +38,24 @@
     "create": {
       "$and": [
         {
+          "$or": [
+            {
+              "user_condition": {
+                "role": "user"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
+        },
+        {
           "created_by_id": "{{user.id}}"
         },
         {
           "data.author_email": "{{user.email}}"
-        },
-        {
-          "data.author_age_group": {
-            "$in": [
-              "under_15",
-              "age_15_plus"
-            ]
-          }
-        },
-        {
-          "data.author_age_group": "{{user.data.age_group}}"
         },
         {
           "data.moderation_status": "pending_review"
@@ -159,7 +156,7 @@
         "minor",
         "adult"
       ],
-      "description": "Only under_15 and age_15_plus are eligible for new discovery. Legacy values are not automatically remapped."
+      "description": "Deprecated historical value. No longer collected, displayed or used for access or discovery."
     },
     "status": {
       "type": "string",

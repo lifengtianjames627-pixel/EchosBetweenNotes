@@ -11,7 +11,6 @@ import StatStrip from '@/components/profile/StatStrip';
 import ProfileActions from '@/components/profile/ProfileActions';
 import { useLang } from '@/i18n/LanguageContext';
 import privacyCopy from '@/features/soulmate/i18n/privacyCopy';
-import AgeDiscoveryNotice from '@/features/soulmate/components/AgeDiscoveryNotice';
 
 // Another member's profile — reached by tapping their avatar on the map.
 // Friend request and the one-message introduction live here, so a tap on the
@@ -25,7 +24,7 @@ export default function UserProfile() {
   const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
 
   const { data: profile, isLoading, error: profileError } = useQuery({
-    queryKey: ['public-profile', me?.id, me?.age_group, identifier],
+    queryKey: ['public-profile', me?.id, 'open-discovery', identifier],
     queryFn: () => base44.functions.invoke('publicProfile', identifier.includes('@') ? { email: identifier } : { user_id: identifier }).then(r => r.data),
     enabled: !!identifier && !!me?.id, retry: false,
   });
@@ -33,19 +32,13 @@ export default function UserProfile() {
   const email = profile?.found ? profile.email : '';
 
   const { data: reviews = [] } = useQuery({
-    queryKey: ['user-reviews', me?.id, me?.age_group, email],
+    queryKey: ['user-reviews', me?.id, 'open-discovery', email],
     queryFn: async () => withCurrentAlbums((await base44.entities.Review.filter({ reviewer_email: email }, '-created_date', 30)).filter(isApproved)),
     enabled: !!email,
   });
 
-  const { data: bands = [] } = useQuery({
-    queryKey: ['user-bands', me?.id, me?.age_group, email],
-    queryFn: () => base44.entities.BandMember.filter({ user_email: email }),
-    enabled: !!email,
-  });
-
   const { data: badges = [] } = useQuery({
-    queryKey: ['user-badges', me?.id, me?.age_group, email],
+    queryKey: ['user-badges', me?.id, 'open-discovery', email],
     queryFn: () => base44.entities.UserBadge.filter({ user_email: email }),
     enabled: !!email,
   });
@@ -74,7 +67,7 @@ export default function UserProfile() {
 
         {isLoading || !me ? (
           <div className="h-44 animate-pulse" style={{ background: '#ece5d6', borderRadius: 12 }} />
-        ) : profile?.age_required ? <AgeDiscoveryNotice /> : profileError || !profile?.found ? (
+        ) : profileError || !profile?.found ? (
           <p role="status" className="text-sm py-16 text-center text-muted-foreground">{copy.profileUnavailable}</p>
         ) : (
           <>
@@ -101,7 +94,6 @@ export default function UserProfile() {
             <StatStrip stats={[
               { label: 'Reviews', val: reviews.length },
               { label: 'Badges', val: badges.length },
-              { label: 'Bands', val: bands.length },
               { label: 'Equipped', val: (profile?.equipped_badges || []).length },
             ]} />
 

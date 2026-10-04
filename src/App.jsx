@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { LanguageProvider } from '@/i18n/LanguageContext';
@@ -17,7 +17,7 @@ import Profile from '@/pages/Profile';
 import About from '@/pages/About';
 import ModerationQueue from '@/pages/ModerationQueue';
 import Stats from '@/pages/Stats';
-import BandDashboard from '@/pages/BandDashboard';
+import Discover from '@/pages/Discover';
 import DirectChat from '@/pages/DirectChat';
 import SoulmateBoard from '@/pages/SoulmateBoard';
 import UserProfile from '@/pages/UserProfile';
@@ -58,6 +58,7 @@ const AuthenticatedApp = () => {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/reviews" element={<WrittenReviews />} />
+        <Route path="/discover" element={<Discover />} />
         <Route path="/podcasts" element={<Podcasts />} />
         <Route path="/podcasts/:categoryId" element={<PodcastSpace />} />
         <Route path="/genre/:genreId" element={<GenreSpace />} />
@@ -68,7 +69,9 @@ const AuthenticatedApp = () => {
         <Route path="/u/:email" element={<RequireAuth><UserProfile /></RequireAuth>} />
         <Route path="/moderation" element={<RequireAdmin><ModerationQueue /></RequireAdmin>} />
         <Route path="/moderation/stats" element={<RequireAdmin><Stats /></RequireAdmin>} />
-        <Route path="/band-dashboard" element={<RequireAuth><BandDashboard /></RequireAuth>} />
+        <Route path="/band-dashboard" element={<Navigate to="/soulmate" replace />} />
+        <Route path="/bands" element={<Navigate to="/soulmate" replace />} />
+        <Route path="/band/:id" element={<Navigate to="/soulmate" replace />} />
         <Route path="/chat" element={<RequireAuth><DirectChat /></RequireAuth>} />
         <Route path="/soulmate" element={<RequireAuth><SoulmateBoard /></RequireAuth>} />
         <Route path="/manage" element={<RequireAdmin><Manage /></RequireAdmin>} />

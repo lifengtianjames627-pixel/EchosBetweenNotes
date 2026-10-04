@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
-import { ageGroupOf, publicRecruitment } from '../../shared/recruitmentPolicy.ts';
+import { publicRecruitment } from '../../shared/recruitmentPolicy.ts';
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -10,7 +10,7 @@ export default async function(req) {
     const post = (await base44.entities.RecruitPost.filter({ id: body.post_id }, '-created_date', 1))[0];
     if (!post) return Response.json({ error: 'NOT_AVAILABLE' }, { status: 404 });
     const privileged = user.role === 'admin' || post.created_by_id === user.id;
-    if (!privileged && !(ageGroupOf(user) && post.author_age_group === ageGroupOf(user) && publicRecruitment(post))) return Response.json({ error: 'NOT_AVAILABLE' }, { status: 404 });
+    if (!privileged && !publicRecruitment(post)) return Response.json({ error: 'NOT_AVAILABLE' }, { status: 404 });
     if (!post.poster_asset_id) return Response.json({ error: 'NOT_AVAILABLE' }, { status: 404 });
     const asset = (await base44.asServiceRole.entities.RecruitPosterAsset.filter({ id: post.poster_asset_id }, '-created_date', 1))[0];
     if (!asset || asset.owner_id !== post.created_by_id) return Response.json({ error: 'NOT_AVAILABLE' }, { status: 404 });

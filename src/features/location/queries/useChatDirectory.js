@@ -7,7 +7,7 @@ export default function useChatDirectory(user, refetchInterval = false) {
   const current = useSyncExternalStore(subscribeLocation, getSessionLocation, () => null);
   const session = current?.userId === user?.id ? current : null;
   return useQuery({
-    queryKey: ['chat-directory', user?.id, user?.age_group, session],
+    queryKey: ['chat-directory', user?.id, 'open-discovery', session],
     queryFn: async () => (await base44.functions.invoke('chatDirectory', {
       ...(session ? { session_location: { lat: session.lat, lng: session.lng, source: session.source } } : {}),
     })).data,

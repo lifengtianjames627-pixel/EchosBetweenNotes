@@ -20,7 +20,6 @@ import { useLang } from '@/i18n/LanguageContext';
 import useChatDirectory from '@/features/location/queries/useChatDirectory';
 import privacyCopy from '@/features/soulmate/i18n/privacyCopy';
 import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
-import AgeDiscoveryNotice from '@/features/soulmate/components/AgeDiscoveryNotice';
 
 // Paper palette — same language as Written Reviews. Shared with the chat
 // subcomponents through the `V` prop.
@@ -118,7 +117,7 @@ export default function DirectChat() {
   };
 
   const searchQuery = useQuery({
-    queryKey: ['user-search', user?.id, user?.age_group, search],
+    queryKey: ['user-search', user?.id, 'open-discovery', search],
     queryFn: () => base44.functions.invoke('searchUsers', { query: search.trim() }).then(r => r.data),
     enabled: !!user?.id && search.trim().length >= 2,
   });
@@ -170,7 +169,7 @@ export default function DirectChat() {
             {(searchQuery.error || openSearchResult.error) && <p role="alert" className="mt-2 text-sm text-destructive">{shared.failed}</p>}
             {search.trim().length >= 2 && (
               <div className="mt-3 space-y-1">
-                {searchQuery.data?.age_required ? <AgeDiscoveryNotice /> : searchQuery.isFetching ? <p className="text-sm text-muted-foreground">{shared.saving}</p> : searchResults.length === 0 ? (
+                {searchQuery.isFetching ? <p className="text-sm text-muted-foreground">{shared.saving}</p> : searchResults.length === 0 ? (
                   <p className="text-sm text-center py-6" style={{ color: V.muted }}>{t('chat.noUsers')}</p>
                 ) : (
                   searchResults.map(u => (
@@ -221,7 +220,6 @@ export default function DirectChat() {
               V={V}
               nearby={directory?.nearby || []}
               loading={directoryLoading}
-              ageRequired={directory?.age_required}
               city={directory?.my_city}
               matchedCity={directory?.matched_city}
               located={directory?.located}

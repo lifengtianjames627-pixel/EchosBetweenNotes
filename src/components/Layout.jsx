@@ -10,15 +10,17 @@ import SiteFooter from '@/components/SiteFooter';
 import MusicDataSync from '@/components/reviews/MusicDataSync';
 import { ReviewerProfileProvider } from '@/components/ReviewerProfileProvider';
 import { displayName } from '@/lib/displayName';
+import discoveryCopy from '@/features/albums/i18n/discoveryCopy';
 
 const NAV_ITEMS = [
   { path: '/', icon: HomeIcon, labelKey: 'nav.home' },
+  { path: '/discover', labelKey: 'nav.discover' },
   { path: '/chat', icon: MessageSquare, labelKey: 'nav.messages' },
 ];
 const ADMIN_ITEMS = [{ path: '/moderation', icon: Shield, labelKey: 'nav.moderation' }];
 
 export default function Layout() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -136,7 +138,7 @@ export default function Layout() {
     const active = isActive(path);
     return (
       <Link key={path} to={path} className="relative px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap" style={active ? { color: '#1a1815', borderBottom: '2px solid #bf7a35' } : { color: '#6b6358' }}>
-        {t(labelKey)}
+        {labelKey === 'nav.discover' ? discoveryCopy(lang).title : t(labelKey)}
         {badge > 0 && (
           <span className="absolute -top-0.5 -right-2 min-w-[15px] h-[15px] px-1 rounded-full flex items-center justify-center text-[9px] font-bold text-white" style={{ background: '#c0392b' }}>
             {badge > 9 ? '9+' : badge}

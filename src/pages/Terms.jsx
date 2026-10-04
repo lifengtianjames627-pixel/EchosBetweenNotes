@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { useLang } from '@/i18n/LanguageContext';
+import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
 
 const V = { bg: '#f3efe6', card: '#faf8f2', border: '#e0d8c8', accent: '#bf7a35', text: '#1a1815', muted: '#6b6358' };
 
@@ -14,6 +16,7 @@ function Section({ title, children }) {
 }
 
 export default function Terms() {
+  const { lang } = useLang();
   return (
     <div className="min-h-screen py-12 px-4" style={{ background: V.bg }}>
       <div className="max-w-2xl mx-auto">
@@ -25,7 +28,7 @@ export default function Terms() {
         <div className="h-px w-20 mt-5 mb-8" style={{ background: V.border }} />
         <div className="space-y-5 p-7" style={{ background: V.card, border: `1px solid ${V.border}` }}>
           <Section title="Who may use Echo Between Notes">
-            Members must be at least 13 years old. Band-forming posts are separated by age bracket so minors and adults never match with each other.
+            {recruitCopy(lang).participation}
           </Section>
           <Section title="Be respectful">
             Write honestly and kindly. Hate speech, harassment, and spam are not tolerated and may be removed.

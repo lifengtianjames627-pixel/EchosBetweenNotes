@@ -105,7 +105,7 @@ export default function CreatePostModal({ currentUser, onClose }) {
     onError: (err) => {
       const code = err.response?.data?.error || err.message;
       setBlockedMsg(code === 'CONTACT' || code.startsWith('CONTACT:') ? copy.contact
-        : code === 'MODERATION' ? copy.blocked : code === 'AGE_REQUIRED' ? copy.ageHint : copy.failed);
+        : code === 'MODERATION' ? copy.blocked : copy.failed);
     },
   });
 

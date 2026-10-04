@@ -17,7 +17,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLang } from '@/i18n/LanguageContext';
 import privacyCopy from '@/features/soulmate/i18n/privacyCopy';
 import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
-import AgeDiscoveryNotice from '@/features/soulmate/components/AgeDiscoveryNotice';
 
 export default function Profile() {
   const queryClient = useQueryClient();
@@ -25,7 +24,6 @@ export default function Profile() {
   const { lang } = useLang();
   const copy = privacyCopy(lang), shared = recruitCopy(lang);
   const [searchError, setSearchError] = useState(false);
-  const [ageRequired, setAgeRequired] = useState(false);
   const [friendEmail, setFriendEmail] = useState('');
   const [friendMsg, setFriendMsg] = useState('');
   const [showAddFriend, setShowAddFriend] = useState(false);
@@ -70,12 +68,6 @@ export default function Profile() {
     });
   }, [user?.email, myReviews.length, allAlbums.length, earnedBadgeIds.length]);
 
-  const { data: myBands = [] } = useQuery({
-    queryKey: ['my-bands', user?.email],
-    queryFn: () => base44.entities.BandMember.filter({ user_email: user.email }),
-    enabled: !!user,
-  });
-
   const { data: sentRequests = [] } = useQuery({
     queryKey: ['sent-requests', user?.email],
     queryFn: () => base44.entities.FriendRequest.filter({ from_email: user.email }),
@@ -90,17 +82,17 @@ export default function Profile() {
 
   useEffect(() => {
     let active = true;
-    setSearchResults([]); setSearchError(false); setAgeRequired(false);
+    setSearchResults([]); setSearchError(false);
     if (searchQuery.trim().length < 2 || selectedFriend) { setSearching(false); return; }
     setSearching(true);
     const timeout = setTimeout(() => {
       base44.functions.invoke('searchUsers', { query: searchQuery.trim() })
-        .then(res => { if (active) { setSearchResults(res.data?.results || []); setAgeRequired(!!res.data?.age_required); } })
+        .then(res => { if (active) { setSearchResults(res.data?.results || []); } })
         .catch(() => { if (active) setSearchError(true); })
         .finally(() => { if (active) setSearching(false); });
     }, 350);
     return () => { active = false; clearTimeout(timeout); };
-  }, [searchQuery, selectedFriend, user?.age_group]);
+  }, [searchQuery, selectedFriend, user?.id]);
 
   const selectFriend = useMutation({
     mutationFn: async id => {
@@ -181,7 +173,6 @@ export default function Profile() {
           { label: 'Reviews', val: myReviews.length },
           { label: 'Friends', val: friendsList.length },
           { label: 'Badges', val: earnedBadgeIds.length },
-          { label: 'Bands', val: myBands.length },
         ]} />
 
         {/* Tabs */}
@@ -193,7 +184,7 @@ export default function Profile() {
               <Shield className="w-3.5 h-3.5 mr-1" />Badges
               {earnedBadgeIds.length > 0 && <span className="ml-1 font-bold" style={{ color: '#bf7a35' }}>{earnedBadgeIds.length}</span>}
             </TabsTrigger>
-            <TabsTrigger value="bands" className="flex-1 text-xs"><Music className="w-3.5 h-3.5 mr-1" />Bands</TabsTrigger>
+            <TabsTrigger value="recruitment" className="flex-1 text-xs"><Music className="w-3.5 h-3.5 mr-1" />{shared.board}</TabsTrigger>
             <TabsTrigger value="friends" className="flex-1 text-xs">
               <Users className="w-3.5 h-3.5 mr-1" />Friends
               {pendingIncoming.length > 0 && (
@@ -216,29 +207,10 @@ export default function Profile() {
             <UserBadges user={user} earnedBadgeIds={earnedBadgeIds} />
           </TabsContent>
 
-          <TabsContent value="bands" className="space-y-3">
-            <Link to="/band-dashboard"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-2"
-              style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #e0d8c8' }}>
-              <Music className="w-3.5 h-3.5" /> Manage My Bands
+          <TabsContent value="recruitment">
+            <Link to="/soulmate" className="inline-flex items-center gap-2 rounded-full border bg-card px-4 py-2 text-xs font-semibold text-card-foreground">
+              <Music className="w-3.5 h-3.5" /> {shared.board}
             </Link>
-            {myBands.length > 0 ? myBands.map(m => (
-              <div key={m.id} className="flex items-center gap-3 p-4 rounded-xl"
-                style={{ background: '#faf8f2', border: '1px solid #e0d8c8' }}>
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: '#f1ebdd' }}>
-                  <Music className="w-4 h-4" style={{ color: '#bf7a35' }} />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm" style={{ color: '#1a1815' }}>{m.band_name || 'Band'}</p>
-                  <p className="text-xs" style={{ color: '#8a7e6f' }}>{m.role || 'Member'}{m.is_founder && ' · Founder'}</p>
-                </div>
-              </div>
-            )) : (
-              <div className="text-center py-16" style={{ color: '#8a7e6f' }}>
-                <Music className="w-8 h-8 mx-auto mb-3 opacity-30" />
-                <p className="text-sm">No bands yet.</p>
-              </div>
-            )}
           </TabsContent>
 
           <TabsContent value="friends" className="space-y-4">
@@ -327,7 +299,6 @@ export default function Profile() {
                   value={searchQuery}
                   onChange={e => { setSearchQuery(e.target.value); setSelectedFriend(null); setFriendEmail(''); }}
                   placeholder={copy.search} />
-                {ageRequired && <AgeDiscoveryNotice />}
                 {(searchError || selectFriend.error) && <p role="alert" className="text-xs text-destructive">{shared.failed}</p>}
                 {(searching || searchResults.length > 0) && searchQuery.trim().length >= 2 && !selectedFriend && (
                   <div className="absolute left-0 right-0 mt-1.5 rounded-xl overflow-hidden max-h-48 overflow-y-auto z-10"
