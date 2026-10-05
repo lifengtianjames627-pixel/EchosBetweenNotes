@@ -1,63 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ThumbsUp, ThumbsDown, Bell, BellOff } from 'lucide-react';
 import useReviewVoting from '@/features/reviews/queries/useReviewVoting';
 import voteCopy from '@/features/reviews/model/voteCopy';
 import { useLang } from '@/i18n/LanguageContext';
-import { notify } from '@/lib/notify';
-import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import useReviewerSubscription from '@/features/reviews/queries/useReviewerSubscription';
+import subscriptionCopy from '@/features/reviews/model/subscriptionCopy';
 import { useAuthed } from '@/hooks/useAuthed';
-import { displayName } from '@/lib/displayName';
 import ReviewEditControl from '@/components/reviews/ReviewEditControl';
 
 export default function ReviewActions({ review, v, currentUser }) {
-  const queryClient = useQueryClient();
   const { login } = useAuthed();
   const { lang } = useLang();
   const { voteMutation, voteLoading, myVote, likesCount, dislikesCount } = useReviewVoting({ review, currentUser });
 
-  // Fetch subscription status
-  const { data: mySubs = [] } = useQuery({
-    queryKey: ['my-sub', review.reviewer_email, currentUser?.email],
-    queryFn: () => base44.entities.Subscription.filter({ subscriber_email: currentUser.email, target_email: review.reviewer_email }),
-    enabled: !!currentUser?.email && !!review.reviewer_email && review.reviewer_email !== currentUser?.email,
-  });
-  const isSubscribed = mySubs.length > 0;
-
-  const [optimisticSub, setOptimisticSub] = useState(null); // null = use real data
-  const effectiveSub = optimisticSub !== null ? optimisticSub : isSubscribed;
-
-  const subMutation = useMutation({
-    mutationFn: async () => {
-      if (!currentUser?.email) return;
-      if (effectiveSub) {
-        setOptimisticSub(false);
-        await base44.entities.Subscription.delete(mySubs[0].id);
-      } else {
-        setOptimisticSub(true);
-        await base44.entities.Subscription.create({
-          subscriber_email: currentUser.email,
-          subscriber_name: displayName(currentUser),
-          target_email: review.reviewer_email,
-          target_name: review.reviewer_name || '',
-        });
-        notify({
-          owner_email: review.reviewer_email,
-          type: 'follow',
-          title: `${displayName(currentUser)} started following you`,
-          link: `/u/${encodeURIComponent(currentUser.email)}`,
-          actor_name: displayName(currentUser),
-        });
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-sub', review.reviewer_email, currentUser?.email] });
-      setOptimisticSub(null);
-    },
-  });
-
+  const { canSubscribe, isSubscribed: effectiveSub, mutation: subMutation, query: subQuery } = useReviewerSubscription(review, currentUser);
+  const subCopy = subscriptionCopy(lang);
   const canVote = !!currentUser?.email;
-  const canSubscribe = !!currentUser?.email && !!review.reviewer_email && review.reviewer_email !== currentUser?.email;
 
   const btnBase = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all";
 
@@ -98,21 +56,27 @@ export default function ReviewActions({ review, v, currentUser }) {
         <span>{dislikesCount}</span>
       </button>
 
+      {canSubscribe && (subMutation.isError || subQuery.isError) && (
+        <p role="alert" className="basis-full text-xs text-destructive">
+          {subQuery.isError ? subCopy.loadFailed : subCopy.failed}
+          {subQuery.isError && <button type="button" className="ml-2 underline" onClick={() => subQuery.refetch()}>{subCopy.retry}</button>}
+        </p>
+      )}
       {/* Subscribe */}
       {canSubscribe && (
         <button
           className={btnBase}
-          disabled={subMutation.isPending}
+          disabled={subMutation.isPending || subQuery.isFetching || subQuery.isError}
           onClick={() => subMutation.mutate()}
-          title={effectiveSub ? 'Unsubscribe from this reviewer' : 'Subscribe to this reviewer'}
+          title={effectiveSub ? subCopy.remove : subCopy.add}
           style={{
             background: effectiveSub ? 'rgba(124,111,255,0.15)' : 'rgba(255,255,255,0.05)',
-            color: effectiveSub ? '#a5b4fc' : v.muted,
+            color: effectiveSub ? 'hsl(var(--foreground))' : v.muted,
             border: `1px solid ${effectiveSub ? 'rgba(124,111,255,0.4)' : 'rgba(255,255,255,0.08)'}`,
           }}
         >
           {effectiveSub ? <BellOff className="w-3 h-3" /> : <Bell className="w-3 h-3" />}
-          <span>{effectiveSub ? 'Subscribed' : 'Subscribe'}</span>
+          <span>{effectiveSub ? subCopy.subscribed : subCopy.subscribe}</span>
         </button>
       )}
     </div>
