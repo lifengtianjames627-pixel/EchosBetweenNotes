@@ -84,7 +84,7 @@ const GENRE_VISUALS = {
     text: '#f0f0f0', muted: '#606060',
     cardBg: 'rgba(10,10,10,0.95)', cardBorder: 'rgba(255,255,255,0.12)',
     headerStyle: { fontWeight: 900, letterSpacing: '-0.06em', textTransform: 'uppercase' },
-    tagline: 'Punk · Extreme Core',
+    tagline: 'Hardcore · Metalcore · Deathcore',
   },
   country: {
     bg: 'radial-gradient(ellipse at 50% 0%, #100c04 0%, #0a0802 60%, #060500 100%)',
@@ -159,6 +159,11 @@ export default function GenreSpace() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t } = useLang();
+
+  // Keep old links usable while showing the category's canonical Core address.
+  useEffect(() => {
+    if (rawGenreId === 'punk') navigate(`/genre/core${window.location.search}`, { replace: true });
+  }, [rawGenreId, navigate]);
   // Genre name / tagline / description are system copy — they follow the system
   // language. Album titles, artist names and review text never do.
   const { gLabel, gTagline, gDesc } = useGenreText();
