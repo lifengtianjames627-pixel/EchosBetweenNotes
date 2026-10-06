@@ -1,10 +1,13 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { getGenre } from '@/shared/config/genres';
+
+// `punk` is the legacy stored key for the app's Core category, not its display name.
 
 const genreLabels = {
   rock: 'Rock', pop: 'Pop', hip_hop: 'Hip Hop', r_and_b: 'R&B',
   jazz: 'Jazz', classical: 'Classical', electronic: 'Electronic',
-  indie: 'Indie', metal: 'Metal', punk: 'Punk', folk: 'Folk',
+  indie: 'Indie', metal: 'Metal', punk: getGenre('core').label, core: getGenre('core').label, folk: 'Folk',
   country: 'Country', latin: 'Latin', k_pop: 'K-Pop', other: 'Other'
 };
 
