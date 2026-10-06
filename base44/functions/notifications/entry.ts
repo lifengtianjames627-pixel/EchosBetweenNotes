@@ -1,4 +1,5 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
+import { notificationEvent } from '../../shared/notificationEvent.ts';
 
 // System notifications (likes, follows, badges, friend requests…). All access
 // is mediated through this function: it identifies the caller via auth.me() and
@@ -14,41 +15,39 @@ export default async function(req) {
     const action = body.action || 'list';
 
     if (action === 'list') {
-      const items = await base44.asServiceRole.entities.Notification.list('-created_date', 30);
-      const mine = (items || []).filter(n => n.owner_email === user.email);
-      const unread = mine.filter(n => !n.read).length;
-      return Response.json({ items: mine, unread });
+      const mine = await base44.asServiceRole.entities.Notification.filter({ owner_email: user.email }, '-created_date', 30);
+      let unread = 0, offset = 0;
+      while (true) {
+        const page = await base44.asServiceRole.entities.Notification.filter({ owner_email: user.email, read: false }, 'id', 100, offset);
+        unread += page.length;
+        if (page.length < 100) break;
+        offset += page.length;
+      }
+      return Response.json({ items: mine.map(({ id, title, body, link, actor_name, read, created_date, type }) => ({ id, title, body, link, actor_name, read, created_date, type })), unread });
     }
 
     if (action === 'create') {
-      const { owner_email, type, title, body: text, link, actor_name } = body;
-      if (!owner_email || !type || !title) return Response.json({ error: 'Missing fields' }, { status: 400 });
-      if (owner_email === user.email) return Response.json({ skipped: true }); // never notify yourself
-      const created = await base44.asServiceRole.entities.Notification.create({
-        owner_email,
-        type,
-        title,
-        body: text || '',
-        link: link || '',
-        actor_name: actor_name || '',
-        read: false,
-      });
+      const event = await notificationEvent(base44, user, body);
+      if (event.error) return Response.json({ error: event.error }, { status: event.status });
+      if (event.skipped) return Response.json({ skipped: true });
+      const created = await base44.asServiceRole.entities.Notification.create(event.record);
       return Response.json({ ok: true, id: created.id });
     }
 
     if (action === 'markAll') {
-      const items = await base44.asServiceRole.entities.Notification.list('-created_date', 100);
-      const mine = (items || []).filter(n => n.owner_email === user.email && !n.read);
-      if (mine.length > 0) {
-        await base44.asServiceRole.entities.Notification.bulkUpdate(mine.map(n => ({ id: n.id, read: true })));
-      }
+      let result;
+      do {
+        result = await base44.asServiceRole.entities.Notification.updateMany({ owner_email: user.email, read: false }, { $set: { read: true } });
+      } while (result.has_more === true);
       return Response.json({ ok: true });
     }
 
     if (action === 'markRead') {
       const { id } = body;
-      if (!id) return Response.json({ error: 'Missing id' }, { status: 400 });
-      await base44.asServiceRole.entities.Notification.update(id, { read: true });
+      if (typeof id !== 'string' || !/^[a-f0-9]{24}$/i.test(id)) return Response.json({ error: 'Invalid id' }, { status: 400 });
+      const mine = await base44.asServiceRole.entities.Notification.filter({ id, owner_email: user.email }, '-created_date', 1);
+      if (!mine.length) return Response.json({ error: 'Forbidden' }, { status: 403 });
+      await base44.asServiceRole.entities.Notification.updateMany({ id, owner_email: user.email }, { $set: { read: true } });
       return Response.json({ ok: true });
     }
 

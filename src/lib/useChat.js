@@ -21,7 +21,7 @@ export function useChat({ chatId, currentUser, limit = 200 }) {
 
   const { data: messages = [], isLoading } = useQuery({
     queryKey,
-    queryFn: () => base44.entities.ChatMessage.filter({ chat_id: chatId }, 'created_date', limit),
+    queryFn: async () => (await base44.entities.ChatMessage.filter({ chat_id: chatId }, '-created_date', limit)).reverse(),
     enabled: !!chatId,
     refetchInterval: 8000,
     placeholderData: (prev) => prev,
@@ -43,13 +43,9 @@ export function useChat({ chatId, currentUser, limit = 200 }) {
   const normalize = (payload) => (typeof payload === 'string' ? { content: payload } : payload);
 
   const send = useMutation({
-    mutationFn: (payload) => base44.entities.ChatMessage.create({
-      chat_id: chatId,
-      participants: chatId.split('|'),
-      sender_email: currentUser.email,
-      sender_name: displayName(currentUser),
-      ...normalize(payload),
-    }),
+    mutationFn: async (payload) => (await base44.functions.invoke('sendChatMessage', {
+      ...normalize(payload), chat_id: chatId,
+    })).data.message,
     onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData(queryKey) || [];
@@ -70,7 +66,11 @@ export function useChat({ chatId, currentUser, limit = 200 }) {
     onError: (_err, _payload, context) => {
       if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ['chat-directory'] });
+      queryClient.invalidateQueries({ queryKey: ['messageUnread'] });
+    },
   });
 
   return { messages, isLoading, send };

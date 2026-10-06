@@ -8,7 +8,7 @@ import { makeChatId } from '@/lib/useChat';
 import { useFriendStatus } from '@/shared/chat/useFriendStatus';
 import { useFriendMutation } from '@/features/friends/queries/useFriendRequests';
 import FriendRequestFeedback from '@/features/friends/components/FriendRequestFeedback';
-import { displayName } from '@/lib/displayName';
+import MessageFeedback from '@/features/chat/components/MessageFeedback';
 
 // Friend + message controls on another member's profile.
 // Before you are friends you get exactly ONE message — enough to introduce
@@ -35,12 +35,7 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
   const addFriend = useFriendMutation();
 
   const sendIntro = useMutation({
-    mutationFn: () => base44.entities.ChatMessage.create({
-      chat_id: chatId,
-      sender_email: me.email,
-      sender_name: displayName(me),
-      content: text.trim(),
-    }),
+    mutationFn: () => base44.functions.invoke('sendChatMessage', { chat_id: chatId, content: text.trim(), context: 'profile' }),
     onSuccess: () => {
       setText(''); setComposing(false);
       queryClient.invalidateQueries({ queryKey: ['chat', chatId] });
@@ -57,6 +52,7 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
   return (
     <div className="w-full">
       <FriendRequestFeedback query={friendQuery} mutation={addFriend} incoming={!isFriend && pendingIn} />
+      <MessageFeedback error={sendIntro.error} />
       <div className="flex flex-wrap gap-2.5">
         {isFriend ? (
           <span className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold"
@@ -117,7 +113,7 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
             autoFocus
             value={text}
             onChange={e => setText(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && text.trim()) sendIntro.mutate(); }}
+            onKeyDown={e => { if (e.key === 'Enter' && text.trim() && !sendIntro.isPending) sendIntro.mutate(); }}
             placeholder="Say hi — one message…"
             className="flex-1 px-4 py-2.5 rounded-full text-sm outline-none"
             style={{ background: '#ffffff', border: '1px solid #e0d8c8', color: '#1a1815' }}

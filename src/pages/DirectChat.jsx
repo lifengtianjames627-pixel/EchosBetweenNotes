@@ -21,6 +21,7 @@ import { useLang } from '@/i18n/LanguageContext';
 import useChatDirectory from '@/features/location/queries/useChatDirectory';
 import privacyCopy from '@/features/soulmate/i18n/privacyCopy';
 import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
+import MessageFeedback from '@/features/chat/components/MessageFeedback';
 
 // Paper palette — same language as Written Reviews. Shared with the chat
 // subcomponents through the `V` prop.
@@ -95,17 +96,19 @@ export default function DirectChat() {
 
   // Contact details stay out of chat — in-app messages are logged and reportable.
   // Returns false when the message was blocked so the composer keeps its draft.
-  const handleSend = (payload) => {
-    if (!chatId) return false;
+  const handleSend = async (payload) => {
+    if (!chatId || send.isPending) return false;
     const contact = findContactInfo(payload.content || '');
     if (contact.length > 0) {
       setWarning(t('chat.keepWarning', { items: contact.join(', ') }));
       return false;
     }
     setWarning(null);
-    setText('');
-    send.mutate(payload);
-    return true;
+    try {
+      await send.mutateAsync(payload);
+      setText('');
+      return true;
+    } catch { return false; }
   };
 
   const searchQuery = useQuery({
@@ -321,6 +324,8 @@ export default function DirectChat() {
         )}
       </AnimatePresence>
 
+      <MessageFeedback error={send.error} />
+
       {/* Pre-friend gate: after 3 one-way messages the composer is replaced by
           an "add friend" prompt — the conversation continues freely once
           accepted. Same rule for user↔user and user↔admin. */}
@@ -363,6 +368,7 @@ export default function DirectChat() {
             onChange={(v) => { setText(v); if (warning) setWarning(null); }}
             onSend={handleSend}
             placeholder={t('chat.typeMessage')}
+            sending={send.isPending}
           />
         </>
       )}

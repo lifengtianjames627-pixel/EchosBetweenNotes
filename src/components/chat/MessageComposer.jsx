@@ -7,7 +7,7 @@ const MAX = 2000;
 
 // Multi-line composer: Enter inserts a newline, the send button (or ⌘/Ctrl+Enter)
 // sends. Supports a character counter, emoji palette and image/PDF attachments.
-export default function MessageComposer({ V, value, onChange, onSend, placeholder }) {
+export default function MessageComposer({ V, value, onChange, onSend, placeholder, sending = false }) {
   const [showEmoji, setShowEmoji] = useState(false);
   const [pending, setPending] = useState(null); // { url, name, kind }
   const [uploading, setUploading] = useState(false);
@@ -27,10 +27,11 @@ export default function MessageComposer({ V, value, onChange, onSend, placeholde
     });
   };
 
-  const submit = () => {
+  const submit = async () => {
+    if (sending || uploading) return;
     const content = value.trim();
     if (!content && !pending) return;
-    const sent = onSend({
+    const sent = await onSend({
       content: content || pending.name,
       attachment_url: pending?.url,
       attachment_name: pending?.name,
@@ -102,7 +103,7 @@ export default function MessageComposer({ V, value, onChange, onSend, placeholde
         <button
           onClick={submit}
           aria-label="Send message"
-          disabled={!value.trim() && !pending}
+          disabled={sending || uploading || (!value.trim() && !pending)}
           className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 mb-6"
           style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #ddd0b6', opacity: (value.trim() || pending) ? 1 : 0.5 }}
         >

@@ -16,7 +16,7 @@ export async function notifyReviewLike(review, user, client) {
     if (totalLikes >= threshold) awardBadge(review.reviewer_email, `likes_${threshold}`, client);
   }
   notify({
-    owner_email: review.reviewer_email, type: 'like',
+    owner_email: review.reviewer_email, type: 'like', review_id: review.id,
     title: `${displayName(user)} liked your review`,
     body: review.album_title ? `On "${review.album_title}"` : '',
     link: review.album_id ? `/album/${review.album_id}` : '/reviews',

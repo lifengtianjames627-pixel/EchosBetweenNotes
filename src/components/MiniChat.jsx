@@ -7,8 +7,9 @@ import FriendRequestFeedback from '@/features/friends/components/FriendRequestFe
 import { useChat, makeChatId } from '@/lib/useChat';
 import { findContactInfo } from '@/lib/contactFilter';
 import ReportButton from '@/components/soulmate/ReportButton';
+import MessageFeedback from '@/features/chat/components/MessageFeedback';
 
-const MAX_MESSAGES = 5;
+const MAX_MESSAGES = 3;
 
 export default function MiniChat({ peer, currentUser, onClose }) {
   const [text, setText] = useState('');
@@ -22,9 +23,9 @@ export default function MiniChat({ peer, currentUser, onClose }) {
   const { messages, send } = useChat({ chatId, currentUser, limit: 30 });
 
   const myMessages = messages.filter(m => m.sender_email === currentUser?.email);
-  const limitReached = myMessages.length >= MAX_MESSAGES;
-
   const { isFriend, sentRequest, incomingRequest, query: friendQuery } = useFriendStatus(currentUser?.email, peer?.email);
+  const limitReached = !isFriend && myMessages.length >= MAX_MESSAGES;
+
   const alreadySentRequest = isFriend || sentRequest;
 
   useEffect(() => {
@@ -36,17 +37,16 @@ export default function MiniChat({ peer, currentUser, onClose }) {
 
   // Contact details stay out of chat: in-app messages are logged and reportable,
   // an exchanged handle is not.
-  const handleSend = () => {
+  const handleSend = async () => {
     const content = text.trim();
-    if (!content) return;
+    if (!content || send.isPending) return;
     const contact = findContactInfo(content);
     if (contact.length > 0) {
       setWarning(`Keep it in echoesbetweennotes — remove your ${contact.join(', ')}.`);
       return;
     }
     setWarning(null);
-    setText('');
-    send.mutate(content);
+    try { await send.mutateAsync(content); setText(''); } catch { /* Shared feedback keeps the draft available. */ }
   };
 
   if (!currentUser || !peer) return null;
@@ -166,6 +166,7 @@ export default function MiniChat({ peer, currentUser, onClose }) {
         </div>
       )}
 
+      <MessageFeedback error={send.error} />
       {/* Input */}
       {!limitReached && (
         <div className="px-3 pb-3 pt-1 shrink-0" style={{ borderTop: '1px solid #e6ddc9' }}>
@@ -179,7 +180,7 @@ export default function MiniChat({ peer, currentUser, onClose }) {
               onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
             />
             <button
-              disabled={!text.trim()}
+              disabled={!text.trim() || send.isPending}
               onClick={handleSend}
               className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #ddd0b6', opacity: text.trim() ? 1 : 0.5 }}>
