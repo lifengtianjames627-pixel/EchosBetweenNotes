@@ -6,14 +6,14 @@
       "data.participants": "{{user.email}}"
     },
     "create": {
-      "data.participants": {
-        "$in": [
-          "{{user.email}}"
-        ]
+      "user_condition": {
+        "role": "admin"
       }
     },
     "update": {
-      "data.sender_email": "{{user.email}}"
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "delete": {
       "data.sender_email": "{{user.email}}"
