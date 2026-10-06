@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, UserPlus, MessageSquare, ShieldAlert, Clock } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useFriendStatus } from '@/shared/chat/useFriendStatus';
+import { useFriendMutation } from '@/features/friends/queries/useFriendRequests';
+import FriendRequestFeedback from '@/features/friends/components/FriendRequestFeedback';
 import { useChat, makeChatId } from '@/lib/useChat';
 import { findContactInfo } from '@/lib/contactFilter';
 import ReportButton from '@/components/soulmate/ReportButton';
-import { displayName } from '@/lib/displayName';
 
 const MAX_MESSAGES = 5;
 
 export default function MiniChat({ peer, currentUser, onClose }) {
   const [text, setText] = useState('');
-  const [friendSent, setFriendSent] = useState(false);
   const [warning, setWarning] = useState(null);
   const bottomRef = useRef(null);
 
@@ -25,27 +24,15 @@ export default function MiniChat({ peer, currentUser, onClose }) {
   const myMessages = messages.filter(m => m.sender_email === currentUser?.email);
   const limitReached = myMessages.length >= MAX_MESSAGES;
 
-  const { data: existingReqs = [] } = useQuery({
-    queryKey: ['friend-check', currentUser?.email, peer?.email],
-    queryFn: () => base44.entities.FriendRequest.filter({ from_email: currentUser.email, to_email: peer.email }),
-    enabled: !!currentUser?.email && !!peer?.email,
-  });
-  const alreadySentRequest = existingReqs.length > 0 || friendSent;
+  const { isFriend, sentRequest, incomingRequest, query: friendQuery } = useFriendStatus(currentUser?.email, peer?.email);
+  const alreadySentRequest = isFriend || sentRequest;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length]);
 
-  const sendFriendRequest = useMutation({
-    mutationFn: () => base44.entities.FriendRequest.create({
-      from_email: currentUser.email,
-      from_name: displayName(currentUser),
-      to_email: peer.email,
-      to_name: peer.name || '',
-      status: 'pending',
-    }),
-    onSuccess: () => setFriendSent(true),
-  });
+  const sendFriendRequest = useFriendMutation();
+  useEffect(() => { sendFriendRequest.reset(); }, [peer?.email]);
 
   // Contact details stay out of chat: in-app messages are logged and reportable,
   // an exchanged handle is not.
@@ -162,12 +149,13 @@ export default function MiniChat({ peer, currentUser, onClose }) {
             <p className="text-xs" style={{ color: '#5a534a' }}>
               Message limit reached! Add {peer.name || 'them'} as a friend to keep chatting.
             </p>
+            <FriendRequestFeedback query={friendQuery} mutation={sendFriendRequest} incoming={!isFriend && incomingRequest} />
             {alreadySentRequest ? (
               <p className="text-xs font-semibold" style={{ color: '#4d5f3f' }}>✓ Friend request sent!</p>
             ) : (
               <button
-                onClick={() => sendFriendRequest.mutate()}
-                disabled={sendFriendRequest.isPending}
+                onClick={() => sendFriendRequest.mutate({ action: 'send', target_email: peer.email })}
+                disabled={sendFriendRequest.isPending || friendQuery.isPending || friendQuery.isError || incomingRequest}
                 className="flex items-center gap-1.5 mx-auto px-4 py-1.5 rounded-full text-xs font-semibold"
                 style={{ background: '#f1ebdd', color: '#8a5a20', border: '1px solid #ddd0b6' }}>
                 <UserPlus className="w-3.5 h-3.5" />

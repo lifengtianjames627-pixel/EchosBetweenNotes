@@ -17,6 +17,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLang } from '@/i18n/LanguageContext';
 import privacyCopy from '@/features/soulmate/i18n/privacyCopy';
 import recruitCopy from '@/features/soulmate/i18n/recruitCopy';
+import useFriendRequests, { useFriendMutation } from '@/features/friends/queries/useFriendRequests';
+import FriendRequestFeedback from '@/features/friends/components/FriendRequestFeedback';
+import friendCopy from '@/features/friends/i18n/friendCopy';
 
 export default function Profile() {
   const queryClient = useQueryClient();
@@ -68,17 +71,10 @@ export default function Profile() {
     });
   }, [user?.email, myReviews.length, allAlbums.length, earnedBadgeIds.length]);
 
-  const { data: sentRequests = [] } = useQuery({
-    queryKey: ['sent-requests', user?.email],
-    queryFn: () => base44.entities.FriendRequest.filter({ from_email: user.email }),
-    enabled: !!user,
-  });
-
-  const { data: incomingRequests = [] } = useQuery({
-    queryKey: ['incoming-requests', user?.email],
-    queryFn: () => base44.entities.FriendRequest.filter({ to_email: user.email }),
-    enabled: !!user,
-  });
+  const friendQuery = useFriendRequests(user?.email);
+  const sentRequests = (friendQuery.data || []).filter(r => r.from_email === user?.email);
+  const incomingRequests = (friendQuery.data || []).filter(r => r.to_email === user?.email);
+  const friendText = friendCopy(lang);
 
   useEffect(() => {
     let active = true;
@@ -103,21 +99,13 @@ export default function Profile() {
     onSuccess: data => { setSelectedFriend(data); setFriendEmail(data.email); setSearchQuery(data.full_name); },
   });
 
-  const sendFriendRequest = useMutation({
-    mutationFn: () => base44.entities.FriendRequest.create({
-      from_email: user.email, from_name: displayName(user),
-      to_email: friendEmail, message: friendMsg, status: 'pending',
-    }),
+  const sendFriendRequest = useFriendMutation();
+  const respondToRequest = useFriendMutation();
+  const submitFriendRequest = () => sendFriendRequest.mutate({ action: 'send', target_email: friendEmail, message: friendMsg }, {
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sent-requests'] });
       setShowAddFriend(false); setFriendEmail(''); setFriendMsg('');
       setSearchQuery(''); setSearchResults([]); setSelectedFriend(null);
     },
-  });
-
-  const respondToRequest = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.FriendRequest.update(id, { status }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['incoming-requests'] }),
   });
 
   const pendingIncoming = incomingRequests.filter(r => r.status === 'pending');
@@ -177,7 +165,7 @@ export default function Profile() {
 
         {/* Tabs */}
         <Tabs defaultValue="reviews">
-          <TabsList className="w-full rounded-xl mb-5"
+          <TabsList className="w-full justify-start overflow-x-auto rounded-xl mb-5"
             style={{ background: '#faf8f2', border: '1px solid #e0d8c8' }}>
             <TabsTrigger value="reviews" className="flex-1 text-xs"><Star className="w-3.5 h-3.5 mr-1" />Reviews</TabsTrigger>
             <TabsTrigger value="badges" className="flex-1 text-xs">
@@ -214,13 +202,14 @@ export default function Profile() {
           </TabsContent>
 
           <TabsContent value="friends" className="space-y-4">
+            <FriendRequestFeedback query={friendQuery} mutation={respondToRequest} />
             {pendingIncoming.length > 0 && (
               <div className="space-y-2">
                 <p className="text-xs uppercase tracking-widest font-bold px-1" style={{ color: '#bf7a35' }}>
                   Pending · {pendingIncoming.length}
                 </p>
                 {pendingIncoming.map(req => (
-                  <div key={req.id} className="flex items-center gap-3 p-4 rounded-xl"
+                  <div key={req.id} data-friend-request={req.id} className="flex items-center gap-3 p-4 rounded-xl"
                     style={{ background: '#f6efe1', border: '1px solid #ddd0b6' }}>
                     <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm"
                       style={{ background: '#efe4d0', color: '#8a5a20' }}>
@@ -233,12 +222,14 @@ export default function Profile() {
                     <div className="flex gap-2">
                       <button className="w-8 h-8 rounded-lg flex items-center justify-center"
                         style={{ background: '#efe4d0', color: '#8a5a20' }}
-                        onClick={() => respondToRequest.mutate({ id: req.id, status: 'accepted' })}>
+                        aria-label={friendText.accept} disabled={respondToRequest.isPending || friendQuery.isFetching}
+                        onClick={() => respondToRequest.mutate({ action: 'respond', id: req.id, status: 'accepted' })}>
                         <Check className="w-4 h-4" />
                       </button>
                       <button className="w-8 h-8 rounded-lg flex items-center justify-center"
                         style={{ background: '#f3e2df', color: '#9c3b33' }}
-                        onClick={() => respondToRequest.mutate({ id: req.id, status: 'declined' })}>
+                        aria-label={friendText.decline} disabled={respondToRequest.isPending || friendQuery.isFetching}
+                        onClick={() => respondToRequest.mutate({ action: 'respond', id: req.id, status: 'declined' })}>
                         <X className="w-4 h-4" />
                       </button>
                     </div>
@@ -269,7 +260,7 @@ export default function Profile() {
                   </button>
                 </div>
               ))}
-              {friendsList.length === 0 && (
+              {friendsList.length === 0 && !friendQuery.isPending && !friendQuery.isError && (
                 <div className="text-center py-16" style={{ color: '#8a7e6f' }}>
                   <Users className="w-8 h-8 mx-auto mb-3 opacity-30" />
                   <p className="text-sm">No friends yet.</p>
@@ -327,11 +318,12 @@ export default function Profile() {
               </div>
               <input className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
                 style={{ background: '#ffffff', border: '1px solid #e0d8c8', color: '#1a1815' }}
-                value={friendMsg} onChange={e => setFriendMsg(e.target.value)} placeholder="Add a message (optional)" />
+                maxLength={1000} value={friendMsg} onChange={e => setFriendMsg(e.target.value)} placeholder="Add a message (optional)" />
             </div>
+            <FriendRequestFeedback mutation={sendFriendRequest} />
             <div className="flex gap-3 pt-1">
               <button disabled={!friendEmail || sendFriendRequest.isPending}
-                onClick={() => sendFriendRequest.mutate()}
+                onClick={submitFriendRequest}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold"
                 style={{ background: '#efe4d0', color: '#8a5a20', border: '1px solid #ddd0b6', opacity: !friendEmail ? 0.4 : 1 }}>
                 {sendFriendRequest.isPending ? 'Sending…' : 'Send'}

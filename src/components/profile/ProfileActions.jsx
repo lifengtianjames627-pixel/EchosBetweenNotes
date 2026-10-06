@@ -5,7 +5,9 @@ import { motion } from 'framer-motion';
 import { UserPlus, MessageSquare, Check, Clock, Send, Lock } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { makeChatId } from '@/lib/useChat';
-import { notify } from '@/lib/notify';
+import { useFriendStatus } from '@/shared/chat/useFriendStatus';
+import { useFriendMutation } from '@/features/friends/queries/useFriendRequests';
+import FriendRequestFeedback from '@/features/friends/components/FriendRequestFeedback';
 import { displayName } from '@/lib/displayName';
 
 // Friend + message controls on another member's profile.
@@ -20,45 +22,17 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
 
   const chatId = me ? makeChatId(me.email, targetEmail) : null;
 
-  const { data: sent = [] } = useQuery({
-    queryKey: ['fr-sent', me?.email, targetEmail],
-    queryFn: () => base44.entities.FriendRequest.filter({ from_email: me.email, to_email: targetEmail }),
-    enabled: !!me,
-  });
-  const { data: received = [] } = useQuery({
-    queryKey: ['fr-recv', me?.email, targetEmail],
-    queryFn: () => base44.entities.FriendRequest.filter({ from_email: targetEmail, to_email: me.email }),
-    enabled: !!me,
-  });
+  const { isFriend, sentRequest: pendingOut, incomingRequest: pendingIn, query: friendQuery } = useFriendStatus(me?.email, targetEmail);
   const { data: messages = [] } = useQuery({
     queryKey: ['chat', chatId],
     queryFn: () => base44.entities.ChatMessage.filter({ chat_id: chatId }, 'created_date', 200),
     enabled: !!chatId,
   });
 
-  const all = [...sent, ...received];
-  const isFriend = all.some(r => r.status === 'accepted');
-  const pendingOut = sent.some(r => r.status === 'pending');
-  const pendingIn = received.some(r => r.status === 'pending');
   const mySent = messages.filter(m => m.sender_email === me?.email).length;
   const introUsed = !isFriend && mySent >= 1;
 
-  const addFriend = useMutation({
-    mutationFn: () => base44.entities.FriendRequest.create({
-      from_email: me.email, from_name: displayName(me),
-      to_email: targetEmail, to_name: targetName, status: 'pending',
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['fr-sent'] });
-      notify({
-        owner_email: targetEmail,
-        type: 'friend_request',
-        title: `${displayName(me)} sent you a friend request`,
-        link: '/profile',
-        actor_name: displayName(me),
-      });
-    },
-  });
+  const addFriend = useFriendMutation();
 
   const sendIntro = useMutation({
     mutationFn: () => base44.entities.ChatMessage.create({
@@ -82,6 +56,7 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
 
   return (
     <div className="w-full">
+      <FriendRequestFeedback query={friendQuery} mutation={addFriend} incoming={!isFriend && pendingIn} />
       <div className="flex flex-wrap gap-2.5">
         {isFriend ? (
           <span className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold"
@@ -99,8 +74,8 @@ export default function ProfileActions({ me, targetEmail, targetName }) {
         ) : (
           <motion.button
             whileTap={{ scale: 0.96 }}
-            onClick={() => addFriend.mutate()}
-            disabled={addFriend.isPending}
+            onClick={() => addFriend.mutate({ action: 'send', target_email: targetEmail, notify: true })}
+            disabled={addFriend.isPending || friendQuery.isPending || friendQuery.isError}
             className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold"
             style={pill()}
           >

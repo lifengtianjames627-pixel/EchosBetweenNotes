@@ -10,7 +10,8 @@ import MessageAttachment from '@/components/chat/MessageAttachment';
 import { useChat, makeChatId } from '@/lib/useChat';
 import { findContactInfo } from '@/lib/contactFilter';
 import { useFriendStatus } from '@/shared/chat/useFriendStatus';
-import { displayName } from '@/lib/displayName';
+import { useFriendMutation } from '@/features/friends/queries/useFriendRequests';
+import FriendRequestFeedback from '@/features/friends/components/FriendRequestFeedback';
 import ReportButton from '@/components/soulmate/ReportButton';
 import PinnedPeople from '@/components/chat/PinnedPeople';
 import RecentConversations from '@/components/chat/RecentConversations';
@@ -49,7 +50,6 @@ export default function DirectChat() {
   const [search, setSearch] = useState('');
   const [warning, setWarning] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [friendSent, setFriendSent] = useState(false);
   const bottomRef = useRef(null);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
@@ -57,24 +57,16 @@ export default function DirectChat() {
   const chatId = user?.email && peerEmail ? makeChatId(user.email, peerEmail) : null;
   const { messages, send } = useChat({ chatId, currentUser: user, limit: 200 });
 
-  const { isFriend, sentRequest } = useFriendStatus(user?.email, peerEmail);
+  const { isFriend, sentRequest, incomingRequest, query: friendQuery } = useFriendStatus(user?.email, peerEmail);
   const mySentCount = messages.filter(m => m.sender_email === user?.email).length;
   const gateActive = !!peerEmail && !isFriend && mySentCount >= PRE_FRIEND_MESSAGE_LIMIT;
   const remaining = Math.max(0, PRE_FRIEND_MESSAGE_LIMIT - mySentCount);
 
-  const sendFriendRequest = useMutation({
-    mutationFn: () => base44.entities.FriendRequest.create({
-      from_email: user.email,
-      from_name: displayName(user),
-      to_email: peerEmail,
-      to_name: peerName || '',
-      status: 'pending',
-    }),
-    onSuccess: () => {
-      setFriendSent(true);
-      queryClient.invalidateQueries({ queryKey: ['friend-status', user.email, peerEmail] });
-    },
-  });
+  const sendFriendRequest = useFriendMutation();
+
+  useEffect(() => {
+    sendFriendRequest.reset();
+  }, [peerEmail]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -339,14 +331,15 @@ export default function DirectChat() {
             <p className="text-sm" style={{ color: '#5a534a' }}>
               {t('chat.friendGate', { name: peerName || t('chat.them') })}
             </p>
-            {sentRequest || friendSent ? (
+            <FriendRequestFeedback query={friendQuery} mutation={sendFriendRequest} incoming={incomingRequest} />
+            {sentRequest ? (
               <p className="text-sm font-semibold flex items-center justify-center gap-1.5" style={{ color: '#4d5f3f' }}>
                 <UserPlus className="w-4 h-4" /> {t('chat.requestSent')}
               </p>
             ) : (
               <button
-                onClick={() => sendFriendRequest.mutate()}
-                disabled={sendFriendRequest.isPending}
+                onClick={() => sendFriendRequest.mutate({ action: 'send', target_email: peerEmail })}
+                disabled={sendFriendRequest.isPending || friendQuery.isPending || friendQuery.isError || incomingRequest}
                 className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-semibold transition-colors hover:scale-[1.02]"
                 style={{ background: '#1a1815', color: '#faf8f2' }}>
                 <UserPlus className="w-4 h-4" />
