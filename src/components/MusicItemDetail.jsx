@@ -46,7 +46,7 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
   useEffect(() => { saveDraft(draftScope, data); }, [data]);
 
   const createReview = useMutation({
-    mutationFn: async (d) => {
+    mutationFn: async (/** @type {typeof EMPTY_REVIEW_DATA} */ d) => {
       const textToCheck = [d.title, d.content, d.band_background, d.band_history, d.band_story].filter(Boolean).join('\n');
       const modResult = await moderate(textToCheck);
 
@@ -177,7 +177,7 @@ function ReviewForm({ albumId, album, v, currentUser, onSuccess, allReviews }) {
   );
 }
 
-export default function MusicItemDetail({ item, v, onClose, onClickRegistered }) {
+export default function MusicItemDetail({ item, v, onClose }) {
   const [showForm, setShowForm] = useState(false);
   const [localItem, setLocalItem] = useState(item);
   const [fullscreen, setFullscreen] = useState(false);
@@ -281,7 +281,7 @@ export default function MusicItemDetail({ item, v, onClose, onClickRegistered })
               <div className="flex items-center gap-1.5 mt-2">
                 <div className="flex gap-0.5">
                   {[1,2,3,4,5].map(n => (
-                    <Star key={n} className="w-3.5 h-3.5" style={{ color: n <= Math.round(avgRating) ? v.accent : v.muted }} fill={n <= Math.round(avgRating) ? 'currentColor' : 'none'} />
+                    <Star key={n} className="w-3.5 h-3.5" style={{ color: n <= Math.round(Number(avgRating)) ? v.accent : v.muted }} fill={n <= Math.round(Number(avgRating)) ? 'currentColor' : 'none'} />
                   ))}
                 </div>
                 <span className="text-sm font-bold" style={{ color: v.accent }}>{avgRating}</span>

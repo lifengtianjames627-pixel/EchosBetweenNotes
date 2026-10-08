@@ -14,7 +14,7 @@ export function usePins(currentUser) {
   });
 
   const toggle = useMutation({
-    mutationFn: async ({ peer_email, peer_name }) => {
+    mutationFn: async (/** @type {{ peer_email: string, peer_name?: string }} */ { peer_email, peer_name }) => {
       const existing = pins.find(p => p.peer_email === peer_email);
       if (existing) return base44.entities.PinnedPeer.delete(existing.id);
       return base44.entities.PinnedPeer.create({ owner_email: email, peer_email, peer_name: publicName(peer_name) });

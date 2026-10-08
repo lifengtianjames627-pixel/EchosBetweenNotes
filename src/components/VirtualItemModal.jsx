@@ -25,6 +25,7 @@ function StarPicker({ rating, onRate, accent, muted }) {
   );
 }
 
+/** @param {{ v: { cardBg: string, cardBorder: string, accent: string, muted: string, text: string }, initialTitle?: string, initialArtist?: string, genre: string, type: 'album' | 'single', coverUrl?: string, allowSearch?: boolean, currentUser?: { id: string, email: string, full_name?: string, equipped_badges?: string[] }, onClose: () => void }} props */
 export default function VirtualItemModal({ v, initialTitle = '', initialArtist = '', genre, type, coverUrl, allowSearch, currentUser, onClose }) {
   const [title, setTitle] = useState(initialTitle);
   const [artist, setArtist] = useState(initialArtist);

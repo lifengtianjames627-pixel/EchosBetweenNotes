@@ -28,7 +28,7 @@ export default function CommentSection({ reviewId, v, currentUser }) {
   const comments = allComments.filter(c => !c.moderation_status || c.moderation_status === 'approved');
 
   const addComment = useMutation({
-    mutationFn: async (content) => {
+    mutationFn: async (/** @type {string} */ content) => {
       const modResult = await moderate(content);
 
       const modStatus = modResult.suggestedAction === 'review' ? 'pending_review' : 'approved';

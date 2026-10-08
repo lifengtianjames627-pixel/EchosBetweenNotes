@@ -7,7 +7,7 @@ import TagPicker from '@/components/TagPicker';
 export default function AddMusicModal({ v, type, onClose, onSubmit, isPending, errorMessage }) {
   const [data, setData] = useState({ title: '', artist: '', cover_url: '', mv_url: '', release_year: '', description: '', tags: [] });
   const [uploading, setUploading] = useState(false);
-  const fileRef = useRef();
+  const fileRef = useRef(/** @type {HTMLInputElement | null} */ (null));
 
   const handleCoverUpload = async (e) => {
     const file = e.target.files[0];
@@ -72,7 +72,7 @@ export default function AddMusicModal({ v, type, onClose, onSubmit, isPending, e
               <div
                 className="w-full rounded-xl overflow-hidden cursor-pointer flex items-center justify-center transition-all"
                 style={{ height: data.cover_url ? 'auto' : 100, border: `1.5px dashed ${v.accent}40`, background: 'rgba(255,255,255,0.04)' }}
-                onClick={() => fileRef.current.click()}
+                onClick={() => fileRef.current?.click()}
               >
                 {uploading ? (
                   <div className="flex flex-col items-center gap-2 py-6">
