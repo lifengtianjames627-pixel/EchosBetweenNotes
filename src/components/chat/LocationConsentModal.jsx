@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useLang } from '@/i18n/LanguageContext';
 import LocationDialog from '@/features/location/components/LocationDialog';
 
-export default function LocationConsentModal({ onChoose, onClose, busy, error }) {
+export default function LocationConsentModal({ onChoose, onClose, busy, error, returnFocusRef = undefined }) {
   const { t } = useLang();
   const [agreed, setAgreed] = useState(false);
-  return <LocationDialog title={t('consent.title')} description={t('consent.agreementTitle')} onClose={onClose} busy={busy}>
+  return <LocationDialog title={t('consent.title')} description={t('consent.agreementTitle')} onClose={onClose} busy={busy} returnFocusRef={returnFocusRef}>
     <div className="rounded-xl border bg-background p-3.5 text-xs leading-relaxed whitespace-pre-wrap text-muted-foreground max-h-[35dvh] overflow-y-auto" tabIndex={0}>
       {t('consent.agreement')}
     </div>

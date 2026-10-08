@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function ChatSection({ V, icon: Icon, label, hint, count, children }) {
+export default function ChatSection({ V, icon: Icon, label, hint = '', count = 0, children }) {
   return (
     <div className="mt-7">
       <div className="flex items-center gap-2 mb-2.5 px-1">

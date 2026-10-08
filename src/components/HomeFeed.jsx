@@ -8,7 +8,7 @@ import FeedQueryState from '@/components/reviews/FeedQueryState';
 
 // Compact review tile for the home feed. When a personal AI reason exists it
 // replaces the review excerpt so the "For You" card reads as a recommendation.
-function ReviewTile({ review, reason }) {
+function ReviewTile({ review, reason = '' }) {
   return (
     <Link to={`/album/${review.album_id}`} className="group block p-4 transition-colors hover:bg-[#f5f0e3]" style={{ background: '#faf8f2', border: '1px solid #e6ddc9' }}>
       <div className="flex gap-3">
@@ -55,7 +55,7 @@ function PodcastTile({ pod }) {
   );
 }
 
-function SectionHeader({ icon: Icon, title, to }) {
+function SectionHeader({ icon: Icon, title, to = '' }) {
   return (
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-2">

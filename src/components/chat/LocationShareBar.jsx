@@ -17,7 +17,8 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
   const [showPicker, setShowPicker] = useState(false);
   const [consent, setConsent] = useState('session');
   const busy = status === 'saving' || status === 'asking';
-  const requestLocation = source => { if (!busy) setShowConsent(source); };
+  const returnFocusRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
+  const requestLocation = (source, trigger) => { if (!busy) { returnFocusRef.current = trigger; setShowConsent(source); } };
   const autoTried = useRef(false);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
@@ -52,8 +53,8 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
     {status === 'error' && !showConsent && !showPicker && <p role="alert" className="text-xs text-destructive">{t('location.failed')}</p>}
     {status === 'saving' && <p role="status" className="text-xs text-muted-foreground">{t('location.saving')}</p>}
     {(status === 'asking' || (user?.location_network_allowed && !located)) && <button onClick={clear} disabled={status === 'saving'} className="text-xs underline text-muted-foreground disabled:opacity-40">{t('loc.turnOff')}</button>}
-    {showConsent && <LocationConsentModal onChoose={choose} onClose={() => setShowConsent(false)} busy={status === 'saving'} error={status === 'error'} />}
-    {showPicker && <LocationPicker initialCenter={pickerCenter} busy={status === 'saving'} error={status === 'error'}
+    {showConsent && <LocationConsentModal returnFocusRef={returnFocusRef} onChoose={choose} onClose={() => setShowConsent(false)} busy={status === 'saving'} error={status === 'error'} />}
+    {showPicker && <LocationPicker returnFocusRef={returnFocusRef} initialCenter={pickerCenter} busy={status === 'saving'} error={status === 'error'}
       onConfirm={async pin => { if (await setManual(pin, consent)) setShowPicker(false); }} onClose={() => setShowPicker(false)} />}
   </>;
 
@@ -75,7 +76,7 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
           </span>
           <div className="flex items-center gap-3 ml-auto">
             <button
-              onClick={() => requestLocation('manual')}
+              onClick={event => requestLocation('manual', event.currentTarget)}
               className="flex items-center gap-1.5 text-[11px] font-semibold underline"
               style={{ color: V.accent }}
             >
@@ -85,7 +86,7 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
                 improves accuracy — offered only on touch devices. */}
             {hasGps && (
               <button
-                onClick={() => requestLocation('device')}
+                onClick={event => requestLocation('device', event.currentTarget)}
                 disabled={busy}
                 className="flex items-center gap-1.5 text-[11px] font-semibold underline"
                 style={{ color: V.accent, opacity: status === 'asking' ? 0.6 : 1 }}
@@ -118,12 +119,12 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
             </p>
             <div className="flex flex-wrap items-center gap-3 mt-2">
               <button
-                onClick={() => requestLocation('device')}
+                onClick={event => requestLocation('device', event.currentTarget)}
                 className="text-xs font-semibold underline" style={{ color: V.accent }}>
                 {t('loc.retry')}
               </button>
               <button
-                onClick={() => requestLocation('manual')}
+                onClick={event => requestLocation('manual', event.currentTarget)}
                 className="flex items-center gap-1.5 text-xs font-semibold underline" style={{ color: V.accent }}>
                 <Crosshair className="w-3 h-3" /> {t('loc.manual')}
               </button>
@@ -133,12 +134,12 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
           <>
             <p className="text-[11px] leading-relaxed" style={{ color: V.muted }}>
               {t('loc.deniedChoice')}{' '}
-              <button onClick={() => requestLocation('device')} className="underline font-semibold" style={{ color: V.accent }}>
+              <button onClick={event => requestLocation('device', event.currentTarget)} className="underline font-semibold" style={{ color: V.accent }}>
                 {t('loc.change')}
               </button>
             </p>
             <button
-              onClick={() => requestLocation('manual')}
+              onClick={event => requestLocation('manual', event.currentTarget)}
               className="flex items-center gap-1.5 text-[11px] font-semibold mt-2 underline" style={{ color: V.accent }}>
               <Crosshair className="w-3 h-3" /> {t('loc.manual')}
             </button>
@@ -146,7 +147,7 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
         ) : (
           <>
             <button
-              onClick={() => requestLocation('device')}
+              onClick={event => requestLocation('device', event.currentTarget)}
               disabled={busy}
               className="flex items-center gap-2 text-xs font-semibold"
               style={{ color: V.accent, opacity: status === 'asking' ? 0.6 : 1 }}
@@ -157,7 +158,7 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
                 : t('loc.use')}
             </button>
             <button
-              onClick={() => requestLocation('manual')}
+              onClick={event => requestLocation('manual', event.currentTarget)}
               className="flex items-center gap-1.5 text-[11px] font-semibold mt-2 underline"
               style={{ color: V.accent }}
             >
