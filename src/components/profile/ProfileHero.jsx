@@ -5,6 +5,9 @@ import ProfileAvatar from './ProfileAvatar';
 // Paper masthead shared by your own profile and other members' profiles —
 // same print-media language as Written Reviews: cream card, ochre hairline,
 // serif italic name. No aurora, no vinyl ring, no equaliser.
+/**
+ * @param {{ name: string, email: string, initial: string, badges?: string[], online?: boolean, statusText?: string, pictureUrl?: string, editable?: boolean, onPictureUploaded?: (url: string) => void, children?: React.ReactNode }} props
+ */
 export default function ProfileHero({ name, email, initial, badges = [], online, statusText, pictureUrl, editable, onPictureUploaded, children }) {
   return (
     <div className="mb-6" style={{ background: '#faf8f2', border: '1px solid #e0d8c8', borderRadius: 12 }}>

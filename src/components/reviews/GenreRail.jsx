@@ -2,6 +2,7 @@ import React from 'react';
 
 // Beige filter bar — the "spine" between the blurred header and the paper
 // content. Genre pills with no fill; the selected one gets a black underline.
+/** @param {{ genres: { id: string, label: string }[], onSelect: (id: string) => void, activeId?: string }} props */
 export default function GenreRail({ genres, onSelect, activeId }) {
   return (
     <section style={{ background: '#e6ddc9' }} className="border-y">

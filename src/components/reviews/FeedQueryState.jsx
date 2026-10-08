@@ -10,6 +10,7 @@ const copy = {
   ru: ['Загрузка рецензий…', 'Не удалось загрузить рецензии. Ваш контент не удалён.', 'Повторить'],
 };
 
+/** @param {({ loading: true, retry?: () => unknown } | { loading?: false, retry: () => unknown })} props */
 export default function FeedQueryState({ loading = false, retry }) {
   const { lang } = useLang();
   const text = copy[lang] || copy.en;

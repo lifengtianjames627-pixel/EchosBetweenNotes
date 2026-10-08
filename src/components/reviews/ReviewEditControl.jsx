@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { useLang } from '@/i18n/LanguageContext';
 import editCopy from '@/components/reviews/editCopy';
 import ReviewEditDialog from '@/components/reviews/ReviewEditDialog';
+/** @param {{ review: React.ComponentProps<typeof ReviewEditDialog>['review'], user?: { id: string, email?: string } }} props */
 export default function ReviewEditControl({ review, user: userProp }) {
   const [editing, setEditing] = useState(false);
   const { lang } = useLang();

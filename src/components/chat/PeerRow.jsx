@@ -2,6 +2,9 @@ import React from 'react';
 import { Pin, PinOff } from 'lucide-react';
 
 // One person row, shared by the pinned / conversations / nearby lists.
+/**
+ * @param {{ V: { card: string, border: string, text: string, muted: string, accent: string }, name?: string, email: string, subtitle?: React.ReactNode, meta?: React.ReactNode, color?: string, pinned?: boolean, online?: boolean, unread?: number, onOpen: React.MouseEventHandler<HTMLButtonElement>, onTogglePin?: React.MouseEventHandler<HTMLButtonElement> }} props
+ */
 export default function PeerRow({ V, name, email, subtitle, meta, color, pinned, online, unread, onOpen, onTogglePin }) {
   return (
     <div className="flex items-center gap-3 px-4 py-3 rounded-2xl"

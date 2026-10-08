@@ -15,6 +15,7 @@ const ICONS = {
 // A badge reads like a library seal pressed into paper: a soft cream plaque,
 // a thin ink border, the family's icon in muted ink, and tier marks (· ·· ···)
 // along the bottom. No glow, no gradients, no saturated colour.
+/** @param {{ badgeId: string, size?: 'xs' | 'sm' | 'md' | 'lg', locked?: boolean, showName?: boolean, onClick?: React.MouseEventHandler<HTMLDivElement> }} props */
 export default function BadgeIcon({ badgeId, size = 'md', locked = false, showName = false, onClick }) {
   const badge = BADGE_MAP[badgeId];
   if (!badge) return null;

@@ -20,7 +20,8 @@ function pitchFor(id) {
   return PITCHES[h % PITCHES.length];
 }
 
-function Note({ active, y, label, icon, onClick }) {
+/** @param {{ active: boolean, y: number, label: string, onClick: React.MouseEventHandler<HTMLButtonElement> }} props */
+function Note({ active, y, label, onClick }) {
   return (
     <button
       onClick={onClick}

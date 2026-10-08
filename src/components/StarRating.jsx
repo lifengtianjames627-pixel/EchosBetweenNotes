@@ -1,6 +1,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 
+/** @param {{ rating: number, onRate?: (rating: number) => void, size?: 'sm' | 'md' | 'lg' }} props */
 export default function StarRating({ rating, onRate, size = 'md' }) {
   const sizeClasses = { sm: 'w-3.5 h-3.5', md: 'w-5 h-5', lg: 'w-6 h-6' };
 

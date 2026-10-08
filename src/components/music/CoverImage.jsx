@@ -4,6 +4,7 @@ import { Music } from 'lucide-react';
 // When a real cover URL exists, show it. When it's missing or fails to load,
 // show a clean, honest placeholder (title + music note) — never fake
 // performance photography masquerading as album art.
+/** @param {Pick<React.ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt' | 'className' | 'loading'>} props */
 export default function CoverImage({ src, alt, className, loading = 'lazy' }) {
   const [failed, setFailed] = useState(false);
   if (src && !failed) {
