@@ -13,7 +13,7 @@ import LocationPicker from './LocationPicker';
 export default function LocationShareBar({ V, located, locationSource, myLat, myLng }) {
   const { t } = useLang();
   const { status, accuracy, share, deny, clear, setManual } = useMyLocation();
-  const [showConsent, setShowConsent] = useState(false);
+  const [showConsent, setShowConsent] = useState(/** @type {false | 'device' | 'manual'} */ (false));
   const [showPicker, setShowPicker] = useState(false);
   const [consent, setConsent] = useState('session');
   const busy = status === 'saving' || status === 'asking';
@@ -53,7 +53,7 @@ export default function LocationShareBar({ V, located, locationSource, myLat, my
     {status === 'saving' && <p role="status" className="text-xs text-muted-foreground">{t('location.saving')}</p>}
     {(status === 'asking' || (user?.location_network_allowed && !located)) && <button onClick={clear} disabled={status === 'saving'} className="text-xs underline text-muted-foreground disabled:opacity-40">{t('loc.turnOff')}</button>}
     {showConsent && <LocationConsentModal onChoose={choose} onClose={() => setShowConsent(false)} busy={status === 'saving'} error={status === 'error'} />}
-    {showPicker && <LocationPicker V={V} initialCenter={pickerCenter} busy={status === 'saving'} error={status === 'error'}
+    {showPicker && <LocationPicker initialCenter={pickerCenter} busy={status === 'saving'} error={status === 'error'}
       onConfirm={async pin => { if (await setManual(pin, consent)) setShowPicker(false); }} onClose={() => setShowPicker(false)} />}
   </>;
 

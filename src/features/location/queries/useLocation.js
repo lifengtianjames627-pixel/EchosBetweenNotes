@@ -8,10 +8,13 @@ export default function useLocation() {
   const client = useQueryClient();
   const [status, setStatus] = useState('idle');
   const [accuracy, setAccuracy] = useState(null);
-  const cancel = useRef(() => {}), generation = useRef(0), queue = useRef(Promise.resolve());
+  const cancel = useRef(() => {}), generation = useRef(0), queue = useRef(/** @type {Promise<void | boolean>} */ (Promise.resolve()));
   const stop = useCallback(() => { generation.current++; cancel.current(); cancel.current = () => {}; }, []);
   useEffect(() => stop, [stop]);
-  const write = useCallback((operation, token) => {
+  const write = useCallback(/**
+   * @param {() => Promise<{ user: Awaited<ReturnType<typeof revokeLocation>>, session?: Awaited<ReturnType<typeof saveLocation>>['session'], revoked?: boolean }>} operation
+   * @param {number} token
+   */ (operation, token) => {
     setStatus('saving');
     const task = queue.current.then(operation).then(async result => {
       if (token !== generation.current) return false;

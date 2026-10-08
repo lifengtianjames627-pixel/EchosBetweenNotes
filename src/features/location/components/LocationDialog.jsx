@@ -5,7 +5,7 @@ import { useLang } from '@/i18n/LanguageContext';
 
 export default function LocationDialog({ title, description, onClose, busy, children }) {
   const { t } = useLang();
-  const opener = useRef(document.activeElement);
+  const opener = useRef(/** @type {HTMLElement | null} */ (document.activeElement));
   return <Dialog.Root open onOpenChange={open => { if (!open && !busy) onClose(); }}>
     <Dialog.Portal>
       <Dialog.Overlay className="fixed inset-0 z-[300] bg-foreground/70" />
