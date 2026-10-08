@@ -29,6 +29,7 @@ export async function publishAlbumReview({ data, album, user, moderate }) {
 export async function publishStoryReview({ draft, user, moderate }) {
   const { kind, title, content, genre, heroImage, albums } = draft;
   const mod = await moderate(`${title}\n${content}\n${albums.map(a => a.blurb).join('\n')}`);
+  /** @type {ReturnType<typeof moderationFields> & { kind: string, title: string, content: string, genre?: string, hero_image_url?: string, reviewer_name: string, reviewer_email: string, featured_albums?: Array<{ title: string, artist: string, cover_url: string, blurb: string }> }} */
   const payload = {
     kind, title: title.trim(), content: content.trim(),
     genre: genre || undefined, hero_image_url: heroImage.trim() || undefined,

@@ -217,7 +217,7 @@ export default function GenreSpace() {
   };
 
   const addItem = useMutation({
-    mutationFn: async (data) => {
+    mutationFn: /** @param {import('@/shared/types/interactionTypes').MusicDraft} data */ async (data) => {
       // Check for duplicate (same title + artist, case-insensitive)
       const exists = allItems.some(
         item =>
@@ -263,7 +263,7 @@ export default function GenreSpace() {
             const stored = await storeCoverImage(result.coverUrl);
             if (stored) {
               await base44.entities.Album.update(item.id, { cover_url: stored });
-              queryClient.setQueryData(['genre-albums', genreId], (old) =>
+              queryClient.setQueryData(['genre-albums', genreId], /** @param {import('@/shared/types/interactionTypes').MusicRecord[] | undefined} old */ (old) =>
                 old ? old.map(it => (it.id === item.id ? { ...it, cover_url: stored } : it)) : old
               );
             }

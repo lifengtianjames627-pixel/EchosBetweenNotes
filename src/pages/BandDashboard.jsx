@@ -17,6 +17,7 @@ const V = {
   muted: '#6b6358',
 };
 
+/** @param {{ band?: Partial<import('@/shared/types/interactionTypes').BandForm>, onSave: (form: import('@/shared/types/interactionTypes').BandForm) => void, onCancel: () => void }} props */
 function EditBandForm({ band, onSave, onCancel }) {
   const [form, setForm] = useState({
     name: band?.name || '',
@@ -119,7 +120,7 @@ export default function BandDashboard() {
   });
 
   const createBand = useMutation({
-    mutationFn: async (form) => {
+    mutationFn: /** @param {import('@/shared/types/interactionTypes').BandForm} form */ async (form) => {
       const band = await base44.entities.Band.create(form);
       await base44.entities.BandMember.create({
         band_id: band.id,
@@ -139,12 +140,12 @@ export default function BandDashboard() {
   });
 
   const updateBand = useMutation({
-    mutationFn: ({ id, form }) => base44.entities.Band.update(id, form),
+    mutationFn: /** @param {{ id: string, form: import('@/shared/types/interactionTypes').BandForm }} change */ ({ id, form }) => base44.entities.Band.update(id, form),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['bands-list'] }); setEditing(null); },
   });
 
   const addMember = useMutation({
-    mutationFn: ({ bandId, bandName }) => base44.entities.BandMember.create({
+    mutationFn: /** @param {{ bandId: string, bandName: string }} member */ ({ bandId, bandName }) => base44.entities.BandMember.create({
       band_id: bandId,
       band_name: bandName,
       user_email: addMemberEmail,
@@ -156,7 +157,7 @@ export default function BandDashboard() {
   });
 
   const removeMember = useMutation({
-    mutationFn: (id) => base44.entities.BandMember.delete(id),
+    mutationFn: /** @param {string} id */ (id) => base44.entities.BandMember.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['band-members-all'] }),
   });
 

@@ -110,39 +110,39 @@ export default function ModerationQueue() {
 
   const { data: reviews = [], isLoading: reviewsLoading } = useQuery({
     queryKey: ['moderation-reviews', filter],
-    queryFn: () => base44.entities.Review.filter(
+    queryFn: () => /** @type {Promise<import('@/shared/types/interactionTypes').ModerationRecord[]>} */ (base44.entities.Review.filter(
       filter === 'all' ? {} : { moderation_status: filter },
       '-created_date',
       100
-    ),
+    )),
   });
 
   const { data: comments = [], isLoading: commentsLoading } = useQuery({
     queryKey: ['moderation-comments', filter],
-    queryFn: () => base44.entities.Comment.filter(
+    queryFn: () => /** @type {Promise<import('@/shared/types/interactionTypes').ModerationRecord[]>} */ (base44.entities.Comment.filter(
       filter === 'all' ? {} : { moderation_status: filter },
       '-created_date',
       100
-    ),
+    )),
   });
 
   // Merge reviews and comments into one list sorted by date (newest first)
   const items = [
     ...reviews.map(r => ({ ...r, _type: 'review' })),
     ...comments.map(c => ({ ...c, _type: 'comment' })),
-  ].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+  ].sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
 
   const isLoading = reviewsLoading || commentsLoading;
 
   const updateReviewStatus = useMutation({
-    mutationFn: ({ id, status }) => base44.functions.invoke('editReview', { action: 'moderate', id, status }),
+    mutationFn: /** @param {import('@/shared/types/interactionTypes').ModerationChange} change */ ({ id, status }) => base44.functions.invoke('editReview', { action: 'moderate', id, status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ predicate: q => /album|review|homeFeed/.test(String(q.queryKey[0])) });
     },
   });
 
   const updateCommentStatus = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.Comment.update(id, { moderation_status: status }),
+    mutationFn: /** @param {import('@/shared/types/interactionTypes').ModerationChange} change */ ({ id, status }) => base44.entities.Comment.update(id, { moderation_status: status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['moderation-comments'] });
       queryClient.invalidateQueries({ queryKey: ['comments'] });

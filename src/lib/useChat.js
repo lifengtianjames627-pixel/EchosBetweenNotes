@@ -48,7 +48,7 @@ export function useChat({ chatId, currentUser, limit = 200 }) {
     })).data.message,
     onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey });
-      const previous = queryClient.getQueryData(queryKey) || [];
+      const previous = queryClient.getQueryData(/** @type {import('@tanstack/react-query').DataTag<typeof queryKey, typeof messages>} */ (queryKey)) || [];
       queryClient.setQueryData(queryKey, [
         ...previous,
         {

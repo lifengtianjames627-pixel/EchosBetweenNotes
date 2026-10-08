@@ -48,7 +48,7 @@ export default function Home() {
               key={path}
               onClick={() => navigate(path)}
               className={`group flex flex-col items-center text-center px-6 py-9 transition-all duration-300 hover:-translate-y-1 ${lift} flex-1`}
-              style={{ '--card-accent': '#bf7a35', background: '#faf8f2', border: '1px solid #e0d8c8', borderRadius: 12, boxShadow: '0 2px 14px rgba(120,100,80,0.06)' }}
+              style={/** @type {React.CSSProperties & { '--card-accent': string }} */ ({ '--card-accent': '#bf7a35', background: '#faf8f2', border: '1px solid #e0d8c8', borderRadius: 12, boxShadow: '0 2px 14px rgba(120,100,80,0.06)' })}
             >
               <div className="mb-5 opacity-70 transition-opacity group-hover:opacity-100">
                 <Motif kind={motif} />

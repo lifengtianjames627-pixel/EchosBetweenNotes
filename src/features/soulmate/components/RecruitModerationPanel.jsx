@@ -10,7 +10,7 @@ export default function RecruitModerationPanel({ filter }) {
   const client = useQueryClient();
   const posts = useQuery({ queryKey: ['moderation-recruit', filter], queryFn: () => base44.entities.RecruitPost.filter(filter === 'all' ? {} : { moderation_status: filter }, '-created_date', 100) });
   const save = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.RecruitPost.update(id, { moderation_status: status }),
+    mutationFn: /** @param {import('@/shared/types/interactionTypes').ModerationChange} change */ ({ id, status }) => base44.entities.RecruitPost.update(id, { moderation_status: status }),
     onSuccess: async (updated, { id }) => {
       // Do not render an old approved snapshot while the follow-up request is pending.
       client.setQueriesData({ queryKey: ['recruit-posts'] }, old => old?.filter(post => post.id !== id));

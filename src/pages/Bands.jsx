@@ -32,7 +32,7 @@ export default function Bands() {
   });
 
   const createBand = useMutation({
-    mutationFn: async (data) => {
+    mutationFn: /** @param {import('@/shared/types/interactionTypes').BandCreateInput} data */ async (data) => {
       const band = await base44.entities.Band.create({
         ...data,
         looking_for: data.looking_for ? data.looking_for.split(',').map(s => s.trim()).filter(Boolean) : [],

@@ -102,7 +102,7 @@ export default function CreatePostModal({ currentUser, onClose }) {
         onClose();
       }
     },
-    onError: (err) => {
+    onError: /** @param {import('@/shared/types/interactionTypes').RequestError} err */ (err) => {
       const code = err.response?.data?.error || err.message;
       setBlockedMsg(code === 'CONTACT' || code.startsWith('CONTACT:') ? copy.contact
         : code === 'MODERATION' ? copy.blocked : copy.failed);

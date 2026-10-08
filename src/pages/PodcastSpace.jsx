@@ -27,7 +27,7 @@ export default function PodcastSpace() {
   });
 
   const addEpisode = useMutation({
-    mutationFn: (data) => base44.entities.Podcast.create({ ...data, host_email: currentUser?.email || '' }),
+    mutationFn: /** @param {import('@/shared/types/interactionTypes').PodcastDraft} data */ (data) => base44.entities.Podcast.create({ ...data, host_email: currentUser?.email || '' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['podcasts'] });
       setAddOpen(false);

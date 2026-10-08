@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 export const getWeekKey = () => {
   const d = new Date();
   const startOfYear = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil(((d - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+  const week = Math.ceil(((d.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7);
   return `${d.getFullYear()}-W${String(week).padStart(2, '0')}`;
 };
 

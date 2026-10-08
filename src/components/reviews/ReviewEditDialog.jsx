@@ -9,9 +9,10 @@ export default function ReviewEditDialog({ review, onClose }) {
   const { lang } = useLang();
   const copy = editCopy(lang);
   const save = useSaveReviewEdit({ review, draft, onSuccess: onClose });
+  const error = /** @type {import('@/shared/types/interactionTypes').RequestError | null} */ (save.error);
   return createPortal(<div className="fixed inset-0 z-[300] flex items-center justify-center bg-foreground/40 p-3" onClick={e => e.stopPropagation()} onKeyDown={e => { e.stopPropagation(); if (e.key === 'Escape' && !save.isPending) onClose(); }}>
     <section role="dialog" aria-modal="true" aria-labelledby="review-edit-title" className="w-full max-w-2xl max-h-[90dvh] overflow-y-auto rounded-xl border bg-card text-card-foreground shadow-xl p-5">
-      {save.error && <p role="alert" className="text-destructive text-sm mb-3">{save.error.response?.status === 409 ? copy.conflict : copy.failed} {save.error.response?.data?.error !== 'conflict' && save.error.response?.data?.error}</p>}
+      {save.error && <p role="alert" className="text-destructive text-sm mb-3">{error.response?.status === 409 ? copy.conflict : copy.failed} {error.response?.data?.error !== 'conflict' && error.response?.data?.error}</p>}
       <h2 id="review-edit-title" className="text-lg font-semibold mb-4">{copy.edit}</h2>
       <form onSubmit={e => { e.preventDefault(); save.mutate(); }}>
         <fieldset disabled={save.isPending} className="min-w-0"><ReviewEditFields draft={draft} setDraft={setDraft} kind={review.kind} copy={copy} /></fieldset>

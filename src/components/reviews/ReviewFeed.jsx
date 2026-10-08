@@ -8,6 +8,7 @@ import boardCopy from '@/components/reviews/boardCopy';
 // Paper grid of review cards — square cover, ochre artist tag, black serif
 // title, rating as a plain number. The genre chip below each card jumps into
 // that genre's space.
+/** @param {{ reviews: Array<{ id: string, album_id?: string, album_cover_url?: string, album_title?: string, album_artist?: string, title?: string, content?: string, rating?: number, reviewer_name?: string, genre?: string }>, onOpen: (id: string) => void, title?: React.ReactNode, hint?: React.ReactNode, accent?: string, text?: string }} props */
 export default function ReviewFeed({ reviews, onOpen, title, hint }) {
   const { lang } = useLang();
   const { gLabel } = useGenreText();
