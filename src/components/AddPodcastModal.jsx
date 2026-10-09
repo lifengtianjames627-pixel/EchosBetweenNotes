@@ -1,77 +1,37 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useState } from 'react';
+import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { PODCAST_CATEGORIES } from '@/lib/podcastConfig';
-
+import { useLang } from '@/i18n/LanguageContext';
+import podcastCopy from '@/features/podcasts/i18n/podcastCopy';
+import useLocalAudio from '@/features/podcasts/queries/useLocalAudio';
+import PodcastFields from '@/features/podcasts/components/PodcastFields';
+import PodcastAudioInput from '@/features/podcasts/components/PodcastAudioInput';
+/** @param {{ defaultCategory: string, onClose: () => void, onSubmit: (data: import('@/features/podcasts/model/podcastTypes').PodcastFields & { file: File, duration_minutes: number }) => Promise<unknown>, isPending: boolean }} props */
 export default function AddPodcastModal({ defaultCategory, onClose, onSubmit, isPending }) {
-  const [data, setData] = useState({
-    title: '', host_name: '', category: defaultCategory || PODCAST_CATEGORIES[0].id,
-    description: '', cover_url: '', audio_url: '', duration_minutes: '',
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({ ...data, duration_minutes: data.duration_minutes ? Number(data.duration_minutes) : undefined });
+  const { lang } = useLang(), copy = podcastCopy(lang), audio = useLocalAudio(copy);
+  const [data, setData] = useState({ title: '', host_name: '', category: defaultCategory || PODCAST_CATEGORIES[0].id, description: '', cover_url: '' });
+  const [error, setError] = useState('');
+  const opener = useRef(/** @type {HTMLElement | null} */ (document.activeElement));
+  const submit = async event => {
+    event.preventDefault(); if (!audio.ready || !audio.file || isPending) return;
+    setError('');
+    try { await onSubmit({ ...data, file: audio.file, duration_minutes: audio.minutes }); }
+    catch { setError(copy.failed); }
   };
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{ background: 'rgba(0,0,0,0.75)' }}
-      onClick={onClose}
-    >
-      <motion.form
-        onSubmit={handleSubmit}
-        initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 30 }}
-        className="w-full max-w-md rounded-2xl p-6 space-y-3"
-        style={{ background: 'rgba(10,12,30,0.98)', border: '1px solid rgba(124,111,255,0.25)' }}
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-1">
-          <p className="font-semibold text-base" style={{ color: 'rgba(220,225,255,0.9)' }}>Submit an Episode</p>
-          <button type="button" onClick={onClose} style={{ color: 'rgba(140,155,210,0.6)' }}><X className="w-5 h-5" /></button>
-        </div>
-
-        <input required className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
-          placeholder="Episode title" value={data.title} onChange={e => setData({ ...data, title: e.target.value })} />
-
-        <input required className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
-          placeholder="Host / creator name" value={data.host_name} onChange={e => setData({ ...data, host_name: e.target.value })} />
-
-        <select className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
-          value={data.category} onChange={e => setData({ ...data, category: e.target.value })}>
-          {PODCAST_CATEGORIES.map(c => <option key={c.id} value={c.id} style={{ color: '#000' }}>{c.label}</option>)}
-        </select>
-
-        <textarea rows={2} className="w-full px-4 py-2.5 rounded-xl text-sm outline-none resize-none"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
-          placeholder="Short description" value={data.description} onChange={e => setData({ ...data, description: e.target.value })} />
-
-        <input className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
-          placeholder="Cover image URL (optional)" value={data.cover_url} onChange={e => setData({ ...data, cover_url: e.target.value })} />
-
-        <input required className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
-          placeholder="Audio link (URL)" value={data.audio_url} onChange={e => setData({ ...data, audio_url: e.target.value })} />
-
-        <input type="number" min="1" className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,111,255,0.2)', color: 'rgba(220,225,255,0.9)' }}
-          placeholder="Duration in minutes (optional)" value={data.duration_minutes} onChange={e => setData({ ...data, duration_minutes: e.target.value })} />
-
-        <div className="flex gap-3 pt-1">
-          <button type="submit" disabled={isPending}
-            className="flex-1 py-2.5 rounded-xl text-sm font-semibold"
-            style={{ background: 'rgba(124,111,255,0.2)', color: '#a5b4fc', border: '1px solid rgba(124,111,255,0.3)', opacity: isPending ? 0.6 : 1 }}>
-            {isPending ? 'Submitting…' : 'Submit Episode'}
-          </button>
-          <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl text-sm" style={{ color: 'rgba(140,155,210,0.5)' }}>Cancel</button>
-        </div>
-      </motion.form>
-    </motion.div>
-  );
+  return <Dialog.Root open onOpenChange={open => { if (!open && !isPending) onClose(); }}><Dialog.Portal>
+    <Dialog.Overlay className="fixed inset-0 z-[300] bg-foreground/40" />
+    <Dialog.Content className="pointer-events-auto fixed left-1/2 top-1/2 z-[310] max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto border bg-card p-5 text-card-foreground shadow-xl sm:p-7" onCloseAutoFocus={event => { event.preventDefault(); if (opener.current?.isConnected) opener.current.focus(); }}>
+      <Dialog.Title className="pr-8 font-playfair text-2xl italic">{copy.upload}</Dialog.Title>
+      <Dialog.Description className="mb-5 mt-3 text-xs leading-relaxed text-muted-foreground">{copy.privacy}</Dialog.Description>
+      <Dialog.Close disabled={isPending} aria-label={copy.close} className="absolute right-4 top-4 p-1 text-muted-foreground disabled:opacity-50"><X className="h-5 w-5" /></Dialog.Close>
+      <form onSubmit={submit} className="space-y-4">
+        <PodcastFields data={data} setData={setData} copy={copy} busy={isPending} />
+        <PodcastAudioInput audio={audio} copy={copy} busy={isPending} />
+        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+        {isPending && <p role="status" className="text-xs text-muted-foreground">{copy.saving}</p>}
+        <div className="flex flex-wrap gap-3 border-t pt-4"><button type="submit" disabled={isPending || !audio.ready || !data.title.trim() || !data.host_name.trim()} className="flex-1 bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-40">{isPending ? copy.saving : copy.save}</button><button type="button" disabled={isPending} onClick={onClose} className="border px-4 py-3 text-sm disabled:opacity-40">{copy.cancel}</button></div>
+      </form>
+    </Dialog.Content>
+  </Dialog.Portal></Dialog.Root>;
 }

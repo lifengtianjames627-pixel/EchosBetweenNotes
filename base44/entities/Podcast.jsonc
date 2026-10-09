@@ -1,6 +1,24 @@
 {
   "name": "Podcast",
   "type": "object",
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
   "properties": {
     "title": {
       "type": "string",
@@ -12,7 +30,7 @@
     },
     "host_email": {
       "type": "string",
-      "description": "Email of the member who submitted the episode \u2014 makes the host name clickable to open a private chat"
+      "description": "Host identity for existing in-app contact"
     },
     "category": {
       "type": "string",
@@ -23,24 +41,27 @@
         "live_scene_chronicle",
         "independent_creator",
         "behind_the_lyrics"
-      ],
-      "description": "Type of podcast episode"
+      ]
     },
     "description": {
       "type": "string",
-      "description": "Short episode summary"
+      "description": "Episode summary"
     },
     "cover_url": {
       "type": "string",
-      "description": "Episode cover art URL"
+      "description": "Optional episode artwork; defaults to series cover"
     },
     "audio_url": {
       "type": "string",
-      "description": "Link to the audio file/episode"
+      "description": "Legacy audio URL; new uploads never populate this field"
+    },
+    "audio_asset_id": {
+      "type": "string",
+      "description": "Private PodcastAudioAsset reference, not a storage URI or signed link"
     },
     "duration_minutes": {
       "type": "number",
-      "description": "Episode length in minutes"
+      "description": "Episode duration in minutes"
     }
   },
   "required": [
