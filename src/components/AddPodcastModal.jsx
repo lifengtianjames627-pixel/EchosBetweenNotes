@@ -9,14 +9,17 @@ import PodcastFields from '@/features/podcasts/components/PodcastFields';
 import PodcastAudioInput from '@/features/podcasts/components/PodcastAudioInput';
 import PodcastCoverInput from '@/features/podcasts/components/PodcastCoverInput';
 import useLocalCover from '@/features/podcasts/queries/useLocalCover';
-/** @param {{ defaultCategory: string, onClose: () => void, onSubmit: (data: import('@/features/podcasts/model/podcastTypes').PodcastFields & { file: File, duration_minutes: number }) => Promise<unknown>, isPending: boolean }} props */
-export default function AddPodcastModal({ defaultCategory, onClose, onSubmit, isPending }) {
+import useR2UploadConfiguration from '@/features/podcasts/queries/useR2UploadConfiguration';
+import R2UploadSetup from '@/features/podcasts/components/R2UploadSetup';
+/** @param {{ defaultCategory: string, onClose: () => void, onSubmit: (data: import('@/features/podcasts/model/podcastTypes').PodcastFields & { file: File, duration_minutes: number }) => Promise<unknown>, isPending: boolean, progress?: number }} props */
+export default function AddPodcastModal({ defaultCategory, onClose, onSubmit, isPending, progress = 0 }) {
   const { lang } = useLang(), copy = podcastCopy(lang), audio = useLocalAudio(copy), cover = useLocalCover(copy);
   const [data, setData] = useState({ title: '', host_name: '', category: defaultCategory || PODCAST_CATEGORIES[0].id, description: '' });
   const [error, setError] = useState('');
+  const setup = useR2UploadConfiguration();
   const opener = useRef(/** @type {HTMLElement | null} */ (document.activeElement));
   const submit = async event => {
-    event.preventDefault(); if (!audio.ready || !audio.file || !cover.ready || isPending) return;
+    event.preventDefault(); if (!audio.ready || !audio.file || !cover.ready || !setup.data?.connection_ok || isPending) return;
     setError('');
     try { await onSubmit({ ...data, file: audio.file, duration_minutes: audio.minutes, ...(cover.file ? { cover_file: cover.file } : {}) }); }
     catch { setError(copy.failed); }
@@ -28,12 +31,13 @@ export default function AddPodcastModal({ defaultCategory, onClose, onSubmit, is
       <Dialog.Description className="mb-5 mt-3 text-xs leading-relaxed text-muted-foreground">{copy.privacy}</Dialog.Description>
       <Dialog.Close disabled={isPending} aria-label={copy.close} className="absolute right-4 top-4 p-1 text-muted-foreground disabled:opacity-50"><X className="h-5 w-5" /></Dialog.Close>
       <form onSubmit={submit} className="space-y-4">
+        <R2UploadSetup setup={setup} copy={copy} />
         <PodcastFields data={data} setData={setData} copy={copy} busy={isPending} />
         <PodcastCoverInput cover={cover} copy={copy} busy={isPending} />
         <PodcastAudioInput audio={audio} copy={copy} busy={isPending} />
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-        {isPending && <p role="status" className="text-xs text-muted-foreground">{copy.saving}</p>}
-        <div className="flex flex-wrap gap-3 border-t pt-4"><button type="submit" disabled={isPending || !audio.ready || !cover.ready || !data.title.trim() || !data.host_name.trim()} className="flex-1 bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-40">{isPending ? copy.saving : copy.save}</button><button type="button" disabled={isPending} onClick={onClose} className="border px-4 py-3 text-sm disabled:opacity-40">{copy.cancel}</button></div>
+        {isPending && <p role="status" className="text-xs text-muted-foreground">{copy.saving} {progress}%</p>}
+        <div className="flex flex-wrap gap-3 border-t pt-4"><button type="submit" disabled={isPending || !setup.data?.connection_ok || !audio.ready || !cover.ready || !data.title.trim() || !data.host_name.trim()} className="flex-1 bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-40">{isPending ? copy.saving : copy.save}</button><button type="button" disabled={isPending} onClick={onClose} className="border px-4 py-3 text-sm disabled:opacity-40">{copy.cancel}</button></div>
       </form>
     </Dialog.Content>
   </Dialog.Portal></Dialog.Root>;

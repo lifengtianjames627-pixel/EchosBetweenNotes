@@ -1,46 +1,51 @@
 {
-  "name": "PodcastAudioAsset",
+  "name": "PodcastUploadSession",
   "type": "object",
   "properties": {
     "owner_id": {
       "type": "string"
     },
-    "file_uri": {
+    "object_key": {
+      "type": "string"
+    },
+    "upload_id": {
       "type": "string"
     },
     "file_name": {
       "type": "string"
     },
-    "content_type": {
-      "type": "string"
-    },
     "size_bytes": {
       "type": "number"
     },
-    "storage_provider": {
+    "content_type": {
+      "type": "string"
+    },
+    "status": {
       "type": "string",
       "enum": [
-        "base44",
-        "r2"
-      ],
-      "default": "base44"
+        "uploading",
+        "completed",
+        "published",
+        "aborted"
+      ]
     },
-    "r2_object_key": {
+    "expires_at": {
       "type": "string",
-      "description": "Private R2 object identifier; returned to neither shared episode metadata nor public clients"
+      "format": "date-time"
     },
-    "cover_file_uri": {
-      "type": "string",
-      "description": "Optional private artwork attached to this episode audio asset; never copied to the shared Podcast record"
-    },
-    "cover_file_name": {
+    "podcast_id": {
       "type": "string"
     }
   },
   "required": [
     "owner_id",
-    "file_uri",
-    "file_name"
+    "object_key",
+    "upload_id",
+    "file_name",
+    "size_bytes",
+    "content_type",
+    "status",
+    "expires_at"
   ],
   "rls": {
     "read": {

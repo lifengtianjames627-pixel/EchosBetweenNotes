@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
+import { signedR2Url } from '../../shared/r2Storage.ts';
 
 export default async function(req) {
   try {
@@ -15,6 +16,10 @@ export default async function(req) {
     // Only the asset referenced by a readable episode is accessible. Never accept file URIs from callers.
     const assets = await base44.asServiceRole.entities.PodcastAudioAsset.filter({ id: episode.audio_asset_id }, { limit: 1 });
     const asset = assets.items[0];
+    if (kind === 'audio' && asset?.storage_provider === 'r2') {
+      if (!/^podcasts\/[a-f0-9-]{36}\.(wav|mp3|m4a|aac|ogg|opus|flac|webm)$/.test(asset.r2_object_key || '')) return Response.json({ error: 'Not found' }, { status: 404 });
+      return Response.json({ signed_url: await signedR2Url('GET', asset.r2_object_key, {}, '', 3600), expires_in: 3600 });
+    }
     const fileUri = kind === 'cover' ? asset?.cover_file_uri : asset?.file_uri;
     if (!fileUri) return Response.json({ error: 'Not found' }, { status: 404 });
     const { signed_url } = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({ file_uri: fileUri, expires_in: 3600 });

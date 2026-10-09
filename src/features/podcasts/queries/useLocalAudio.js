@@ -7,7 +7,7 @@ export default function useLocalAudio(copy) {
   const select = selected => {
     setReady(false); setMinutes(0); setError(''); setFile(null);
     if (!selected) return;
-    if (!/\.(wav|mp3|m4a|aac|ogg|opus|flac|webm)$/i.test(selected.name) || !selected.size || selected.size > 50 * 1024 * 1024) { setError(copy.invalid); return; }
+    if (!/\.(wav|mp3|m4a|aac|ogg|opus|flac|webm)$/i.test(selected.name) || !selected.size || selected.size > 1024 * 1024 * 1024) { setError(copy.invalid); return; }
     setFile(selected);
   };
   const loaded = audio => { if (Number.isFinite(audio.duration) && audio.duration > 0) { setReady(true); setMinutes(audio.duration / 60); } else setError(copy.unsupported); };

@@ -22,6 +22,6 @@ export default function PodcastSpace() {
     <PodcastSeriesHeader category={category} isAdmin={user?.role === 'admin'} onAdd={() => setAddOpen(true)} />
     {episodes.isLoading ? <p role="status" className="py-12 text-center text-muted-foreground">{copy.loading}</p> : episodes.isError ? <button onClick={() => episodes.refetch()} className="text-accent underline">{copy.retry}</button> : items.length === 0 ? <div className="flex flex-col items-center border border-dashed bg-card py-14 text-muted-foreground"><Headphones className="mb-3 h-7 w-7 text-accent" /><p className="font-playfair text-lg italic">{copy.empty}</p></div> : <div className="space-y-4">{items.map(episode => <PodcastEpisodeCard key={episode.id} episode={episode} />)}</div>}
     {episodes.hasNextPage && <button disabled={episodes.isFetchingNextPage} onClick={() => episodes.fetchNextPage()} className="mt-6 border bg-card px-5 py-2 text-sm disabled:opacity-50">{episodes.isFetchingNextPage ? copy.loading : copy.more}</button>}
-    {addOpen && user?.role === 'admin' && <AddPodcastModal defaultCategory={category.id} onClose={() => setAddOpen(false)} onSubmit={data => publish.mutateAsync(data)} isPending={publish.isPending} />}
+    {addOpen && user?.role === 'admin' && <AddPodcastModal defaultCategory={category.id} onClose={() => setAddOpen(false)} onSubmit={data => publish.mutateAsync(data)} isPending={publish.isPending} progress={publish.progress} />}
   </div></div>;
 }
