@@ -16,6 +16,13 @@
     },
     "size_bytes": {
       "type": "number"
+    },
+    "cover_file_uri": {
+      "type": "string",
+      "description": "Optional private artwork attached to this episode audio asset; never copied to the shared Podcast record"
+    },
+    "cover_file_name": {
+      "type": "string"
     }
   },
   "required": [

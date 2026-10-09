@@ -10,6 +10,6 @@ export default function PodcastFields({ data, setData, copy, busy }) {
     <label className="block text-xs font-semibold">{copy.host}<input name="host_name" required maxLength={120} className={inputClass} value={data.host_name} onChange={e => setData({ ...data, host_name: e.target.value })} /></label>
     <label className="block text-xs font-semibold">{copy.category}<select name="category" className={inputClass} value={data.category} onChange={e => setData({ ...data, category: e.target.value })}>{PODCAST_CATEGORIES.map(c => <option key={c.id} value={c.id}>{t(`pod.cat.${c.id}.label`)}</option>)}</select></label>
     <label className="block text-xs font-semibold">{copy.description}<textarea name="description" rows={3} maxLength={5000} className={inputClass} value={data.description} onChange={e => setData({ ...data, description: e.target.value })} /></label>
-    <label className="block text-xs font-semibold">{copy.cover}<input name="cover_url" type="url" pattern="https://.*" className={inputClass} value={data.cover_url} onChange={e => setData({ ...data, cover_url: e.target.value })} /></label>
+
   </fieldset>;
 }

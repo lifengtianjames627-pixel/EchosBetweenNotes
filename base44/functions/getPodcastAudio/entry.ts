@@ -6,7 +6,8 @@ export default async function(req) {
     if (!(await base44.auth.isAuthenticated())) return Response.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await base44.auth.me();
     if (!user?.id) return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    const { podcast_id } = await req.json();
+    const { podcast_id, kind = 'audio' } = await req.json();
+    if (!['audio', 'cover'].includes(kind)) return Response.json({ error: 'INVALID_ASSET_KIND' }, { status: 400 });
     if (typeof podcast_id !== 'string' || !podcast_id.trim() || podcast_id.length > 100) return Response.json({ error: 'INVALID_PODCAST' }, { status: 400 });
     const page = await base44.entities.Podcast.filter({ id: podcast_id }, { limit: 1 });
     const episode = page.items[0];
@@ -14,8 +15,9 @@ export default async function(req) {
     // Only the asset referenced by a readable episode is accessible. Never accept file URIs from callers.
     const assets = await base44.asServiceRole.entities.PodcastAudioAsset.filter({ id: episode.audio_asset_id }, { limit: 1 });
     const asset = assets.items[0];
-    if (!asset) return Response.json({ error: 'Not found' }, { status: 404 });
-    const { signed_url } = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({ file_uri: asset.file_uri, expires_in: 3600 });
+    const fileUri = kind === 'cover' ? asset?.cover_file_uri : asset?.file_uri;
+    if (!fileUri) return Response.json({ error: 'Not found' }, { status: 404 });
+    const { signed_url } = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({ file_uri: fileUri, expires_in: 3600 });
     return Response.json({ signed_url, expires_in: 3600 });
   } catch (error) { return Response.json({ error: error.message }, { status: 500 }); }
 }

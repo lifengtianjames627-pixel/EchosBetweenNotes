@@ -49,7 +49,12 @@
     },
     "cover_url": {
       "type": "string",
-      "description": "Optional episode artwork; defaults to series cover"
+      "description": "Legacy episode artwork URL; new covers are uploaded privately"
+    },
+    "has_uploaded_cover": {
+      "type": "boolean",
+      "default": false,
+      "description": "Artwork lives in the referenced private audio asset; shared metadata contains no file URI"
     },
     "audio_url": {
       "type": "string",

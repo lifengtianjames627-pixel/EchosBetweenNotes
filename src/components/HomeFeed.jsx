@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Sparkles, PenLine, Headphones, ArrowRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import CoverImage from '@/components/music/CoverImage';
+import PodcastCoverImage from '@/features/podcasts/components/PodcastCoverImage';
 import FeedQueryState from '@/components/reviews/FeedQueryState';
 
 // Compact review tile for the home feed. When a personal AI reason exists it
@@ -39,8 +40,8 @@ function PodcastTile({ pod }) {
     <Link to="/podcasts" className="group block p-4 transition-colors hover:bg-[#f5f0e3]" style={{ background: '#faf8f2', border: '1px solid #e6ddc9' }}>
       <div className="flex gap-3">
         <div className="w-14 h-14 shrink-0 overflow-hidden flex items-center justify-center" style={{ background: '#e6ddc9' }}>
-          {pod.cover_url ? (
-            <img src={pod.cover_url} alt={pod.title} className="w-full h-full object-cover" />
+          {pod.cover_url || pod.has_uploaded_cover ? (
+            <PodcastCoverImage episode={pod} alt={pod.title} className="w-full h-full object-cover" />
           ) : (
             <Headphones className="w-5 h-5" style={{ color: '#8a7e6f' }} />
           )}
