@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { X, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '@/api/appClient';
+import { base44 } from '@/api/base44Client';
 import ReviewActions from '@/components/ReviewActions';
 import CommentSection from '@/components/CommentSection';
 import { openPrivateChat } from '@/shared/chat/openPrivateChat';
@@ -38,7 +38,7 @@ export default function ReviewDetailModal({ review: seed, onClose }) {
   const copy = boardCopy(lang);
   const { data: currentUser } = useQuery({
     queryKey: ['me'],
-    queryFn: () => apiClient.auth.me(),
+    queryFn: () => base44.auth.me(),
   });
 
   if (!review) return null;
