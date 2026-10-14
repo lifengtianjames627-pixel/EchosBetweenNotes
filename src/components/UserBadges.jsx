@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { apiClient } from '@/api/appClient';
+import { base44 } from '@/api/base44Client';
 import { useQueryClient } from '@tanstack/react-query';
 import BadgeIcon from '@/components/BadgeIcon';
 import { BADGES, BADGE_CATEGORIES } from '@/lib/badgeConfig';
@@ -20,7 +20,7 @@ export default function UserBadges({ user, earnedBadgeIds }) {
       next = [...localEquipped, badgeId];
     }
     setLocalEquipped(next);
-    await apiClient.auth.updateMe({ equipped_badges: next });
+    await base44.auth.updateMe({ equipped_badges: next });
     queryClient.invalidateQueries({ queryKey: ['me'] });
   };
 

@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { apiClient } from '@/api/appClient';
+import { base44 } from '@/api/base44Client';
 
 // Bell in the top bar with an unread count badge. Lists system notifications
 // (likes, follows, badges, friend requests). Direct messages live on the
@@ -16,7 +16,7 @@ export default function NotificationBell() {
 
   const { data } = useQuery({
     queryKey: ['notifications'],
-    queryFn: () => apiClient.functions.invoke('notifications', { action: 'list' }).then(r => r.data),
+    queryFn: () => base44.functions.invoke('notifications', { action: 'list' }).then(r => r.data),
     refetchInterval: 30000,
   });
   const items = data?.items || [];
@@ -29,13 +29,13 @@ export default function NotificationBell() {
   }, []);
 
   const markAll = async () => {
-    await apiClient.functions.invoke('notifications', { action: 'markAll' });
+    await base44.functions.invoke('notifications', { action: 'markAll' });
     qc.invalidateQueries({ queryKey: ['notifications'] });
   };
 
   const openItem = async (n) => {
     if (!n.read) {
-      await apiClient.functions.invoke('notifications', { action: 'markRead', id: n.id });
+      await base44.functions.invoke('notifications', { action: 'markRead', id: n.id });
       qc.invalidateQueries({ queryKey: ['notifications'] });
     }
     setOpen(false);

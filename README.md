@@ -1,72 +1,39 @@
-# Echoes Between Notes
+**Welcome to your Base44 project** 
 
-This is a React + Vite frontend that talks to a generic HTTP API (no Base44 SDK or Base44 Vite plugin required).
+**About**
 
-## Local development
+View and Edit  your app on [Base44.com](http://Base44.com) 
 
-### Prerequisites
+This project contains everything you need to run your app locally.
 
-- Node.js 20+
-- npm 10+
+**Edit the code in your local development environment**
 
-### Setup
+Any change pushed to the repo will also be reflected in the Base44 Builder.
 
-```bash
-npm install
-cp .env.example .env.local
-npm run dev
+**Prerequisites:** 
+
+1. Clone the repository using the project's Git URL 
+2. Navigate to the project directory
+3. Install dependencies: `npm install`
+4. Create an `.env.local` file and set the right environment variables
+
+```
+VITE_BASE44_APP_ID=your_app_id
+VITE_BASE44_APP_BASE_URL=your_backend_url
+
+e.g.
+VITE_BASE44_APP_ID=cbef744a8545c389ef439ea6
+VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
 ```
 
-## Environment variables
+Run the app: `npm run dev`
 
-Create `.env.local` (or set these in your hosting provider):
+**Publish your changes**
 
-```bash
-# Public app identifier used by optional app-level endpoints
-VITE_APP_ID=your_app_id
+Open [Base44.com](http://Base44.com) and click on Publish.
 
-# API origin. Leave empty to use same-origin /api.
-VITE_API_BASE_URL=https://api.your-domain.com
+**Docs & Support**
 
-# Login path or URL used for auth redirects.
-VITE_LOGIN_URL=/login
-```
+Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
 
-## Scripts
-
-- `npm run dev` — start Vite dev server
-- `npm run build` — production build
-- `npm run preview` — local preview of built assets
-- `npm run start` — preview server bound to `0.0.0.0` (useful on hosting VMs)
-- `npm run lint` — lint check
-- `npm run typecheck` — TypeScript/JS type checking
-
-## Deploying to a hosting server
-
-### Option A: static hosting + separate API
-
-1. Build assets:
-   ```bash
-   npm ci
-   npm run build
-   ```
-2. Upload `dist/` to your static host.
-3. Configure SPA fallback so every route resolves to `index.html`.
-4. Set `VITE_API_BASE_URL` to your API origin at build time.
-
-### Option B: run directly on a VM
-
-```bash
-npm ci
-npm run build
-PORT=4173 npm run start
-```
-
-Put a reverse proxy (nginx/caddy) in front and route `/api` to your backend service.
-
-## Notes
-
-- Frontend routes require SPA fallback (`try_files ... /index.html`).
-- Auth/session endpoints expected by the app are under `/api/auth/*`.
-- Function calls are expected under `/api/functions/:name`.
-- Entity CRUD endpoints are expected under `/api/entities/:entityName`.
+Support: [https://app.base44.com/support](https://app.base44.com/support)

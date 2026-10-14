@@ -1,4 +1,4 @@
-import { apiClient } from '@/api/appClient';
+import { base44 } from '@/api/base44Client';
 
 // Downloads an externally-hosted cover image (iTunes/MusicBrainz/NetEase/Last.fm)
 // and re-uploads it to our own storage, so future page loads read a fast,
@@ -9,7 +9,7 @@ import { apiClient } from '@/api/appClient';
 export async function storeCoverImage(externalUrl) {
   if (!externalUrl) return null;
   try {
-    const res = await apiClient.functions.invoke('storeCoverImage', { imageUrl: externalUrl });
+    const res = await base44.functions.invoke('storeCoverImage', { imageUrl: externalUrl });
     return res.data?.file_url || externalUrl;
   } catch {
     return externalUrl;

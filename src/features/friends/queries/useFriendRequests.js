@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/api/appClient';
+import { base44 } from '@/api/base44Client';
 import { listFriendRequests, saveFriendRequest } from '@/features/friends/api/friendRequests';
 
 export default function useFriendRequests(email, peer) {
@@ -12,7 +12,7 @@ export default function useFriendRequests(email, peer) {
   });
   useEffect(() => {
     if (!email) return;
-    return apiClient.entities.FriendRequest.subscribe(() => {
+    return base44.entities.FriendRequest.subscribe(() => {
       client.invalidateQueries({ queryKey: ['friend-requests', email] });
     });
   }, [email, client]);

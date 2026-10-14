@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { MapPin, MessageCircle, ArrowRight } from 'lucide-react';
-import { apiClient } from '@/api/appClient';
+import { base44 } from '@/api/base44Client';
 import { useLang } from '@/i18n/LanguageContext';
 import { useAuthed } from '@/shared/identity';
 import { publicName } from '@/shared/identity';
@@ -21,7 +21,7 @@ export default function PeopleAroundYou() {
 
   const { data: user } = useQuery({
     queryKey: ['me'],
-    queryFn: () => apiClient.auth.me(),
+    queryFn: () => base44.auth.me(),
     enabled: authed,
   });
 
